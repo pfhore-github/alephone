@@ -77,7 +77,7 @@ typedef struct builtin_font
 	unsigned int size;
 } builtin_font_t;
 
-static builtin_font_t builtin_fontspecs[] = {};
+static builtin_font_t builtin_fontspecs[1] = {};
 
 #define NUMBER_OF_BUILTIN_FONTS sizeof(builtin_fontspecs) / sizeof(builtin_font)
 
