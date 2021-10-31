@@ -739,6 +739,9 @@
     <ClCompile Include="Network\PortForward.cpp">
       <Filter>Network\Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="CSeries\converter.cpp">
+      <Filter>CSeries\Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CSeries\BStream.h">
@@ -1436,6 +1439,9 @@
     </ClInclude>
     <ClInclude Include="Network\PortForward.h">
       <Filter>Network\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CSeries\converter.h">
+      <Filter>CSeries\Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

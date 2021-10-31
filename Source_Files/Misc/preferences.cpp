@@ -1168,6 +1168,24 @@ std::vector<std::string> build_resolution_labels()
 	return result;
 }
 
+class w_fov_slider : public w_slider
+{
+public:
+	w_fov_slider(int sel) : w_slider(101, sel)
+	{
+		init_formatted_value();
+	}
+
+	virtual std::string formatted_value(void)
+	{
+		std::ostringstream oss;
+		oss << (selection + 30);
+		return oss.str();
+	}
+};
+
+extern float View_FOV_Normal();
+
 static void graphics_dialog(void *arg)
 {
 	dialog *parent = (dialog *)arg;
@@ -1181,6 +1199,7 @@ static void graphics_dialog(void *arg)
 
 	table_placer *table = new table_placer(2, get_theme_space(ITEM_WIDGET), true);
 	table->col_flags(0, placeable::kAlignRight);
+	table->col_flags(1, placeable::kAlignLeft);
 
 	w_select *renderer_w = new w_select(graphics_preferences->screen_mode.acceleration, renderer_labels);
 	renderer_w->set_identifier(iRENDERING_SYSTEM);
@@ -1191,6 +1210,8 @@ static void graphics_dialog(void *arg)
 	table->dual_add(renderer_w->label("レンダリングシステム"), d);
 	table->dual_add(renderer_w, d);
 
+	table->add_row(new w_spacer(), true);
+
 	w_select_popup *size_w = new w_select_popup();
 	size_w->set_labels(build_resolution_labels());
 	if (graphics_preferences->screen_mode.auto_resolution)
@@ -1200,6 +1221,10 @@ static void graphics_dialog(void *arg)
 	table->dual_add(size_w->label("画面の大きさ"), d);
 	table->dual_add(size_w, d);
 
+	w_toggle *fullscreen_w = new w_toggle(!graphics_preferences->screen_mode.fullscreen);
+	table->dual_add(fullscreen_w->label("ウィンドウモード"), d);
+	table->dual_add(fullscreen_w, d);
+
 	w_toggle *high_dpi_w = NULL;
 	high_dpi_w = new w_toggle(graphics_preferences->screen_mode.high_dpi);
 #if (defined(__APPLE__) && defined(__MACH__))
@@ -1207,14 +1232,6 @@ static void graphics_dialog(void *arg)
 	table->dual_add(high_dpi_w->label("高DPIを使う"), d);
 	table->dual_add(high_dpi_w, d);
 #endif
-
-	w_toggle *fixh_w = new w_toggle(!graphics_preferences->screen_mode.fix_h_not_v);
-	table->dual_add(fixh_w->label("垂直視野を制限"), d);
-	table->dual_add(fixh_w, d);
-
-	w_toggle *bob_w = new w_toggle(graphics_preferences->screen_mode.camera_bob);
-	table->dual_add(bob_w->label("カメラ振動"), d);
-	table->dual_add(bob_w, d);
 
 	w_select_popup *gamma_w = new w_select_popup();
 	gamma_w->set_labels(build_stringvector_from_cstring_array(gamma_labels));
@@ -1235,9 +1252,40 @@ static void graphics_dialog(void *arg)
 
 	table->add_row(new w_spacer(), true);
 
-	w_toggle *fullscreen_w = new w_toggle(!graphics_preferences->screen_mode.fullscreen);
-	table->dual_add(fullscreen_w->label("ウィンドウモード"), d);
-	table->dual_add(fullscreen_w, d);
+	w_toggle *fixh_w = new w_toggle(!graphics_preferences->screen_mode.fix_h_not_v);
+	table->dual_add(fixh_w->label("垂直視野を制限"), d);
+	table->dual_add(fixh_w, d);
+
+	w_toggle *override_fov_w = new w_toggle(graphics_preferences->screen_mode.fov != 0);
+	w_fov_slider *fov_slider_w = new w_fov_slider((graphics_preferences->screen_mode.fov == 0 ? static_cast<int>(View_FOV_Normal()) : graphics_preferences->screen_mode.fov) - 30);
+	fov_slider_w->set_enabled(graphics_preferences->screen_mode.fov != 0);
+	override_fov_w->set_selection_changed_callback(
+		[&](w_select *)
+		{
+			if (override_fov_w->get_selection())
+			{
+				fov_slider_w->set_enabled(true);
+			}
+			else
+			{
+				fov_slider_w->set_enabled(false);
+			}
+		});
+
+	table->dual_add(override_fov_w->label("FOVを上書き*"), d);
+	auto fov_placer = new horizontal_placer(get_theme_space(ITEM_WIDGET));
+	fov_placer->dual_add(override_fov_w, d);
+	fov_placer->dual_add(fov_slider_w, d);
+
+	table->add(fov_placer);
+
+	table->dual_add_row(new w_static_text("*サードパーティのシナリオの効果と干渉するかもしれません"), d);
+
+	table->add_row(new w_spacer(), true);
+
+	w_toggle *bob_w = new w_toggle(graphics_preferences->screen_mode.camera_bob);
+	table->dual_add(bob_w->label("カメラ振動"), d);
+	table->dual_add(bob_w, d);
 
 	table->add_row(new w_spacer(), true);
 	table->dual_add_row(new w_static_text("ヘッドアップディスプレイ(HUD)"), d);
@@ -1384,6 +1432,13 @@ static void graphics_dialog(void *arg)
 		if (camera_bob != graphics_preferences->screen_mode.camera_bob)
 		{
 			graphics_preferences->screen_mode.camera_bob = camera_bob;
+			changed = true;
+		}
+
+		int fov = override_fov_w->get_selection() == 0 ? 0 : fov_slider_w->get_selection() + 30;
+		if (fov != graphics_preferences->screen_mode.fov)
+		{
+			graphics_preferences->screen_mode.fov = fov;
 			changed = true;
 		}
 
@@ -3080,6 +3135,12 @@ static void environment_dialog(void *arg)
 	table->dual_add(hide_extensions_w, d);
 #endif
 
+#ifdef HAVE_NFD
+	w_toggle *use_native_file_dialogs_w = new w_toggle(environment_preferences->use_native_file_dialogs);
+	table->dual_add(use_native_file_dialogs_w->label("Use Native File Dialogs"), d);
+	table->dual_add(use_native_file_dialogs_w, d);
+#endif
+
 	w_select *max_saves_w = new w_select(0, max_saves_labels);
 	for (int i = 0; max_saves_labels[i] != NULL; ++i)
 	{
@@ -3222,6 +3283,15 @@ static void environment_dialog(void *arg)
 			environment_preferences->maximum_quick_saves = saves;
 			saves_changed = true;
 		}
+
+#ifdef HAVE_NFD
+		auto use_native_file_dialogs = use_native_file_dialogs_w->get_selection() != 0;
+		if (use_native_file_dialogs != environment_preferences->use_native_file_dialogs)
+		{
+			environment_preferences->use_native_file_dialogs = use_native_file_dialogs;
+			changed = true;
+		}
+#endif
 
 		if (changed)
 			load_environment_from_preferences();
@@ -3473,6 +3543,7 @@ InfoTree graphics_preferences_tree()
 	root.put_attr("scmode_accel", graphics_preferences->screen_mode.acceleration);
 	root.put_attr("scmode_highres", graphics_preferences->screen_mode.high_resolution);
 	root.put_attr("scmode_draw_every_other_line", graphics_preferences->screen_mode.draw_every_other_line);
+	root.put_attr("scmode_fov", graphics_preferences->screen_mode.fov);
 	root.put_attr("scmode_fullscreen", graphics_preferences->screen_mode.fullscreen);
 	root.put_attr("scmode_bitdepth", graphics_preferences->screen_mode.bit_depth);
 	root.put_attr("scmode_gamma", graphics_preferences->screen_mode.gamma_level);
@@ -3897,6 +3968,9 @@ InfoTree environment_preferences_tree()
 	root.put_attr("hide_alephone_extensions", environment_preferences->hide_extensions);
 	root.put_attr("film_profile", static_cast<uint32>(environment_preferences->film_profile));
 	root.put_attr("maximum_quick_saves", environment_preferences->maximum_quick_saves);
+#ifdef HAVE_NFD
+	root.put_attr("use_native_file_dialogs", environment_preferences->use_native_file_dialogs);
+#endif
 
 	for (Plugins::iterator it = Plugins::instance()->begin(); it != Plugins::instance()->end(); ++it)
 	{
@@ -3977,6 +4051,8 @@ static void default_graphics_preferences(graphics_preferences_data *preferences)
 	preferences->screen_mode.bit_depth = 32;
 
 	preferences->screen_mode.draw_every_other_line = false;
+
+	preferences->screen_mode.fov = 0; // use default
 
 	OGL_SetDefaults(preferences->OGL_Configure);
 
@@ -4131,6 +4207,9 @@ static void default_environment_preferences(environment_preferences_data *prefer
 	preferences->hide_extensions = true;
 	preferences->film_profile = FILM_PROFILE_DEFAULT;
 	preferences->maximum_quick_saves = 0;
+#ifdef HAVE_NFD
+	preferences->use_native_file_dialogs = false;
+#endif
 }
 
 /*
@@ -4170,6 +4249,18 @@ static bool validate_graphics_preferences(graphics_preferences_data *preferences
 		changed = true;
 	}
 #endif
+
+	if (preferences->screen_mode.fov < 30 && preferences->screen_mode.fov != 0)
+	{
+		preferences->screen_mode.fov = 30;
+		changed = true;
+	}
+
+	if (preferences->screen_mode.fov > 130)
+	{
+		preferences->screen_mode.fov = 130;
+		changed = true;
+	}
 
 	return changed;
 }
@@ -4459,6 +4550,7 @@ void parse_graphics_preferences(InfoTree root, std::string version)
 	root.read_attr("scmode_fix_h_not_v", graphics_preferences->screen_mode.fix_h_not_v);
 	root.read_attr("scmode_bitdepth", graphics_preferences->screen_mode.bit_depth);
 	root.read_attr("scmode_gamma", graphics_preferences->screen_mode.gamma_level);
+	root.read_attr("scmode_fov", graphics_preferences->screen_mode.fov);
 	root.read_attr("ogl_flags", graphics_preferences->OGL_Configure.Flags);
 	root.read_attr("software_alpha_blending", graphics_preferences->software_alpha_blending);
 	root.read_attr("software_sdl_driver", graphics_preferences->software_sdl_driver);
@@ -4909,6 +5001,10 @@ void parse_environment_preferences(InfoTree root, std::string version)
 		environment_preferences->film_profile = static_cast<FilmProfileType>(profile);
 
 	root.read_attr("maximum_quick_saves", environment_preferences->maximum_quick_saves);
+#ifdef HAVE_NFD
+	root.read_attr("use_native_file_dialogs", environment_preferences->use_native_file_dialogs);
+#endif
+
 	for (const InfoTree &plugin : root.children_named("disable_plugin"))
 	{
 		char tempstr[256];

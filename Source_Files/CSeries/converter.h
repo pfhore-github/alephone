@@ -8,7 +8,7 @@
 #include <iconv.h>
 #include <string>
 #include <vector>
-#include "SDL_ttf.h"
+#include "SDL2/SDL_ttf.h"
 inline int utf8_len(const char* t) {
 	unsigned char c = *t;
 	if( c <= 0xc2 )
