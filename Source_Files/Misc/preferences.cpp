@@ -3137,7 +3137,7 @@ static void environment_dialog(void *arg)
 
 #ifdef HAVE_NFD
 	w_toggle *use_native_file_dialogs_w = new w_toggle(environment_preferences->use_native_file_dialogs);
-	table->dual_add(use_native_file_dialogs_w->label("Use Native File Dialogs"), d);
+	table->dual_add(use_native_file_dialogs_w->label("ネイティブのファイルダイアログを使う"), d);
 	table->dual_add(use_native_file_dialogs_w, d);
 #endif
 
