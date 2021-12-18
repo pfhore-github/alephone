@@ -74,6 +74,7 @@ public:
 };
 
 std::string sjis2utf8(const char* str, size_t len);
+std::string macroman2utf8(const char* str);
 
 
 void sjisChar(const char* in, int* step, char* dst);

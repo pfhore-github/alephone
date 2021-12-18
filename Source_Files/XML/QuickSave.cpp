@@ -261,13 +261,13 @@ void w_saves::draw_item(QuickSaves::iterator it, SDL_Surface* s, int16 x, int16 
     y += font->get_ascent();
     if (it->name.length())
     {
-        draw_text(s, utf8_to_mac_roman(it->name).c_str(), x, y, color, font, style);
+        draw_text(s, it->name.c_str(), x, y, color, font, style);
         y += font->get_ascent() + 1;
     }
     draw_text(s, it->formatted_time.c_str(), x, y, color, font, style);
     
     y += font->get_ascent() + 1;
-    draw_text(s, utf8_to_mac_roman(it->level_name).c_str(), x, y, color, font, style);
+    draw_text(s, it->level_name.c_str(), x, y, color, font, style);
     
     y += font->get_ascent() + 1;
     std::string game_time = it->formatted_ticks;

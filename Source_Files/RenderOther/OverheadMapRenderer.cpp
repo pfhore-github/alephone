@@ -34,7 +34,7 @@
 #include "platforms.h"
 #include "player.h"
 #include "render.h"
-
+#include "converter.h"
 #include <string.h>
 #include <stdlib.h>
 #include <limits.h>
@@ -57,7 +57,6 @@ enum /* render flags */
 // Changed to link properly with code in pathfinding.c
 extern world_point2d *path_peek(short path_index, short *step_count);
 extern short GetNumberOfPaths();
-
 
 // Main rendering routine
 
@@ -383,8 +382,8 @@ void OverheadMapClass::Render(overhead_map_data& Control)
 			}
 		}
 	}
-
-	if (Control.mode==_rendering_game_map) draw_map_name(Control, static_world->level_name);
+	std::string level_name_utf8 = macroman2utf8(static_world->level_name);
+	if (Control.mode==_rendering_game_map) draw_map_name(Control, (char*)level_name_utf8.c_str());
 	if (Control.mode==_rendering_checkpoint_map) replace_real_automap();
 	
 	// LP addition: overall cleanup

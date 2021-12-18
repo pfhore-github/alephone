@@ -3493,10 +3493,11 @@ static int Lua_Level_Get_Fog(lua_State *L)
 	Lua_Fog::Push(L, OGL_Fog_AboveLiquid);
 	return 1;
 }
-	
+#include "converter.h"	
 static int Lua_Level_Get_Name(lua_State *L)
 {
-	lua_pushstring(L, static_world->level_name);
+	std::string name = macroman2utf8(static_world->level_name);
+	lua_pushstring(L, name.c_str());
 	return 1;
 }
 

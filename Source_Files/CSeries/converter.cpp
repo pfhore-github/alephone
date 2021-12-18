@@ -14,6 +14,30 @@
 
 // Convert from Shift_JIS to UTF8
 #define MAC_LINE_END 13
+
+std::string macroman2utf8(const char* str) {
+	if (*str == '\0') {
+		return "";
+	}
+	size_t len = strlen(str);
+	size_t firstsize = len * 2;
+	std::string text(firstsize, '\0');
+	char* strp = (char*)str;
+	char* retp = &text[0];
+	size_t sz = len * 2;
+	static iconv_t j = iconv_open("UTF-8", "Mac");
+	if (j == iconv_t(-1)) {
+		return str;
+	}
+	strp = (char*)str;
+	retp = &text[0];
+	sz = firstsize;
+	iconv(j, &strp, &len, &retp, &sz);
+	text.resize(firstsize - sz);
+	if (text.back() == MAC_LINE_END) { text.resize(text.size() - 1); }
+	return text;
+}
+
 std::string sjis2utf8(const char* str, size_t len) {
 	if( len == 0 ) {
 		return "";
@@ -28,7 +52,7 @@ std::string sjis2utf8(const char* str, size_t len) {
 		return str;
 	}
 	if( iconv(i,  &strp, &len, &retp, &sz) == -1 ) {
-		static iconv_t j = iconv_open("UTF-8", "MACROMAN");
+		static iconv_t j = iconv_open("UTF-8", "Mac");
 		if( j == iconv_t(-1) ) {
 			return str;
 		}
@@ -61,7 +85,7 @@ void sjisChar(const char* in, int* step, char* dst) {
 	size_t sz = 4;
 	iconv_t i = iconv_open("UTF-8", "SHIFT-JIS");
 	if( iconv(i,  &strp, &len, &retp, &sz) == -1 ) {
-		iconv_t j = iconv_open("UTF-8", "MACROMAN");
+		iconv_t j = iconv_open("UTF-8", "Mac");
 		strp = (char*)in;
 		retp = dst;
 		sz = 4;

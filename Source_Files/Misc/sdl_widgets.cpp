@@ -56,7 +56,7 @@
 #include "player.h"
 
 #include "screen.h"
-
+#include "converter.h"
 // ZZZ: for stringset business for modified w_select
 #include	"TextStrings.h"
 
@@ -2264,11 +2264,11 @@ w_levels::draw_item(vector<entry_point>::const_iterator i, SDL_Surface *s, int16
 {
 	y = y + font->get_ascent();
 	char str[256];
-
+	std::string level_name = macroman2utf8(i->level_name);
     if(show_level_numbers)
-    	sprintf(str, "%d - %s", i->level_number + 1, i->level_name);
+    	sprintf(str, "%d - %s", i->level_number + 1, level_name.c_str());
     else
-        sprintf(str, "%s", i->level_name);
+        sprintf(str, "%s", level_name.c_str());
 
 	set_drawing_clip_rectangle(0, x, static_cast<short>(s->h), x + width);
 	draw_text(s, str, x, y, get_theme_color(ITEM_WIDGET, selected ? ACTIVE_STATE : DEFAULT_STATE), font, style);
