@@ -2,7 +2,7 @@
 
 #Our optional parameters
 param(
-[bool]$x64=$false, #Build 64 or 32 bits
+[bool]$x64=$true, #Build 64 or 32 bits
 [bool]$a1=$true, #Build AlephOne
 [bool]$m1=$false, #Build Marathon
 [bool]$m2=$false, #Build Marathon 2
@@ -16,7 +16,10 @@ function MsBuild {
 	Param (
         [string]$configuration
     )
-	Remove-Item -Path $exe_path
+	
+	if(Test-Path -Path $exe_path) {
+		Remove-Item -Path $exe_path
+	}
 	&$msbuild_path $input_path /t:"Build" /p:Configuration=$configuration /p:Platform=$platform | Out-Host
 	([bool]$success = Test-Path -Path $exe_path) | Out-Null
 	return $success
@@ -76,7 +79,7 @@ function Package {
 	
 	#now we have our folder with all files except data files
 	
-	$os_target = if($x64) {"64"} else {"32"}
+	$os_target = if($x64) {""} else {"32"}
 	#we can already pack what we have if we wanna pack without data
 	if(($data -ne 1) -and ($build -ne "Release")) {		
 		$zip_name = "${package_fullname}-Exe-Win${os_target}.zip"
