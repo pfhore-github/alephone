@@ -986,8 +986,8 @@ static const char *sw_alpha_blending_labels[4] = {
 static const char *sw_sdl_driver_labels[5] = {
 	"デフォルト", "なし", "Direct3D", "OpenGL", NULL};
 
-static const char *ephemera_quality_labels[5] = {
-	"オフ", "低", "中", "高", "最高"};
+static const char *ephemera_quality_labels[] = {
+	"オフ", "低", "中", "高", "最高", NULL};
 
 static const char *fps_target_labels[] = {
 	"30", "60 (補完)", "120 (補完)", "無制限 (補完)", NULL};
