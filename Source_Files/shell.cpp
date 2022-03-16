@@ -821,6 +821,7 @@ static void handle_game_key(const SDL_Event &event)
 	SDL_Scancode sc = event.key.keysym.scancode;
 	bool changed_screen_mode = false;
 	bool changed_prefs = false;
+	bool changed_resolution = false;
 
 	if (!game_is_networked && (event.key.keysym.mod & KMOD_CTRL) && CheatsActive)
 	{
@@ -1036,7 +1037,7 @@ static void handle_game_key(const SDL_Event &event)
 					graphics_preferences->screen_mode.height = alephone::Screen::instance()->ModeHeight(mode + 1);
 					graphics_preferences->screen_mode.auto_resolution = false;
 					graphics_preferences->screen_mode.hud = false;
-					changed_screen_mode = changed_prefs = true;
+					changed_screen_mode = changed_prefs = changed_resolution = true;
 				}
 				else
 					PlayInterfaceButtonSound(Sound_ButtonFailure());
@@ -1062,7 +1063,7 @@ static void handle_game_key(const SDL_Event &event)
 					if ((mode - 1) == automode)
 						graphics_preferences->screen_mode.auto_resolution = true;
 					graphics_preferences->screen_mode.hud = true;
-					changed_screen_mode = changed_prefs = true;
+					changed_screen_mode = changed_prefs = changed_resolution = true;
 				}
 				else
 					PlayInterfaceButtonSound(Sound_ButtonFailure());
@@ -1177,7 +1178,7 @@ static void handle_game_key(const SDL_Event &event)
 	{
 		screen_mode_data temp_screen_mode = graphics_preferences->screen_mode;
 		temp_screen_mode.fullscreen = get_screen_mode()->fullscreen;
-		change_screen_mode(&temp_screen_mode, true);
+		change_screen_mode(&temp_screen_mode, true, changed_resolution);
 		render_screen(0);
 	}
 

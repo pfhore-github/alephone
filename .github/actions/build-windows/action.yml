@@ -1,0 +1,34 @@
+name: windows
+description: template used to build for windows
+
+inputs:
+ platform:
+    required: true
+    type: string
+ vcpkg_installed_folder:
+    required: true
+    type: string
+
+runs:
+    using: "composite"
+    steps:
+    - uses: actions/checkout@v2
+    
+    - name: Add MSBuild to PATH
+      uses: microsoft/setup-msbuild@v1.0.2
+      
+    - name: Vcpkg Integration
+      run: |
+        $vcpkg_path = (Join-Path ${env:VCPKG_INSTALLATION_ROOT} vcpkg.exe)
+        &$vcpkg_path integrate install
+      shell: pwsh
+      
+    - name: Cache Vcpkg
+      uses: actions/cache@v2
+      with:
+        path: vcpkg/${{inputs.vcpkg_installed_folder}}
+        key: ${{runner.os}}-${{inputs.vcpkg_installed_folder}}-${{hashFiles('**/vcpkg.json')}}
+        
+    - name: Build
+      run: msbuild /m /p:Platform=${{inputs.platform}} /p:Configuration=Release ./VisualStudio/AlephOne.sln
+      shell: pwsh

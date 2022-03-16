@@ -217,42 +217,41 @@ static TTF_Font *load_ttf_font(const std::string &path, uint16 style, int16 size
 	}
 	TTF_Init();
 	TTF_Font *font = 0;
-	static const string fontPath[] = {
-		FONT_PATH,
+	static const string fontPath[] = { FONT_PATH,
 #if defined(__WIN32__)
-		// Path to the below Windows directory
-		// for Windows 7 (Meiryo Bold)
-		"C:/Windows/winsxs/x86_microsoft-windows-f..truetype-meiryobold_31bf3856ad364e35_6.1.7600.16385_none_cd23f5e0d8f9c6fa/meiryob.ttc",
-		"C:/Windows/winsxs/amd64_microsoft-windows-f..truetype-meiryobold_31bf3856ad364e35_6.1.7600.16385_none_2942916491573830/meiryob.ttc",
-		// for Windows Vista
-		"C:/Windows/Fonts/meiryob.ttc",
-		// for less than Windows XP (MS Gothic)
-		"C:/Windows/fonts/msgothic.ttc",
+									   // Path to the below Windows directory
+									   // for Windows 7 (Meiryo Bold)
+									   "C:/Windows/winsxs/x86_microsoft-windows-f..truetype-meiryobold_31bf3856ad364e35_6.1.7600.16385_none_cd23f5e0d8f9c6fa/meiryob.ttc",
+									   "C:/Windows/winsxs/amd64_microsoft-windows-f..truetype-meiryobold_31bf3856ad364e35_6.1.7600.16385_none_2942916491573830/meiryob.ttc",
+									   // for Windows Vista
+									   "C:/Windows/Fonts/meiryob.ttc",
+									   // for less than Windows XP (MS Gothic)
+									   "C:/Windows/fonts/msgothic.ttc",
 #elif defined(__MACOS__)
-		// for MacOS (Hiragino Kaku Gothic Pro W6)
-		"/System/Library/Fonts/ヒラギノ角ゴ ProN W6.otf",
-		"/System/Library/Fonts/Hiragino Kaku Gothic Pro W6.otf",
-		"/System/Library/Fonts/Cache/HiraginoKakuGothicProNW6.otf" // for iOS
+									   // for MacOS (Hiragino Kaku Gothic Pro W6)
+									   "/System/Library/Fonts/ヒラギノ角ゴ ProN W6.otf",
+									   "/System/Library/Fonts/Hiragino Kaku Gothic Pro W6.otf",
+									   "/System/Library/Fonts/Cache/HiraginoKakuGothicProNW6.otf" // for iOS
 #else
-		// for Linux
-		"/usr/share/fonts/truetype/vlgothic/VL-Gothic-Regular.ttf",
-		"/usr/X11R6/lib/X11/fonts/TrueType/VL-Gothic-Regular.ttf",
-		"/usr/X11/lib/X11/fonts/truetype/VL-Gothic-Regular.ttf",
+									   // for Linux
+									   "/usr/share/fonts/truetype/vlgothic/VL-Gothic-Regular.ttf",
+									   "/usr/X11R6/lib/X11/fonts/TrueType/VL-Gothic-Regular.ttf",
+									   "/usr/X11/lib/X11/fonts/truetype/VL-Gothic-Regular.ttf",
 
-		"/usr/share/fonts/truetype/takao/TakaoExGothic.ttf"
-		"/usr/share/fonts/ja-ipafonts/ipag.ttc",
+									   "/usr/share/fonts/truetype/takao/TakaoExGothic.ttf"
+									   "/usr/share/fonts/ja-ipafonts/ipag.ttc",
 
-		"/usr/share/fonts/TrueType/mika.ttf",
-		"/usr/X11R6/lib/X11/fonts/TrueType/mika.ttf",
-		"/usr/X11R6/lib/X11/fonts/truetype/sazanami-gothic.ttf",
-		"/usr/X11/lib/X11/fonts/truetype/sazanami-gothic.ttf",
-		"/usr/share/fonts/TrueType/sazanami-gothic.ttf",
-		"/usr/X11R6/lib/X11/fonts/TrueType/sazanami-gothic.ttf",
-		"/usr/share/fonts/truetype/sazanami-gothic.ttf",
-		"/usr/share/fonts/TrueType/FS-Gothic-gs.ttf",
-		"/usr/X11R6/lib/X11/fonts/TrueType/FS-Gothic.ttf",
-		"/usr/share/fonts/TrueType/gt200001.ttf",
-		"/usr/X11R6/lib/X11/fonts/TrueType/gt200001.ttf",
+									   "/usr/share/fonts/TrueType/mika.ttf",
+									   "/usr/X11R6/lib/X11/fonts/TrueType/mika.ttf",
+									   "/usr/X11R6/lib/X11/fonts/truetype/sazanami-gothic.ttf",
+									   "/usr/X11/lib/X11/fonts/truetype/sazanami-gothic.ttf",
+									   "/usr/share/fonts/TrueType/sazanami-gothic.ttf",
+									   "/usr/X11R6/lib/X11/fonts/TrueType/sazanami-gothic.ttf",
+									   "/usr/share/fonts/truetype/sazanami-gothic.ttf",
+									   "/usr/share/fonts/TrueType/FS-Gothic-gs.ttf",
+									   "/usr/X11R6/lib/X11/fonts/TrueType/FS-Gothic.ttf",
+									   "/usr/share/fonts/TrueType/gt200001.ttf",
+									   "/usr/X11R6/lib/X11/fonts/TrueType/gt200001.ttf",
 #endif
 	};
 	for (int i = 0; i < sizeof(fontPath) / sizeof(fontPath[0]); i++)
