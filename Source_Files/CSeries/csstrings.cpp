@@ -417,7 +417,7 @@ void expand_app_variables(char *dest, const char *src)
 }
 
 #define LIBICONV_PLUG
-
+#include "converter.h"
 #include <iconv.h>
 
 // Convert from Shift_JIS to UTF8
