@@ -257,6 +257,7 @@
       <AdditionalIncludeDirectories>$(ProjectDir)..\Source_Files\;$(ProjectDir)..\Source_Files\XML;$(ProjectDir)..\Source_Files\TCPMess;$(ProjectDir)..\Source_Files\Sound;$(ProjectDir)..\Source_Files\RenderOther;$(ProjectDir)..\Source_Files\RenderMain;$(ProjectDir)..\Source_Files\Network\Metaserver;$(ProjectDir)..\Source_Files\Network;$(ProjectDir)..\Source_Files\ModelView;$(ProjectDir)..\Source_Files\Misc;$(ProjectDir)..\Source_Files\Lua;$(ProjectDir)..\Source_Files\Input;$(ProjectDir)..\Source_Files\GameWorld;$(ProjectDir)..\Source_Files\Files;$(ProjectDir)..\Source_Files\FFmpeg;$(ProjectDir)..\Source_Files\CSeries;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <WholeProgramOptimization>true</WholeProgramOptimization>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <TargetMachine>MachineX86</TargetMachine>
@@ -415,7 +416,6 @@
     <ClCompile Include="..\Source_Files\CSeries\byte_swapping.cpp" />
     <ClCompile Include="..\Source_Files\CSeries\csalerts_sdl.cpp" />
     <ClCompile Include="..\Source_Files\CSeries\cscluts_sdl.cpp" />
-    <ClCompile Include="..\Source_Files\CSeries\converter.cpp" />
     <ClCompile Include="..\Source_Files\CSeries\csdialogs_sdl.cpp" />
     <ClCompile Include="..\Source_Files\CSeries\csmisc_sdl.cpp" />
     <ClCompile Include="..\Source_Files\CSeries\cspaths_sdl.cpp" />
