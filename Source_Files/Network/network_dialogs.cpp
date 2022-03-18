@@ -234,7 +234,7 @@ bool network_gather(bool inResumingGame)
 						}
 						else
 						{
-							sprintf(message, "ログイン拒否：そのアカウントはロックされています。インターネット上にゲームの募集広告を出すことができませんでした。", e.what());
+							sprintf(message, "ログイン拒否：%s。インターネット上にゲームの募集広告を出すことができませんでした。", e.what());
 						}
 
 						alert_user(message, 0);
@@ -2766,7 +2766,7 @@ public:
 
 		w_toggle *advertise_on_metaserver_w = new w_toggle(sAdvertiseGameOnMetaserver);
 		network_table->dual_add(advertise_on_metaserver_w, m_dialog);
-		network_table->dual_add(advertise_on_metaserver_w->label("インターネットにゲーム募集を表\示"), m_dialog);
+		network_table->dual_add(advertise_on_metaserver_w->label("インターネットにゲーム募集を表示"), m_dialog);
 
 #ifdef HAVE_MINIUPNPC
 		w_toggle *use_upnp_w = new w_toggle(true);

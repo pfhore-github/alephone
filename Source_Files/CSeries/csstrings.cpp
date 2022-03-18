@@ -416,7 +416,6 @@ void expand_app_variables(char *dest, const char *src)
 		strcpy(dest, src);
 }
 
-#define LIBICONV_PLUG
 #include "converter.h"
 #include <iconv.h>
 
