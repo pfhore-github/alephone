@@ -29,6 +29,11 @@
     Even the beginning programmer should be able to use this library
     so he or she can use multimedia in his/her program.
 **/
+#ifdef HAVE_CONFIG_H // for HAVE_FFMPEG
+#include "config.h"
+#endif
+
+#ifdef HAVE_FFMPEG
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -2258,3 +2263,4 @@ int SDL_ffmpegDecodeVideoFrame( SDL_ffmpegFile* file, AVPacket *pack, SDL_ffmpeg
 /**
 \endcond
 */
+#endif
