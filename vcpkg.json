@@ -63,6 +63,9 @@
       "name": "nativefiledialog"
     },
     {
+      "name": "libiconv"
+    },
+    {
       "name": "libsndfile",
       "default-features": false
     }
