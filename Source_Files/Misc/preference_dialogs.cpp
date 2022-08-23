@@ -31,49 +31,47 @@
 class TexQualityPref : public Bindable<int>
 {
 public:
-	TexQualityPref(int16 &pref, int16 normal) : m_pref(pref), m_normal(normal) {}
+	TexQualityPref (int16& pref, int16 normal) : m_pref (pref), m_normal (normal) {}
 
-	virtual int bind_export()
+	virtual int bind_export ()
 	{
 		int result = 0;
 		int temp = m_pref;
-		while (temp >= m_normal)
-		{
+		while (temp >= m_normal) {
 			temp = temp >> 1;
 			++result;
 		}
 		return result;
 	}
 
-	virtual void bind_import(int value)
+	virtual void bind_import (int value)
 	{
 		m_pref = (value == 0) ? 0 : m_normal << (value - 1);
 	}
 
 protected:
-	int16 &m_pref;
+	int16& m_pref;
 	int16 m_normal;
 };
 
 class ColourPref : public Bindable<RGBColor>
 {
 public:
-	ColourPref(RGBColor &pref) : m_pref(pref) {}
+	ColourPref (RGBColor& pref) : m_pref (pref) {}
 
-	virtual RGBColor bind_export() { return m_pref; }
-	virtual void bind_import(RGBColor value) { m_pref = value; }
+	virtual RGBColor bind_export () { return m_pref; }
+	virtual void bind_import (RGBColor value) { m_pref = value; }
 
 protected:
-	RGBColor &m_pref;
+	RGBColor& m_pref;
 };
 
 class FarFilterPref : public Bindable<int>
 {
 public:
-	FarFilterPref(int16 &pref) : m_pref(pref) {}
+	FarFilterPref (int16& pref) : m_pref(pref) { }
 
-	int bind_export()
-	{
+	int bind_export() {
 		if (m_pref == 5)
 		{
 			return 3;
@@ -88,8 +86,7 @@ public:
 		}
 	}
 
-	void bind_import(int value)
-	{
+	void bind_import(int value) {
 		if (value == 2)
 		{
 			m_pref = 3;
@@ -105,55 +102,54 @@ public:
 	}
 
 protected:
-	int16 &m_pref;
+	int16& m_pref;
 };
 
 class TimesTwoPref : public Bindable<int>
 {
 public:
-	TimesTwoPref(int16 &pref) : m_pref(pref) {}
+	TimesTwoPref (int16& pref) : m_pref (pref) {}
 
-	virtual int bind_export()
+	virtual int bind_export ()
 	{
 		return (m_pref / 2);
 	}
 
-	virtual void bind_import(int value)
+	virtual void bind_import (int value)
 	{
 		m_pref = value * 2;
 	}
 
 protected:
-	int16 &m_pref;
+	int16& m_pref;
 };
 
 class AnisotropyPref : public Bindable<int>
 {
 public:
-	AnisotropyPref(float &pref) : m_pref(pref) {}
+	AnisotropyPref (float& pref) : m_pref (pref) {}
 
-	virtual int bind_export()
+	virtual int bind_export ()
 	{
 		int result = 0;
-		int temp = static_cast<int>(m_pref);
-		while (temp >= 1)
-		{
+		int temp = static_cast<int> (m_pref);
+		while (temp >= 1) {
 			temp = temp >> 1;
 			++result;
 		}
 		return result;
 	}
 
-	virtual void bind_import(int value)
+	virtual void bind_import (int value)
 	{
 		m_pref = (value == 0) ? 0.0 : 1 << (value - 1);
 	}
 
 protected:
-	float &m_pref;
+	float& m_pref;
 };
 
-OpenGLDialog::OpenGLDialog() {}
+OpenGLDialog::OpenGLDialog() {  }
 
 OpenGLDialog::~OpenGLDialog()
 {
@@ -176,116 +172,116 @@ OpenGLDialog::~OpenGLDialog()
 	delete m_wallsFilterWidget;
 	delete m_spritesFilterWidget;
 
-	for (int i = 0; i < OGL_NUMBER_OF_TEXTURE_TYPES; ++i)
-	{
-		delete m_textureQualityWidget[i];
+	for (int i=0; i<OGL_NUMBER_OF_TEXTURE_TYPES; ++i) {
+		delete m_textureQualityWidget [i];
 		delete m_nearFiltersWidget[i];
-		delete m_textureResolutionWidget[i];
+		delete m_textureResolutionWidget [i];
 		delete m_textureDepthWidget[i];
 	}
+
 }
 
-void OpenGLDialog::OpenGLPrefsByRunning()
+void OpenGLDialog::OpenGLPrefsByRunning ()
 {
-	m_cancelWidget->set_callback(std::bind(&OpenGLDialog::Stop, this, false));
-	m_okWidget->set_callback(std::bind(&OpenGLDialog::Stop, this, true));
+	m_cancelWidget->set_callback (std::bind (&OpenGLDialog::Stop, this, false));
+	m_okWidget->set_callback (std::bind (&OpenGLDialog::Stop, this, true));
 
 	BinderSet binders;
 
-	BitPref fogPref(graphics_preferences->OGL_Configure.Flags, OGL_Flag_Fog);
-	binders.insert<bool>(m_fogWidget, &fogPref);
-	BitPref colourEffectsPref(graphics_preferences->OGL_Configure.Flags, OGL_Flag_Fader);
-	binders.insert<bool>(m_colourEffectsWidget, &colourEffectsPref);
-	BitPref transparentLiquidsPref(graphics_preferences->OGL_Configure.Flags, OGL_Flag_LiqSeeThru);
-	binders.insert<bool>(m_transparentLiquidsWidget, &transparentLiquidsPref);
-	BitPref modelsPref(graphics_preferences->OGL_Configure.Flags, OGL_Flag_3D_Models);
-	binders.insert<bool>(m_3DmodelsWidget, &modelsPref);
-	BitPref blurPref(graphics_preferences->OGL_Configure.Flags, OGL_Flag_Blur);
-	binders.insert<bool>(m_blurWidget, &blurPref);
-	BitPref bumpPref(graphics_preferences->OGL_Configure.Flags, OGL_Flag_BumpMap);
-	binders.insert<bool>(m_bumpWidget, &bumpPref);
-	BitPref perspectivePref(graphics_preferences->OGL_Configure.Flags, OGL_Flag_MimicSW, true);
-	binders.insert<bool>(m_perspectiveWidget, &perspectivePref);
+	BitPref fogPref (graphics_preferences->OGL_Configure.Flags, OGL_Flag_Fog);
+	binders.insert<bool> (m_fogWidget, &fogPref);
+	BitPref colourEffectsPref (graphics_preferences->OGL_Configure.Flags, OGL_Flag_Fader);
+	binders.insert<bool> (m_colourEffectsWidget, &colourEffectsPref);
+	BitPref transparentLiquidsPref (graphics_preferences->OGL_Configure.Flags, OGL_Flag_LiqSeeThru);
+	binders.insert<bool> (m_transparentLiquidsWidget, &transparentLiquidsPref);
+	BitPref modelsPref (graphics_preferences->OGL_Configure.Flags, OGL_Flag_3D_Models);
+	binders.insert<bool> (m_3DmodelsWidget, &modelsPref);
+	BitPref blurPref (graphics_preferences->OGL_Configure.Flags, OGL_Flag_Blur);
+	binders.insert<bool> (m_blurWidget, &blurPref);
+	BitPref bumpPref (graphics_preferences->OGL_Configure.Flags, OGL_Flag_BumpMap);
+	binders.insert<bool> (m_bumpWidget, &bumpPref);
+	BitPref perspectivePref (graphics_preferences->OGL_Configure.Flags, OGL_Flag_MimicSW, true);
+	binders.insert<bool> (m_perspectiveWidget, &perspectivePref);
 
-	BitPref colourTheVoidPref(graphics_preferences->OGL_Configure.Flags, OGL_Flag_VoidColor);
-	binders.insert<bool>(m_colourTheVoidWidget, &colourTheVoidPref);
-	ColourPref voidColourPref(graphics_preferences->OGL_Configure.VoidColor);
-	binders.insert<RGBColor>(m_voidColourWidget, &voidColourPref);
+	BitPref colourTheVoidPref (graphics_preferences->OGL_Configure.Flags, OGL_Flag_VoidColor);
+	binders.insert<bool> (m_colourTheVoidWidget, &colourTheVoidPref);
+	ColourPref voidColourPref (graphics_preferences->OGL_Configure.VoidColor);
+	binders.insert<RGBColor> (m_voidColourWidget, &voidColourPref);
 
-	TimesTwoPref fsaaPref(graphics_preferences->OGL_Configure.Multisamples);
-	binders.insert<int>(m_fsaaWidget, &fsaaPref);
+	TimesTwoPref fsaaPref (graphics_preferences->OGL_Configure.Multisamples);
+	binders.insert<int> (m_fsaaWidget, &fsaaPref);
 
-	AnisotropyPref anisotropyPref(graphics_preferences->OGL_Configure.AnisotropyLevel);
-	binders.insert<int>(m_anisotropicWidget, &anisotropyPref);
+	AnisotropyPref anisotropyPref (graphics_preferences->OGL_Configure.AnisotropyLevel);
+	binders.insert<int> (m_anisotropicWidget, &anisotropyPref);
 
-	BoolPref sRGBPref(graphics_preferences->OGL_Configure.Use_sRGB);
-	binders.insert<bool>(m_sRGBWidget, &sRGBPref);
+	BoolPref sRGBPref (graphics_preferences->OGL_Configure.Use_sRGB);
+	binders.insert<bool> (m_sRGBWidget, &sRGBPref);
 
-	BoolPref geForceFixPref(graphics_preferences->OGL_Configure.GeForceFix);
-	binders.insert<bool>(m_geForceFixWidget, &geForceFixPref);
+	BoolPref geForceFixPref (graphics_preferences->OGL_Configure.GeForceFix);
+	binders.insert<bool> (m_geForceFixWidget, &geForceFixPref);
 
-	BoolPref useNPOTPref(graphics_preferences->OGL_Configure.Use_NPOT);
-	binders.insert<bool>(m_useNPOTWidget, &useNPOTPref);
+	BoolPref useNPOTPref (graphics_preferences->OGL_Configure.Use_NPOT);
+	binders.insert<bool> (m_useNPOTWidget, &useNPOTPref);
 
-	BoolPref vsyncPref(graphics_preferences->OGL_Configure.WaitForVSync);
-	binders.insert<bool>(m_vsyncWidget, &vsyncPref);
+	BoolPref vsyncPref (graphics_preferences->OGL_Configure.WaitForVSync);
+	binders.insert<bool> (m_vsyncWidget, &vsyncPref);
 
 	Int16Pref ephemeraQualityPref(graphics_preferences->ephemera_quality);
 	binders.insert<int>(m_ephemeraQualityWidget, &ephemeraQualityPref);
 
-	FarFilterPref wallsFarFilterPref(graphics_preferences->OGL_Configure.TxtrConfigList[OGL_Txtr_Wall].FarFilter);
-	binders.insert<int>(m_wallsFilterWidget, &wallsFarFilterPref);
-	FarFilterPref spritesFarFilterPref(graphics_preferences->OGL_Configure.TxtrConfigList[OGL_Txtr_Inhabitant].FarFilter);
-	binders.insert<int>(m_spritesFilterWidget, &spritesFarFilterPref);
+	FarFilterPref wallsFarFilterPref (graphics_preferences->OGL_Configure.TxtrConfigList [OGL_Txtr_Wall].FarFilter);
+	binders.insert<int> (m_wallsFilterWidget, &wallsFarFilterPref);
+	FarFilterPref spritesFarFilterPref (graphics_preferences->OGL_Configure.TxtrConfigList [OGL_Txtr_Inhabitant].FarFilter);
+	binders.insert<int> (m_spritesFilterWidget, &spritesFarFilterPref);
 
-	Int16Pref wallsNearFilterPref(graphics_preferences->OGL_Configure.TxtrConfigList[OGL_Txtr_Wall].NearFilter);
-	binders.insert<int>(m_nearFiltersWidget[0], &wallsNearFilterPref);
-	Int16Pref landscapeNearFilterPref(graphics_preferences->OGL_Configure.TxtrConfigList[OGL_Txtr_Landscape].NearFilter);
-	binders.insert<int>(m_nearFiltersWidget[1], &landscapeNearFilterPref);
-	Int16Pref spriteNearFilterPref(graphics_preferences->OGL_Configure.TxtrConfigList[OGL_Txtr_Inhabitant].NearFilter);
-	binders.insert<int>(m_nearFiltersWidget[2], &spriteNearFilterPref);
-	Int16Pref weaponNearFilterPref(graphics_preferences->OGL_Configure.TxtrConfigList[OGL_Txtr_WeaponsInHand].NearFilter);
-	binders.insert<int>(m_nearFiltersWidget[3], &weaponNearFilterPref);
+	Int16Pref wallsNearFilterPref (graphics_preferences->OGL_Configure.TxtrConfigList[OGL_Txtr_Wall].NearFilter);
+	binders.insert<int> (m_nearFiltersWidget[0], &wallsNearFilterPref);
+	Int16Pref landscapeNearFilterPref (graphics_preferences->OGL_Configure.TxtrConfigList[OGL_Txtr_Landscape].NearFilter);
+	binders.insert<int> (m_nearFiltersWidget[1], &landscapeNearFilterPref);
+	Int16Pref spriteNearFilterPref (graphics_preferences->OGL_Configure.TxtrConfigList[OGL_Txtr_Inhabitant].NearFilter);
+	binders.insert<int> (m_nearFiltersWidget[2], &spriteNearFilterPref);
+	Int16Pref weaponNearFilterPref (graphics_preferences->OGL_Configure.TxtrConfigList[OGL_Txtr_WeaponsInHand].NearFilter);
+	binders.insert<int> (m_nearFiltersWidget[3], &weaponNearFilterPref);
 
-	TexQualityPref wallQualityPref(graphics_preferences->OGL_Configure.TxtrConfigList[0].MaxSize, 128);
-	binders.insert<int>(m_textureQualityWidget[0], &wallQualityPref);
-	TexQualityPref landscapeQualityPref(graphics_preferences->OGL_Configure.TxtrConfigList[1].MaxSize, 256);
-	binders.insert<int>(m_textureQualityWidget[1], &landscapeQualityPref);
-	TexQualityPref spriteQualityPref(graphics_preferences->OGL_Configure.TxtrConfigList[2].MaxSize, 256);
-	binders.insert<int>(m_textureQualityWidget[2], &spriteQualityPref);
-	TexQualityPref weaponQualityPref(graphics_preferences->OGL_Configure.TxtrConfigList[3].MaxSize, 256);
-	binders.insert<int>(m_textureQualityWidget[3], &weaponQualityPref);
-	TexQualityPref modelQualityPref(graphics_preferences->OGL_Configure.ModelConfig.MaxSize, 256);
-	binders.insert<int>(m_modelQualityWidget, &modelQualityPref);
+	TexQualityPref wallQualityPref (graphics_preferences->OGL_Configure.TxtrConfigList [0].MaxSize, 128);
+	binders.insert<int> (m_textureQualityWidget [0], &wallQualityPref);
+	TexQualityPref landscapeQualityPref (graphics_preferences->OGL_Configure.TxtrConfigList [1].MaxSize, 256);
+	binders.insert<int> (m_textureQualityWidget [1], &landscapeQualityPref);
+	TexQualityPref spriteQualityPref (graphics_preferences->OGL_Configure.TxtrConfigList [2].MaxSize, 256);
+	binders.insert<int> (m_textureQualityWidget [2], &spriteQualityPref);
+	TexQualityPref weaponQualityPref (graphics_preferences->OGL_Configure.TxtrConfigList [3].MaxSize, 256);
+	binders.insert<int> (m_textureQualityWidget [3], &weaponQualityPref);
+	TexQualityPref modelQualityPref (graphics_preferences->OGL_Configure.ModelConfig.MaxSize, 256);
+	binders.insert<int> (m_modelQualityWidget, &modelQualityPref);
 
-	Int16Pref wallResoPref(graphics_preferences->OGL_Configure.TxtrConfigList[0].Resolution);
-	binders.insert<int>(m_textureResolutionWidget[0], &wallResoPref);
-	Int16Pref landscapeResoPref(graphics_preferences->OGL_Configure.TxtrConfigList[1].Resolution);
-	binders.insert<int>(m_textureResolutionWidget[1], &landscapeResoPref);
-	Int16Pref spriteResoPref(graphics_preferences->OGL_Configure.TxtrConfigList[2].Resolution);
-	binders.insert<int>(m_textureResolutionWidget[2], &spriteResoPref);
-	Int16Pref weaponResoPref(graphics_preferences->OGL_Configure.TxtrConfigList[3].Resolution);
-	binders.insert<int>(m_textureResolutionWidget[3], &weaponResoPref);
+	Int16Pref wallResoPref (graphics_preferences->OGL_Configure.TxtrConfigList [0].Resolution);
+	binders.insert<int> (m_textureResolutionWidget [0], &wallResoPref);
+	Int16Pref landscapeResoPref (graphics_preferences->OGL_Configure.TxtrConfigList [1].Resolution);
+	binders.insert<int> (m_textureResolutionWidget [1], &landscapeResoPref);
+	Int16Pref spriteResoPref (graphics_preferences->OGL_Configure.TxtrConfigList [2].Resolution);
+	binders.insert<int> (m_textureResolutionWidget [2], &spriteResoPref);
+	Int16Pref weaponResoPref (graphics_preferences->OGL_Configure.TxtrConfigList [3].Resolution);
+	binders.insert<int> (m_textureResolutionWidget [3], &weaponResoPref);
 
 	Int16Pref wallDepthPref(graphics_preferences->OGL_Configure.TxtrConfigList[0].ColorFormat);
-	binders.insert<int>(m_textureDepthWidget[0], &wallDepthPref);
+	binders.insert<int> (m_textureDepthWidget[0], &wallDepthPref);
 	Int16Pref landscapeDepthPref(graphics_preferences->OGL_Configure.TxtrConfigList[1].ColorFormat);
-	binders.insert<int>(m_textureDepthWidget[1], &landscapeDepthPref);
+	binders.insert<int> (m_textureDepthWidget[1], &landscapeDepthPref);
 	Int16Pref spriteDepthPref(graphics_preferences->OGL_Configure.TxtrConfigList[2].ColorFormat);
-	binders.insert<int>(m_textureDepthWidget[2], &spriteDepthPref);
+	binders.insert<int> (m_textureDepthWidget[2], &spriteDepthPref);
 	Int16Pref weaponDepthPref(graphics_preferences->OGL_Configure.TxtrConfigList[3].ColorFormat);
-	binders.insert<int>(m_textureDepthWidget[3], &weaponDepthPref);
+	binders.insert<int> (m_textureDepthWidget[3], &weaponDepthPref);
+	
 
 	// Set initial values from prefs
-	binders.migrate_all_second_to_first();
+	binders.migrate_all_second_to_first ();
 
-	bool result = Run();
+	bool result = Run ();
 
-	if (result)
-	{
+	if (result) {
 		// migrate prefs and save
-		binders.migrate_all_first_to_second();
-		write_preferences();
+		binders.migrate_all_first_to_second ();
+		write_preferences ();
 	}
 }
 
@@ -302,28 +298,27 @@ static std::vector<std::string> ephemera_quality_labels{
 	"低",
 	"中",
 	"高",
-	"最高"};
+	"最高"
+};
 
-class w_aniso_slider : public w_slider
-{
+class w_aniso_slider : public w_slider {
 public:
-	w_aniso_slider(int num_items, int sel) : w_slider(num_items, sel)
-	{
+	w_aniso_slider(int num_items, int sel) : w_slider(num_items, sel) {
 		init_formatted_value();
 	}
 
-	virtual std::string formatted_value(void)
-	{
+	virtual std::string formatted_value(void) {
 		std::ostringstream ss;
 		ss << ((selection == 0) ? 0 : 1 << (selection - 1));
 		return ss.str();
 	}
 };
 
+
 class SdlOpenGLDialog : public OpenGLDialog
 {
 public:
-	SdlOpenGLDialog(int theSelectedRenderer)
+	SdlOpenGLDialog (int theSelectedRenderer)
 	{
 
 		vertical_placer *placer = new vertical_placer;
@@ -432,25 +427,24 @@ public:
 		general_table->dual_add_row(new w_static_text("外部テスクチャのクオリティ"), m_dialog);
 
 		w_select_popup *texture_quality_wa[OGL_NUMBER_OF_TEXTURE_TYPES];
-		for (int i = 0; i < OGL_NUMBER_OF_TEXTURE_TYPES; i++)
-			texture_quality_wa[i] = NULL;
+		for (int i = 0; i < OGL_NUMBER_OF_TEXTURE_TYPES; i++) texture_quality_wa[i] = NULL;
 
-		texture_quality_wa[OGL_Txtr_Wall] = new w_select_popup();
+		texture_quality_wa[OGL_Txtr_Wall] =  new w_select_popup ();
 		//		general_table->dual_add(texture_quality_wa[OGL_Txtr_Wall]->label("Walls"), m_dialog);
 		general_table->dual_add(texture_quality_wa[OGL_Txtr_Wall]->label("壁"), m_dialog);
 		general_table->dual_add(texture_quality_wa[OGL_Txtr_Wall], m_dialog);
 
-		texture_quality_wa[OGL_Txtr_Landscape] = new w_select_popup();
+		texture_quality_wa[OGL_Txtr_Landscape] = new w_select_popup ();
 		//		general_table->dual_add(texture_quality_wa[OGL_Txtr_Landscape]->label("Landscapes"), m_dialog);
 		general_table->dual_add(texture_quality_wa[OGL_Txtr_Landscape]->label("背景"), m_dialog);
 		general_table->dual_add(texture_quality_wa[OGL_Txtr_Landscape], m_dialog);
 
-		texture_quality_wa[OGL_Txtr_Inhabitant] = new w_select_popup();
+		texture_quality_wa[OGL_Txtr_Inhabitant] = new w_select_popup ();
 		//		general_table->dual_add(texture_quality_wa[OGL_Txtr_Inhabitant]->label("Sprites"), m_dialog);
 		general_table->dual_add(texture_quality_wa[OGL_Txtr_Inhabitant]->label("スプライト"), m_dialog);
 		general_table->dual_add(texture_quality_wa[OGL_Txtr_Inhabitant], m_dialog);
 
-		texture_quality_wa[OGL_Txtr_WeaponsInHand] = new w_select_popup();
+		texture_quality_wa[OGL_Txtr_WeaponsInHand] = new w_select_popup ();
 		//		general_table->dual_add(texture_quality_wa[OGL_Txtr_WeaponsInHand]->label("Weapons in Hand"), m_dialog);
 		general_table->dual_add(texture_quality_wa[OGL_Txtr_WeaponsInHand]->label("手中の武器"), m_dialog);
 		general_table->dual_add(texture_quality_wa[OGL_Txtr_WeaponsInHand], m_dialog);
@@ -472,11 +466,9 @@ public:
 		tex_quality_strings.push_back("高品位");
 		tex_quality_strings.push_back("最高品位");
 
-		for (int i = 0; i < OGL_NUMBER_OF_TEXTURE_TYPES; i++)
-		{
-			if (texture_quality_wa[i])
-			{
-				texture_quality_wa[i]->set_labels(tex_quality_strings);
+		for (int i = 0; i < OGL_NUMBER_OF_TEXTURE_TYPES; i++) {
+			if (texture_quality_wa[i]) {
+				texture_quality_wa[i]->set_labels (tex_quality_strings);
 			}
 		}
 		model_quality_w->set_labels(tex_quality_strings);
@@ -505,8 +497,8 @@ public:
 		advanced_table->dual_add_row(new w_static_text("テスクチャのフィルタリング"), m_dialog);
 		advanced_placer->add(advanced_table, true);
 
-		w_select *near_filter_wa[OGL_NUMBER_OF_TEXTURE_TYPES];
-		w_select *far_filter_wa[OGL_NUMBER_OF_TEXTURE_TYPES];
+		w_select* near_filter_wa[OGL_NUMBER_OF_TEXTURE_TYPES];
+		w_select* far_filter_wa[OGL_NUMBER_OF_TEXTURE_TYPES];
 		for (int i = 0; i < OGL_NUMBER_OF_TEXTURE_TYPES; ++i)
 		{
 			near_filter_wa[i] = new w_select(0, near_filter_labels);
@@ -516,7 +508,7 @@ public:
 				far_filter_wa[i] = NULL;
 		}
 
-		w_label *near_filter_labels[OGL_NUMBER_OF_TEXTURE_TYPES];
+		w_label* near_filter_labels[OGL_NUMBER_OF_TEXTURE_TYPES];
 		//		near_filter_labels[OGL_Txtr_Wall] = new w_label("Walls");
 		//		near_filter_labels[OGL_Txtr_Inhabitant] = new w_label("Sprites");
 		//		near_filter_labels[OGL_Txtr_Landscape] = new w_label("Landscapes");
@@ -634,82 +626,79 @@ public:
 
 		horizontal_placer *button_placer = new horizontal_placer;
 		//		w_button* ok_w = new w_button("ACCEPT");
-		w_button *ok_w = new w_button("了承");
+		w_button* ok_w = new w_button("了承");
 		button_placer->dual_add(ok_w, m_dialog);
 
 		//		w_button* cancel_w = new w_button("CANCEL");
-		w_button *cancel_w = new w_button("キャンセル");
+		w_button* cancel_w = new w_button("キャンセル");
 		button_placer->dual_add(cancel_w, m_dialog);
 		placer->add(button_placer, true);
 
 		m_dialog.set_widget_placer(placer);
 
-		m_cancelWidget = new ButtonWidget(cancel_w);
-		m_okWidget = new ButtonWidget(ok_w);
+		m_cancelWidget = new ButtonWidget (cancel_w);
+		m_okWidget = new ButtonWidget (ok_w);
 
-		m_fogWidget = new ToggleWidget(fog_w);
-		m_colourEffectsWidget = new ToggleWidget(fader_w);
-		m_transparentLiquidsWidget = new ToggleWidget(liq_w);
-		m_3DmodelsWidget = new ToggleWidget(models_w);
-		m_blurWidget = new ToggleWidget(blur_w);
-		m_bumpWidget = new ToggleWidget(bump_w);
-		m_perspectiveWidget = new ToggleWidget(perspective_w);
+		m_fogWidget = new ToggleWidget (fog_w);
+		m_colourEffectsWidget = new ToggleWidget (fader_w);
+		m_transparentLiquidsWidget = new ToggleWidget (liq_w);
+		m_3DmodelsWidget = new ToggleWidget (models_w);
+		m_blurWidget = new ToggleWidget (blur_w);
+		m_bumpWidget = new ToggleWidget (bump_w);
+		m_perspectiveWidget = new ToggleWidget (perspective_w);
 
 		m_colourTheVoidWidget = 0;
 		m_voidColourWidget = 0;
 
 		m_ephemeraQualityWidget = new PopupSelectorWidget(ephemera_w);
 
-		m_fsaaWidget = new PopupSelectorWidget(fsaa_w);
+		m_fsaaWidget = new PopupSelectorWidget (fsaa_w);
 
-		m_anisotropicWidget = new SliderSelectorWidget(aniso_w);
+		m_anisotropicWidget = new SliderSelectorWidget (aniso_w);
 
 		m_sRGBWidget = new ToggleWidget(srgb_w);
 
-		m_geForceFixWidget = new ToggleWidget(geforce_fix_w);
-		m_useNPOTWidget = new ToggleWidget(use_npot_w);
-		m_vsyncWidget = new ToggleWidget(vsync_w);
+		m_geForceFixWidget = new ToggleWidget (geforce_fix_w);
+		m_useNPOTWidget = new ToggleWidget (use_npot_w);
+		m_vsyncWidget = new ToggleWidget (vsync_w);
 
-		m_wallsFilterWidget = new SelectSelectorWidget(far_filter_wa[OGL_Txtr_Wall]);
-		m_spritesFilterWidget = new SelectSelectorWidget(far_filter_wa[OGL_Txtr_Inhabitant]);
+		m_wallsFilterWidget = new SelectSelectorWidget (far_filter_wa[OGL_Txtr_Wall]);
+		m_spritesFilterWidget = new SelectSelectorWidget (far_filter_wa[OGL_Txtr_Inhabitant]);
 
-		for (int i = 0; i < OGL_NUMBER_OF_TEXTURE_TYPES; ++i)
-		{
-			m_textureQualityWidget[i] = new PopupSelectorWidget(texture_quality_wa[i]);
+		for (int i = 0; i < OGL_NUMBER_OF_TEXTURE_TYPES; ++i) {
+			m_textureQualityWidget [i] = new PopupSelectorWidget (texture_quality_wa[i]);
 			m_nearFiltersWidget[i] = new SelectSelectorWidget(near_filter_wa[i]);
-			m_textureResolutionWidget[i] = new PopupSelectorWidget(texture_resolution_wa[i]);
-			m_textureDepthWidget[i] = new PopupSelectorWidget(texture_depth_wa[i]);
+			m_textureResolutionWidget [i] = new PopupSelectorWidget (texture_resolution_wa[i]);
+			m_textureDepthWidget [i] = new PopupSelectorWidget(texture_depth_wa[i]);
 		}
 		m_modelQualityWidget = new PopupSelectorWidget(model_quality_w);
 	}
 
-	~SdlOpenGLDialog()
-	{
+	~SdlOpenGLDialog() {
 		delete m_tabs;
 	}
 
-	virtual bool Run()
+	virtual bool Run ()
 	{
-		return (m_dialog.run() == 0);
+		return (m_dialog.run () == 0);
 	}
 
-	virtual void Stop(bool result)
+	virtual void Stop (bool result)
 	{
-		m_dialog.quit(result ? 0 : -1);
+		m_dialog.quit (result ? 0 : -1);
 	}
 
 	static void choose_generic_tab(void *arg);
 	static void choose_advanced_tab(void *arg);
 
 private:
-	enum
-	{
+	enum {
 		TAB_WIDGET = 400,
 		BASIC_TAB,
 		ADVANCED_TAB
 	};
 
-	tab_placer *m_tabs;
+	tab_placer* m_tabs;
 	dialog m_dialog;
 };
 

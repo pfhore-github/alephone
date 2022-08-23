@@ -119,15 +119,18 @@ using namespace alephone;
 
 static const char sPasswordMask[] = "reverof nohtaram";
 
-static const char *sNetworkGameProtocolNames[] =
-	{ // These should match up with _network_game_protocol_ring, etc.
-		"ring",
-		"star"};
+static const char* sNetworkGameProtocolNames[] =
+{	// These should match up with _network_game_protocol_ring, etc.
+	"ring",
+	"star"
+};
 
 static const size_t NUMBER_OF_NETWORK_GAME_PROTOCOL_NAMES = sizeof(sNetworkGameProtocolNames) / sizeof(sNetworkGameProtocolNames[0]);
 
+
 // Have the prefs been inited?
 static bool PrefsInited = false;
+
 
 // Global preferences data
 struct graphics_preferences_data *graphics_preferences = NULL;
@@ -138,7 +141,7 @@ SoundManager::Parameters *sound_preferences = NULL;
 struct environment_preferences_data *environment_preferences = NULL;
 
 // LP: fake portable-files stuff
-inline short memory_error() { return 0; }
+inline short memory_error() {return 0;}
 
 static bool ethernet_active(void);
 static std::string get_name_from_system(void);
@@ -171,7 +174,7 @@ static void controls_dialog(void *arg);
 static void environment_dialog(void *arg);
 static void plugins_dialog(void *arg);
 static void keyboard_dialog(void *arg);
-// static void texture_options_dialog(void *arg);
+//static void texture_options_dialog(void *arg);
 
 /*
  *  Get user name
@@ -179,7 +182,7 @@ static void keyboard_dialog(void *arg);
 
 static std::string get_name_from_system()
 {
-#if defined(unix) || (defined(__APPLE__) && defined(__MACH__)) || defined(__NetBSD__) || defined(__OpenBSD__)
+#if defined(unix) || (defined (__APPLE__) && defined (__MACH__)) || defined(__NetBSD__) || defined(__OpenBSD__)
 
 	const char *login_name = getlogin();
 	std::string login = (login_name ? login_name : "");
@@ -200,6 +203,7 @@ static std::string get_name_from_system()
 	return "Bob User";
 }
 
+
 /*
  *  Ethernet always available
  */
@@ -208,6 +212,7 @@ static bool ethernet_active(void)
 {
 	return true;
 }
+
 
 /*
  *  Main preferences dialog
@@ -265,88 +270,75 @@ void handle_preferences(void)
 class CrosshairPref : public Bindable<int>
 {
 public:
-	CrosshairPref(short &pref) : m_pref(pref) {}
+	CrosshairPref(short& pref) : m_pref(pref) { }
 
-	virtual int bind_export()
-	{
+	virtual int bind_export() {
 		return (m_pref - 1);
 	}
 
-	virtual void bind_import(int value)
-	{
+	virtual void bind_import(int value) {
 		m_pref = value + 1;
 	}
 
 protected:
-	short &m_pref;
+	short& m_pref;
 };
 
 class ColorComponentPref : public Bindable<int>
 {
 public:
-	ColorComponentPref(uint16 &pref) : m_pref(pref) {}
+	ColorComponentPref(uint16& pref) : m_pref(pref) { }
 
-	virtual int bind_export()
-	{
+	virtual int bind_export() {
 		return (m_pref >> 12);
 	}
 
-	virtual void bind_import(int value)
-	{
+	virtual void bind_import(int value) {
 		m_pref = value << 12;
 	}
 
 protected:
-	uint16 &m_pref;
+	uint16& m_pref;
 };
 
 class OpacityPref : public Bindable<int>
 {
 public:
-	OpacityPref(float &pref) : m_pref(pref) {}
+	OpacityPref(float& pref) : m_pref(pref) { }
 
-	virtual int bind_export()
-	{
+	virtual int bind_export() {
 		return (static_cast<int>(floor(m_pref * 16)));
 	}
 
-	virtual void bind_import(int value)
-	{
-		m_pref = ((float)value / 16.0);
+	virtual void bind_import(int value) {
+		m_pref = ((float) value / 16.0);
 	}
-
 protected:
-	float &m_pref;
+	float& m_pref;
 };
 
 static const char *shape_labels[3] = {
-	"Cross", "Octagon", NULL};
-
-enum
-{
-	kCrosshairWidget
+	"Cross", "Octagon", NULL
 };
+
+enum { kCrosshairWidget };
 
 static std::unique_ptr<BinderSet> crosshair_binders;
 
 struct update_crosshair_display
 {
-	void operator()(dialog *d)
-	{
+	void operator()(dialog *d) {
 		crosshair_binders->migrate_all_first_to_second();
 	}
 };
 
-class w_crosshair_slider : public w_slider
-{
+class w_crosshair_slider : public w_slider {
 public:
-	w_crosshair_slider(int num_items, int sel) : w_slider(num_items, sel)
-	{
+	w_crosshair_slider(int num_items, int sel) : w_slider(num_items, sel) {
 		init_formatted_value();
 	}
 
-	virtual std::string formatted_value(void)
-	{
+	virtual std::string formatted_value(void) {
 		std::ostringstream ss;
 		ss << (selection + 1);
 		return ss.str();
@@ -358,7 +350,7 @@ static void crosshair_dialog(void *arg)
 	CrosshairData OldCrosshairs = player_preferences->Crosshairs;
 	crosshair_binders.reset(new BinderSet);
 
-	dialog *parent = (dialog *)arg;
+	dialog *parent = (dialog *) arg;
 	(void)parent;
 
 	dialog d;
@@ -382,17 +374,17 @@ static void crosshair_dialog(void *arg)
 	w_select *shape_w = new w_select(0, shape_labels);
 	SelectSelectorWidget shapeWidget(shape_w);
 	Int16Pref shapePref(player_preferences->Crosshairs.Shape);
-	crosshair_binders->insert<int>(&shapeWidget, &shapePref);
+	crosshair_binders->insert<int> (&shapeWidget, &shapePref);
 	table->dual_add(shape_w->label("形"), d);
 	table->dual_add(shape_w, d);
 
 	table->add_row(new w_spacer(), true);
 
 	// Thickness
-	w_slider *thickness_w = new w_crosshair_slider(7, 0);
+	w_slider* thickness_w = new w_crosshair_slider(7, 0);
 	SliderSelectorWidget thicknessWidget(thickness_w);
 	CrosshairPref thicknessPref(player_preferences->Crosshairs.Thickness);
-	crosshair_binders->insert<int>(&thicknessWidget, &thicknessPref);
+	crosshair_binders->insert<int> (&thicknessWidget, &thicknessPref);
 	table->dual_add(thickness_w->label("太さ"), d);
 	table->dual_add(thickness_w, d);
 
@@ -400,7 +392,7 @@ static void crosshair_dialog(void *arg)
 	w_slider *from_center_w = new w_slider(15, 0);
 	SliderSelectorWidget fromCenterWidget(from_center_w);
 	Int16Pref fromCenterPref(player_preferences->Crosshairs.FromCenter);
-	crosshair_binders->insert<int>(&fromCenterWidget, &fromCenterPref);
+	crosshair_binders->insert<int> (&fromCenterWidget, &fromCenterPref);
 	table->dual_add(from_center_w->label("ギャップ"), d);
 	table->dual_add(from_center_w, d);
 
@@ -408,7 +400,7 @@ static void crosshair_dialog(void *arg)
 	w_slider *length_w = new w_crosshair_slider(15, 0);
 	SliderSelectorWidget lengthWidget(length_w);
 	CrosshairPref lengthPref(player_preferences->Crosshairs.Length);
-	crosshair_binders->insert<int>(&lengthWidget, &lengthPref);
+	crosshair_binders->insert<int> (&lengthWidget, &lengthPref);
 	table->dual_add(length_w->label("大きさ"), d);
 	table->dual_add(length_w, d);
 
@@ -419,21 +411,21 @@ static void crosshair_dialog(void *arg)
 	w_slider *red_w = new w_percentage_slider(16, 0);
 	SliderSelectorWidget redWidget(red_w);
 	ColorComponentPref redPref(player_preferences->Crosshairs.Color.red);
-	crosshair_binders->insert<int>(&redWidget, &redPref);
+	crosshair_binders->insert<int> (&redWidget, &redPref);
 	table->dual_add(red_w->label("赤"), d);
 	table->dual_add(red_w, d);
 
 	w_slider *green_w = new w_percentage_slider(16, 0);
 	SliderSelectorWidget greenWidget(green_w);
 	ColorComponentPref greenPref(player_preferences->Crosshairs.Color.green);
-	crosshair_binders->insert<int>(&greenWidget, &greenPref);
+	crosshair_binders->insert<int> (&greenWidget, &greenPref);
 	table->dual_add(green_w->label("緑"), d);
 	table->dual_add(green_w, d);
 
 	w_slider *blue_w = new w_percentage_slider(16, 0);
 	SliderSelectorWidget blueWidget(blue_w);
 	ColorComponentPref bluePref(player_preferences->Crosshairs.Color.blue);
-	crosshair_binders->insert<int>(&blueWidget, &bluePref);
+	crosshair_binders->insert<int> (&blueWidget, &bluePref);
 	table->dual_add(blue_w->label("青"), d);
 	table->dual_add(blue_w, d);
 
@@ -443,7 +435,7 @@ static void crosshair_dialog(void *arg)
 	w_slider *opacity_w = new w_percentage_slider(16, 0);
 	SliderSelectorWidget opacityWidget(opacity_w);
 	OpacityPref opacityPref(player_preferences->Crosshairs.Opacity);
-	crosshair_binders->insert<int>(&opacityWidget, &opacityPref);
+	crosshair_binders->insert<int> (&opacityWidget, &opacityPref);
 	table->dual_add(opacity_w->label("透過度"), d);
 	table->dual_add(opacity_w, d);
 
@@ -482,8 +474,7 @@ static void crosshair_dialog(void *arg)
  *  Player dialog
  */
 
-enum
-{
+enum {
 	NAME_W
 };
 
@@ -554,13 +545,11 @@ static void player_dialog(void *arg)
 	clear_screen();
 
 	// Run dialog
-	if (d.run() == 0)
-	{ // Accepted
+	if (d.run() == 0) {	// Accepted
 		bool changed = false;
 
 		const char *name = name_w->get_text();
-		if (strcmp(name, player_preferences->name))
-		{
+		if (strcmp(name, player_preferences->name)) {
 			strncpy(player_preferences->name, name, PREFERENCES_NAME_LENGTH);
 			player_preferences->name[PREFERENCES_NAME_LENGTH] = '\0';
 			changed = true;
@@ -568,31 +557,27 @@ static void player_dialog(void *arg)
 
 		int16 level = static_cast<int16>(level_w->get_selection());
 		assert(level >= 0);
-		if (level != player_preferences->difficulty_level)
-		{
+		if (level != player_preferences->difficulty_level) {
 			player_preferences->difficulty_level = level;
 			changed = true;
 		}
 
 		int16 color = static_cast<int16>(pcolor_w->get_selection());
 		assert(color >= 0);
-		if (color != player_preferences->color)
-		{
+		if (color != player_preferences->color) {
 			player_preferences->color = color;
 			changed = true;
 		}
 
 		int16 team = static_cast<int16>(tcolor_w->get_selection());
 		assert(team >= 0);
-		if (team != player_preferences->team)
-		{
+		if (team != player_preferences->team) {
 			player_preferences->team = team;
 			changed = true;
 		}
 
 		bool crosshair = crosshairs_active_w->get_selection();
-		if (crosshair != player_preferences->crosshairs_active)
-		{
+		if (crosshair != player_preferences->crosshairs_active) {
 			player_preferences->crosshairs_active = crosshair;
 			changed = true;
 		}
@@ -749,7 +734,7 @@ static void online_dialog(void *arg)
 	placer->dual_add(new w_title("インターネットゲーム設定"), d);
 	placer->add(new w_spacer());
 
-	tab_placer *tabs = new tab_placer();
+	tab_placer* tabs = new tab_placer();
 
 	std::vector<std::string> labels;
 	labels.push_back("アカウント");
@@ -874,42 +859,34 @@ static void online_dialog(void *arg)
 	clear_screen();
 
 	// Run dialog
-	if (d.run() == 0)
-	{ // Accepted
+	if (d.run() == 0) {	// Accepted
 		bool changed = false;
 
 		const char *name = name_w->get_text();
-		if (strcmp(name, player_preferences->name))
-		{
+		if (strcmp(name, player_preferences->name)) {
 			strncpy(player_preferences->name, name, PREFERENCES_NAME_LENGTH);
 			player_preferences->name[PREFERENCES_NAME_LENGTH] = '\0';
 			changed = true;
 		}
 
 		const char *metaserver_login = login_w->get_text();
-		if (strcmp(metaserver_login, network_preferences->metaserver_login))
-		{
-			strncpy(network_preferences->metaserver_login, metaserver_login, network_preferences_data::kMetaserverLoginLength - 1);
-			network_preferences->metaserver_login[network_preferences_data::kMetaserverLoginLength - 1] = '\0';
+		if (strcmp(metaserver_login, network_preferences->metaserver_login)) {
+			strncpy(network_preferences->metaserver_login, metaserver_login, network_preferences_data::kMetaserverLoginLength-1);
+			network_preferences->metaserver_login[network_preferences_data::kMetaserverLoginLength-1] = '\0';
 			changed = true;
 		}
 
 		// clear password if login has been cleared
-		if (!strlen(metaserver_login))
-		{
-			if (strlen(network_preferences->metaserver_password))
-			{
+		if (!strlen(metaserver_login)) {
+			if (strlen(network_preferences->metaserver_password)) {
 				network_preferences->metaserver_password[0] = '\0';
 				changed = true;
 			}
-		}
-		else
-		{
+		} else {
 			const char *metaserver_password = password_w->get_text();
-			if (strcmp(metaserver_password, network_preferences->metaserver_password))
-			{
-				strncpy(network_preferences->metaserver_password, metaserver_password, network_preferences_data::kMetaserverLoginLength - 1);
-				network_preferences->metaserver_password[network_preferences_data::kMetaserverLoginLength - 1] = '\0';
+			if (strcmp(metaserver_password, network_preferences->metaserver_password)) {
+				strncpy(network_preferences->metaserver_password, metaserver_password, network_preferences_data::kMetaserverLoginLength-1);
+				network_preferences->metaserver_password[network_preferences_data::kMetaserverLoginLength-1] = '\0';
 				changed = true;
 			}
 		}
@@ -931,11 +908,11 @@ static void online_dialog(void *arg)
 			}
 
 			rgb_color secondary_color = secondary_w->get_selection();
-			if (secondary_color.red != network_preferences->metaserver_colors[1].red || secondary_color.green != network_preferences->metaserver_colors[1].green || secondary_color.blue != network_preferences->metaserver_colors[1].blue)
-			{
+			if (secondary_color.red != network_preferences->metaserver_colors[1].red || secondary_color.green != network_preferences->metaserver_colors[1].green || secondary_color.blue != network_preferences->metaserver_colors[1].blue)			{
 				network_preferences->metaserver_colors[1] = secondary_color;
 				changed = true;
 			}
+			
 		}
 
 		bool mute_metaserver_guests = mute_guests_w->get_selection() == 1;
@@ -960,6 +937,7 @@ static void online_dialog(void *arg)
 			changed = true;
 		}
 
+		
 		if (changed)
 			write_preferences();
 	}
@@ -968,6 +946,7 @@ static void online_dialog(void *arg)
 /*
  *  Handle graphics dialog
  */
+
 #ifdef TRUE_COLOR_ONLY
 static const char *depth_labels[3] = {
 	"16ビット", "32ビット", NULL};
@@ -991,7 +970,8 @@ static const char *ephemera_quality_labels[] = {
 static const char *fps_target_labels[] = {
 	"30", "60 (補完)", "120 (補完)", "無制限 (補完)", NULL};
 static const int16_t fps_target_values[] = {
-	30, 60, 120, 0};
+	30, 60, 120, 0
+};
 
 static const char *gamma_labels[9] = {
 	"とても暗い", "暗い", "やや暗い", "通常", "やや明るい", "明るい", "より明るい", "とても明るい", NULL};
@@ -1012,14 +992,15 @@ static const char *max_saves_labels[] = {
 	"20", "100", "500", "無制限", NULL};
 
 static const uint32 max_saves_values[] = {
-	20, 100, 500, 0};
+	20, 100, 500, 0
+};
 
-enum
-{
+
+enum {
 	iRENDERING_SYSTEM = 1000
 };
 
-static const vector<string> build_stringvector_from_cstring_array(const char **label_array)
+static const vector<string> build_stringvector_from_cstring_array (const char** label_array)
 {
 	std::vector<std::string> label_vector;
 	for (int i = 0; label_array[i] != NULL; ++i)
@@ -1028,7 +1009,8 @@ static const vector<string> build_stringvector_from_cstring_array(const char **l
 	return label_vector;
 }
 
-static void software_rendering_options_dialog(void *arg)
+
+static void software_rendering_options_dialog(void* arg)
 {
 	// Create dialog
 	dialog d;
@@ -1042,9 +1024,7 @@ static void software_rendering_options_dialog(void *arg)
 #ifdef TRUE_COLOR_ONLY
 	w_select *depth_w = new w_select(graphics_preferences->screen_mode.bit_depth == 16 ? 0 : 1, depth_labels);
 #else
-	w_select *depth_w = new w_select(graphics_preferences->screen_mode.bit_depth == 8 ? 0 : graphics_preferences->screen_mode.bit_depth == 16 ? 1
-																																			  : 2,
-									 depth_labels);
+	w_select *depth_w = new w_select(graphics_preferences->screen_mode.bit_depth == 8 ? 0 : graphics_preferences->screen_mode.bit_depth == 16 ? 1 : 2, depth_labels);
 #endif
 	table->dual_add(depth_w->label("色深度"), d);
 	table->dual_add(depth_w, d);
@@ -1080,26 +1060,22 @@ static void software_rendering_options_dialog(void *arg)
 	clear_screen();
 
 	// Run dialog
-	if (d.run() == 0)
-	{ // Accepted
+	if (d.run() == 0) {	// Accepted
 		bool changed = false;
 
 #ifdef TRUE_COLOR_ONLY
 		int depth = (depth_w->get_selection() == 0 ? 16 : 32);
 #else
-		int depth = (depth_w->get_selection() == 0 ? 8 : depth_w->get_selection() == 1 ? 16
-																					   : 32);
+		int depth = (depth_w->get_selection() == 0 ? 8 : depth_w->get_selection() == 1 ? 16 : 32);
 #endif
-		if (depth != graphics_preferences->screen_mode.bit_depth)
-		{
+		if (depth != graphics_preferences->screen_mode.bit_depth) {
 			graphics_preferences->screen_mode.bit_depth = depth;
 			changed = true;
 			// don't change mode now; it will be changed when the game starts
 		}
 
 		bool hi_res = resolution_w->get_selection() != 0;
-		if (hi_res != graphics_preferences->screen_mode.high_resolution)
-		{
+		if (hi_res != graphics_preferences->screen_mode.high_resolution) {
 			graphics_preferences->screen_mode.high_resolution = hi_res;
 			changed = true;
 		}
@@ -1128,18 +1104,17 @@ static void software_rendering_options_dialog(void *arg)
 }
 
 // ZZZ addition: bounce to correct renderer-config box based on selected rendering system.
-static void rendering_options_dialog_demux(void *arg)
+static void rendering_options_dialog_demux(void* arg)
 {
-	int theSelectedRenderer = get_selection_control_value((dialog *)arg, iRENDERING_SYSTEM) - 1;
+	int theSelectedRenderer = get_selection_control_value((dialog*) arg, iRENDERING_SYSTEM) - 1;
 
-	switch (theSelectedRenderer)
-	{
+	switch(theSelectedRenderer) {
 	case _no_acceleration:
 		software_rendering_options_dialog(arg);
 		break;
 
 	case _opengl_acceleration:
-		OpenGLDialog::Create(theSelectedRenderer)->OpenGLPrefsByRunning();
+			OpenGLDialog::Create (theSelectedRenderer)->OpenGLPrefsByRunning ();
 		break;
 
 	default:
@@ -1152,7 +1127,7 @@ std::vector<std::string> build_resolution_labels()
 {
 	std::vector<std::string> result;
 	bool first_mode = true;
-	for (std::vector<std::pair<int, int>>::const_iterator it = Screen::instance()->GetModes().begin(); it != Screen::instance()->GetModes().end(); ++it)
+	for (std::vector<std::pair<int, int> >::const_iterator it = Screen::instance()->GetModes().begin(); it != Screen::instance()->GetModes().end(); ++it)
 	{
 		std::ostringstream os;
 		os << it->first << "x" << it->second;
@@ -1167,16 +1142,13 @@ std::vector<std::string> build_resolution_labels()
 	return result;
 }
 
-class w_fov_slider : public w_slider
-{
+class w_fov_slider : public w_slider {
 public:
-	w_fov_slider(int sel) : w_slider(101, sel)
-	{
+	w_fov_slider(int sel) : w_slider(101, sel) {
 		init_formatted_value();
 	}
 
-	virtual std::string formatted_value(void)
-	{
+	virtual std::string formatted_value(void) {
 		std::ostringstream oss;
 		oss << (selection + 30);
 		return oss.str();
@@ -1200,7 +1172,7 @@ static void graphics_dialog(void *arg)
 	table->col_flags(0, placeable::kAlignRight);
 	table->col_flags(1, placeable::kAlignLeft);
 
-	w_select *renderer_w = new w_select(graphics_preferences->screen_mode.acceleration, renderer_labels);
+	w_select* renderer_w = new w_select(graphics_preferences->screen_mode.acceleration, renderer_labels);
 	renderer_w->set_identifier(iRENDERING_SYSTEM);
 #ifndef HAVE_OPENGL
 	renderer_w->set_selection(_no_acceleration);
@@ -1259,8 +1231,7 @@ static void graphics_dialog(void *arg)
 	w_fov_slider *fov_slider_w = new w_fov_slider((graphics_preferences->screen_mode.fov == 0 ? static_cast<int>(View_FOV_Normal()) : graphics_preferences->screen_mode.fov) - 30);
 	fov_slider_w->set_enabled(graphics_preferences->screen_mode.fov != 0);
 	override_fov_w->set_selection_changed_callback(
-		[&](w_select *)
-		{
+		[&](w_select*) {
 			if (override_fov_w->get_selection())
 			{
 				fov_slider_w->set_enabled(true);
@@ -1333,32 +1304,27 @@ static void graphics_dialog(void *arg)
 	clear_screen();
 
 	// Run dialog
-	if (d.run() == 0)
-	{ // Accepted
+    if (d.run() == 0) {	// Accepted
 		bool changed = false;
 
 		bool fullscreen = fullscreen_w->get_selection() == 0;
-		if (fullscreen != graphics_preferences->screen_mode.fullscreen)
-		{
+	    if (fullscreen != graphics_preferences->screen_mode.fullscreen) {
 			graphics_preferences->screen_mode.fullscreen = fullscreen;
 			changed = true;
 		}
 
 		short renderer = static_cast<short>(renderer_w->get_selection());
 		assert(renderer >= 0);
-		if (renderer != graphics_preferences->screen_mode.acceleration)
-		{
+	    if(renderer != graphics_preferences->screen_mode.acceleration) {
 			graphics_preferences->screen_mode.acceleration = renderer;
-			if (renderer)
-				graphics_preferences->screen_mode.bit_depth = 32;
+		    if (renderer) graphics_preferences->screen_mode.bit_depth = 32;
 			changed = true;
 		}
 
 		short resolution = static_cast<short>(size_w->get_selection());
 		if (resolution == 0)
 		{
-			if (!graphics_preferences->screen_mode.auto_resolution)
-			{
+			if (!graphics_preferences->screen_mode.auto_resolution) {
 				graphics_preferences->screen_mode.auto_resolution = true;
 				changed = true;
 			}
@@ -1372,15 +1338,13 @@ static void graphics_dialog(void *arg)
 		}
 
 		bool high_dpi = high_dpi_w->get_selection() != 0;
-		if (high_dpi != graphics_preferences->screen_mode.high_dpi)
-		{
+		if (high_dpi != graphics_preferences->screen_mode.high_dpi) {
 			graphics_preferences->screen_mode.high_dpi = high_dpi;
 			changed = true;
 		}
 
 		short gamma = static_cast<short>(gamma_w->get_selection());
-		if (gamma != graphics_preferences->screen_mode.gamma_level)
-		{
+	    if (gamma != graphics_preferences->screen_mode.gamma_level) {
 			graphics_preferences->screen_mode.gamma_level = gamma;
 			changed = true;
 		}
@@ -1393,8 +1357,7 @@ static void graphics_dialog(void *arg)
 		}
 
 		bool fix_h_not_v = fixh_w->get_selection() == 0;
-		if (fix_h_not_v != graphics_preferences->screen_mode.fix_h_not_v)
-		{
+        if (fix_h_not_v != graphics_preferences->screen_mode.fix_h_not_v) {
 			graphics_preferences->screen_mode.fix_h_not_v = fix_h_not_v;
 			changed = true;
 		}
@@ -1421,15 +1384,13 @@ static void graphics_dialog(void *arg)
 		}
 
 		bool translucent_map = map_w->get_selection() != 0;
-		if (translucent_map != graphics_preferences->screen_mode.translucent_map)
-		{
+		if (translucent_map != graphics_preferences->screen_mode.translucent_map) {
 			graphics_preferences->screen_mode.translucent_map = translucent_map;
 			changed = true;
 		}
 
 		bool camera_bob = bob_w->get_selection() != 0;
-		if (camera_bob != graphics_preferences->screen_mode.camera_bob)
-		{
+		if (camera_bob != graphics_preferences->screen_mode.camera_bob) {
 			graphics_preferences->screen_mode.camera_bob = camera_bob;
 			changed = true;
 		}
@@ -1441,13 +1402,12 @@ static void graphics_dialog(void *arg)
 			changed = true;
 		}
 
-		if (changed)
-		{
+	    if (changed) {
 			write_preferences();
 			change_screen_mode(&graphics_preferences->screen_mode, true);
 			clear_screen(true);
 			parent->layout();
-			parent->draw(); // DirectX seems to need this
+		    parent->draw();		// DirectX seems to need this
 		}
 	}
 }
@@ -1458,8 +1418,7 @@ static void graphics_dialog(void *arg)
 
 class w_toggle *stereo_w, *dynamic_w;
 
-class w_stereo_toggle : public w_toggle
-{
+class w_stereo_toggle : public w_toggle {
 public:
 	w_stereo_toggle(bool selection) : w_toggle(selection) {}
 
@@ -1472,8 +1431,7 @@ public:
 	}
 };
 
-class w_dynamic_toggle : public w_toggle
-{
+class w_dynamic_toggle : public w_toggle {
 public:
 	w_dynamic_toggle(bool selection) : w_toggle(selection) {}
 
@@ -1488,8 +1446,7 @@ public:
 
 static const char *channel_labels[] = {"1", "2", "4", "8", "16", "32", NULL};
 
-class w_volume_slider : public w_percentage_slider
-{
+class w_volume_slider : public w_percentage_slider {
 public:
 	w_volume_slider(int vol) : w_percentage_slider(21, vol) {}
 	~w_volume_slider() {}
@@ -1500,16 +1457,13 @@ public:
 	}
 };
 
-class w_music_slider : public w_slider
-{
+class w_music_slider : public w_slider {
 public:
-	w_music_slider(int sel) : w_slider(41, sel)
-	{
+	w_music_slider(int sel) : w_slider(41, sel) {
 		init_formatted_value();
 	}
 
-	virtual std::string formatted_value()
-	{
+	virtual std::string formatted_value() {
 		std::ostringstream ss;
 		ss << (selection * 200 / (num_items - 1)) << "%";
 		return ss.str();
@@ -1592,56 +1546,43 @@ static void sound_dialog(void *arg)
 	clear_screen();
 
 	// Run dialog
-	if (d.run() == 0)
-	{ // Accepted
+	if (d.run() == 0) {	// Accepted
 		bool changed = false;
 
 		uint16 flags = 0;
-		if (quality_w->get_selection())
-			flags |= _16bit_sound_flag;
-		if (stereo_w->get_selection())
-			flags |= _stereo_flag;
-		if (dynamic_w->get_selection())
-			flags |= _dynamic_tracking_flag;
-		if (ambient_w->get_selection())
-			flags |= _ambient_sound_flag;
-		if (more_w->get_selection())
-			flags |= _more_sounds_flag;
-		if (zrd_w->get_selection())
-			flags |= _zero_restart_delay;
+		if (quality_w->get_selection()) flags |= _16bit_sound_flag;
+		if (stereo_w->get_selection()) flags |= _stereo_flag;
+		if (dynamic_w->get_selection()) flags |= _dynamic_tracking_flag;
+		if (ambient_w->get_selection()) flags |= _ambient_sound_flag;
+		if (more_w->get_selection()) flags |= _more_sounds_flag;
+		if (zrd_w->get_selection()) flags |= _zero_restart_delay;
 
-		if (flags != sound_preferences->flags)
-		{
+		if (flags != sound_preferences->flags) {
 			sound_preferences->flags = flags;
 			changed = true;
 		}
 
 		flags = input_preferences->modifiers & ~_inputmod_use_button_sounds;
-		if (button_sounds_w->get_selection())
-			flags |= _inputmod_use_button_sounds;
-		if (flags != input_preferences->modifiers)
-		{
+		if (button_sounds_w->get_selection()) flags |= _inputmod_use_button_sounds;
+		if (flags != input_preferences->modifiers) {
 			input_preferences->modifiers = flags;
 			changed = true;
 		}
 
 		int16 channel_count = 1 << (channels_w->get_selection() == UNONE ? 1 : channels_w->get_selection());
-		if (channel_count != sound_preferences->channel_count)
-		{
+		if (channel_count != sound_preferences->channel_count) {
 			sound_preferences->channel_count = channel_count;
 			changed = true;
 		}
 
 		float volume_db = (volume_w->get_selection() - 20) * 2;
-		if (volume_db != sound_preferences->volume_db)
-		{
+		if (volume_db != sound_preferences->volume_db) {
 			sound_preferences->volume_db = volume_db;
 			changed = true;
 		}
 
 		float music_db = music_volume_w->get_selection() - 20;
-		if (music_db != sound_preferences->music_db)
-		{
+		if (music_db != sound_preferences->music_db) {
 			sound_preferences->music_db = music_db;
 			changed = true;
 		}
@@ -1653,14 +1594,14 @@ static void sound_dialog(void *arg)
 			changed = true;
 		}
 
-		if (changed)
-		{
+		if (changed) {
 			//			set_sound_manager_parameters(sound_preferences);
 			SoundManager::instance()->SetParameters(*sound_preferences);
 			write_preferences();
 		}
 	}
 }
+
 
 /*
  *  Controls dialog
@@ -1670,16 +1611,13 @@ const float kMinSensitivityLog = -3.0f;
 const float kMaxSensitivityLog = 3.0f;
 const float kSensitivityLogRange = kMaxSensitivityLog - kMinSensitivityLog;
 
-class w_sens_slider : public w_slider
-{
+class w_sens_slider : public w_slider {
 public:
-	w_sens_slider(int num_items, int sel) : w_slider(num_items, sel)
-	{
+	w_sens_slider(int num_items, int sel) : w_slider(num_items, sel) {
 		init_formatted_value();
 	}
 
-	virtual std::string formatted_value(void)
-	{
+	virtual std::string formatted_value(void) {
 		std::ostringstream ss;
 		float val = std::exp(selection * kSensitivityLogRange / 1000.0f + kMinSensitivityLog);
 		if (val >= 1.f)
@@ -1695,21 +1633,19 @@ public:
 	}
 };
 
-class w_deadzone_slider : public w_slider
-{
+class w_deadzone_slider : public w_slider {
 public:
-	w_deadzone_slider(int num_items, int sel) : w_slider(num_items, sel)
-	{
+	w_deadzone_slider(int num_items, int sel) : w_slider(num_items, sel) {
 		init_formatted_value();
 	}
 
-	virtual std::string formatted_value(void)
-	{
+	virtual std::string formatted_value(void) {
 		std::ostringstream ss;
 		ss << selection << "%";
 		return ss.str();
 	}
 };
+
 
 const int NUM_KEYS = 21;
 
@@ -1721,46 +1657,102 @@ static const char *action_name[NUM_KEYS] = {
 	"アクション", "地図", "マイク"};
 
 static key_binding_map default_key_bindings = {
-	{0, {SDL_SCANCODE_W, static_cast<SDL_Scancode>(AO_SCANCODE_BASE_JOYSTICK_AXIS_NEGATIVE + SDL_CONTROLLER_AXIS_LEFTY)}},
-	{1, {SDL_SCANCODE_S, static_cast<SDL_Scancode>(AO_SCANCODE_BASE_JOYSTICK_AXIS_POSITIVE + SDL_CONTROLLER_AXIS_LEFTY)}},
-	{2, {SDL_SCANCODE_LEFT, static_cast<SDL_Scancode>(AO_SCANCODE_BASE_JOYSTICK_AXIS_NEGATIVE + SDL_CONTROLLER_AXIS_RIGHTX)}},
-	{3, {SDL_SCANCODE_RIGHT, static_cast<SDL_Scancode>(AO_SCANCODE_BASE_JOYSTICK_AXIS_POSITIVE + SDL_CONTROLLER_AXIS_RIGHTX)}},
-	{4, {SDL_SCANCODE_A, static_cast<SDL_Scancode>(AO_SCANCODE_BASE_JOYSTICK_AXIS_NEGATIVE + SDL_CONTROLLER_AXIS_LEFTX)}},
-	{5, {SDL_SCANCODE_D, static_cast<SDL_Scancode>(AO_SCANCODE_BASE_JOYSTICK_AXIS_POSITIVE + SDL_CONTROLLER_AXIS_LEFTX)}},
-	{6, {SDL_SCANCODE_Q, static_cast<SDL_Scancode>(AO_SCANCODE_BASE_JOYSTICK_BUTTON + SDL_CONTROLLER_BUTTON_DPAD_LEFT)}},
-	{7, {SDL_SCANCODE_E, static_cast<SDL_Scancode>(AO_SCANCODE_BASE_JOYSTICK_BUTTON + SDL_CONTROLLER_BUTTON_DPAD_RIGHT)}},
-	{8, {SDL_SCANCODE_UP, static_cast<SDL_Scancode>(AO_SCANCODE_BASE_JOYSTICK_AXIS_NEGATIVE + SDL_CONTROLLER_AXIS_RIGHTY)}},
-	{9, {SDL_SCANCODE_DOWN, static_cast<SDL_Scancode>(AO_SCANCODE_BASE_JOYSTICK_AXIS_POSITIVE + SDL_CONTROLLER_AXIS_RIGHTY)}},
-	{10, {SDL_SCANCODE_V, static_cast<SDL_Scancode>(AO_SCANCODE_BASE_JOYSTICK_BUTTON + SDL_CONTROLLER_BUTTON_RIGHTSTICK)}},
-	{11, {SDL_SCANCODE_F, static_cast<SDL_Scancode>(AO_SCANCODE_MOUSESCROLL_UP), static_cast<SDL_Scancode>(AO_SCANCODE_BASE_JOYSTICK_BUTTON + SDL_CONTROLLER_BUTTON_LEFTSHOULDER)}},
-	{12, {SDL_SCANCODE_R, static_cast<SDL_Scancode>(AO_SCANCODE_MOUSESCROLL_DOWN), static_cast<SDL_Scancode>(AO_SCANCODE_BASE_JOYSTICK_BUTTON + SDL_CONTROLLER_BUTTON_RIGHTSHOULDER)}},
-	{13, {SDL_SCANCODE_SPACE, static_cast<SDL_Scancode>(AO_SCANCODE_BASE_MOUSE_BUTTON + SDL_BUTTON_LEFT - 1), static_cast<SDL_Scancode>(AO_SCANCODE_BASE_JOYSTICK_AXIS_POSITIVE + SDL_CONTROLLER_AXIS_TRIGGERRIGHT)}},
-	{14, {SDL_SCANCODE_LSHIFT, static_cast<SDL_Scancode>(AO_SCANCODE_BASE_MOUSE_BUTTON + SDL_BUTTON_RIGHT - 1), static_cast<SDL_Scancode>(AO_SCANCODE_BASE_JOYSTICK_AXIS_POSITIVE + SDL_CONTROLLER_AXIS_TRIGGERLEFT)}},
-	{15, {SDL_SCANCODE_LALT}},
-	{16, {SDL_SCANCODE_LCTRL, static_cast<SDL_Scancode>(AO_SCANCODE_BASE_JOYSTICK_BUTTON + SDL_CONTROLLER_BUTTON_LEFTSTICK)}},
-	{17, {SDL_SCANCODE_LGUI}},
-	{18, {SDL_SCANCODE_TAB, static_cast<SDL_Scancode>(AO_SCANCODE_BASE_JOYSTICK_BUTTON + SDL_CONTROLLER_BUTTON_A)}},
-	{19, {SDL_SCANCODE_M, static_cast<SDL_Scancode>(AO_SCANCODE_BASE_JOYSTICK_BUTTON + SDL_CONTROLLER_BUTTON_X)}},
-	{20, {SDL_SCANCODE_GRAVE, static_cast<SDL_Scancode>(AO_SCANCODE_BASE_JOYSTICK_BUTTON + SDL_CONTROLLER_BUTTON_Y)}},
+	{ 0, { SDL_SCANCODE_W,
+		   static_cast<SDL_Scancode>(AO_SCANCODE_BASE_JOYSTICK_AXIS_NEGATIVE + SDL_CONTROLLER_AXIS_LEFTY)
+	} },
+	{ 1, { SDL_SCANCODE_S,
+			static_cast<SDL_Scancode>(AO_SCANCODE_BASE_JOYSTICK_AXIS_POSITIVE + SDL_CONTROLLER_AXIS_LEFTY)
+	} },
+	{ 2, { SDL_SCANCODE_LEFT,
+		static_cast<SDL_Scancode>(AO_SCANCODE_BASE_JOYSTICK_AXIS_NEGATIVE + SDL_CONTROLLER_AXIS_RIGHTX)
+	} },
+	{ 3, { SDL_SCANCODE_RIGHT,
+		static_cast<SDL_Scancode>(AO_SCANCODE_BASE_JOYSTICK_AXIS_POSITIVE + SDL_CONTROLLER_AXIS_RIGHTX)
+	} },
+	{ 4, { SDL_SCANCODE_A,
+		static_cast<SDL_Scancode>(AO_SCANCODE_BASE_JOYSTICK_AXIS_NEGATIVE + SDL_CONTROLLER_AXIS_LEFTX)
+	} },
+	{ 5, { SDL_SCANCODE_D,
+		static_cast<SDL_Scancode>(AO_SCANCODE_BASE_JOYSTICK_AXIS_POSITIVE + SDL_CONTROLLER_AXIS_LEFTX)
+	} },
+	{ 6, { SDL_SCANCODE_Q,
+		static_cast<SDL_Scancode>(AO_SCANCODE_BASE_JOYSTICK_BUTTON + SDL_CONTROLLER_BUTTON_DPAD_LEFT)
+	} },
+	{ 7, { SDL_SCANCODE_E,
+		static_cast<SDL_Scancode>(AO_SCANCODE_BASE_JOYSTICK_BUTTON + SDL_CONTROLLER_BUTTON_DPAD_RIGHT)
+	} },
+	{ 8, { SDL_SCANCODE_UP,
+		static_cast<SDL_Scancode>(AO_SCANCODE_BASE_JOYSTICK_AXIS_NEGATIVE + SDL_CONTROLLER_AXIS_RIGHTY)
+	} },
+	{ 9, { SDL_SCANCODE_DOWN,
+		static_cast<SDL_Scancode>(AO_SCANCODE_BASE_JOYSTICK_AXIS_POSITIVE + SDL_CONTROLLER_AXIS_RIGHTY)
+	} },
+	{ 10, { SDL_SCANCODE_V,
+		static_cast<SDL_Scancode>(AO_SCANCODE_BASE_JOYSTICK_BUTTON + SDL_CONTROLLER_BUTTON_RIGHTSTICK)
+	} },
+	{ 11, { SDL_SCANCODE_F,
+		static_cast<SDL_Scancode>(AO_SCANCODE_MOUSESCROLL_UP),
+		static_cast<SDL_Scancode>(AO_SCANCODE_BASE_JOYSTICK_BUTTON + SDL_CONTROLLER_BUTTON_LEFTSHOULDER)
+	} },
+	{ 12, { SDL_SCANCODE_R,
+		static_cast<SDL_Scancode>(AO_SCANCODE_MOUSESCROLL_DOWN),
+		static_cast<SDL_Scancode>(AO_SCANCODE_BASE_JOYSTICK_BUTTON + SDL_CONTROLLER_BUTTON_RIGHTSHOULDER)
+	} },
+	{ 13, { SDL_SCANCODE_SPACE,
+		static_cast<SDL_Scancode>(AO_SCANCODE_BASE_MOUSE_BUTTON + SDL_BUTTON_LEFT - 1),
+		static_cast<SDL_Scancode>(AO_SCANCODE_BASE_JOYSTICK_AXIS_POSITIVE + SDL_CONTROLLER_AXIS_TRIGGERRIGHT)
+	} },
+	{ 14, { SDL_SCANCODE_LSHIFT,
+		static_cast<SDL_Scancode>(AO_SCANCODE_BASE_MOUSE_BUTTON + SDL_BUTTON_RIGHT - 1),
+		static_cast<SDL_Scancode>(AO_SCANCODE_BASE_JOYSTICK_AXIS_POSITIVE + SDL_CONTROLLER_AXIS_TRIGGERLEFT)
+	} },
+	{ 15, { SDL_SCANCODE_LALT
+	} },
+	{ 16, { SDL_SCANCODE_LCTRL,
+		static_cast<SDL_Scancode>(AO_SCANCODE_BASE_JOYSTICK_BUTTON + SDL_CONTROLLER_BUTTON_LEFTSTICK)
+	} },
+	{ 17, { SDL_SCANCODE_LGUI
+	} },
+	{ 18, { SDL_SCANCODE_TAB,
+		static_cast<SDL_Scancode>(AO_SCANCODE_BASE_JOYSTICK_BUTTON + SDL_CONTROLLER_BUTTON_A)
+	} },
+	{ 19, { SDL_SCANCODE_M,
+		static_cast<SDL_Scancode>(AO_SCANCODE_BASE_JOYSTICK_BUTTON + SDL_CONTROLLER_BUTTON_X)
+	} },
+	{ 20, { SDL_SCANCODE_GRAVE,
+		static_cast<SDL_Scancode>(AO_SCANCODE_BASE_JOYSTICK_BUTTON + SDL_CONTROLLER_BUTTON_Y)
+	} },
 };
 
 static const char *shell_action_name[NUMBER_OF_SHELL_KEYS] = {
 	"前の道具", "次の道具", "主観／客観切り替え", "ボリュームを上げる", "ボリュームを下げる", "マップを拡大", "マップを縮小", "FPSを表示", "チャット／コンソール", "ネットワーク状況"};
 
 static key_binding_map default_shell_key_bindings = {
-	{0, {SDL_SCANCODE_LEFTBRACKET}},
-	{1, {SDL_SCANCODE_RIGHTBRACKET}},
-	{2, {SDL_SCANCODE_BACKSPACE}},
-	{3, {SDL_SCANCODE_PERIOD}},
-	{4, {SDL_SCANCODE_COMMA}},
-	{5, {SDL_SCANCODE_EQUALS, static_cast<SDL_Scancode>(AO_SCANCODE_BASE_JOYSTICK_BUTTON + SDL_CONTROLLER_BUTTON_DPAD_UP)}},
-	{6, {SDL_SCANCODE_MINUS, static_cast<SDL_Scancode>(AO_SCANCODE_BASE_JOYSTICK_BUTTON + SDL_CONTROLLER_BUTTON_DPAD_DOWN)}},
-	{7, {SDL_SCANCODE_SLASH}},
-	{8, {SDL_SCANCODE_BACKSLASH}},
-	{9, {SDL_SCANCODE_N}},
+	{ 0, { SDL_SCANCODE_LEFTBRACKET
+	} },
+	{ 1, { SDL_SCANCODE_RIGHTBRACKET
+	} },
+	{ 2, { SDL_SCANCODE_BACKSPACE
+	} },
+	{ 3, { SDL_SCANCODE_PERIOD
+	} },
+	{ 4, { SDL_SCANCODE_COMMA
+	} },
+	{ 5, { SDL_SCANCODE_EQUALS,
+		static_cast<SDL_Scancode>(AO_SCANCODE_BASE_JOYSTICK_BUTTON + SDL_CONTROLLER_BUTTON_DPAD_UP)
+	} },
+	{ 6, { SDL_SCANCODE_MINUS,
+		static_cast<SDL_Scancode>(AO_SCANCODE_BASE_JOYSTICK_BUTTON + SDL_CONTROLLER_BUTTON_DPAD_DOWN)
+	} },
+	{ 7, { SDL_SCANCODE_SLASH
+	} },
+	{ 8, { SDL_SCANCODE_BACKSLASH
+	} },
+	{ 9, { SDL_SCANCODE_N
+	} },
 };
 
-static const char *hotkey_action_name[NUMBER_OF_HOTKEYS] = {
+static const char* hotkey_action_name[NUMBER_OF_HOTKEYS] = {
 	"Hotkey 1",
 	"Hotkey 2",
 	"Hotkey 3",
@@ -1776,29 +1768,29 @@ static const char *hotkey_action_name[NUMBER_OF_HOTKEYS] = {
 };
 
 static key_binding_map default_hotkey_bindings = {
-	{0, {SDL_SCANCODE_1}},
-	{1, {SDL_SCANCODE_2}},
-	{2, {SDL_SCANCODE_3}},
-	{3, {SDL_SCANCODE_4}},
-	{4, {SDL_SCANCODE_5}},
-	{5, {SDL_SCANCODE_6}},
-	{6, {SDL_SCANCODE_7}},
-	{7, {SDL_SCANCODE_8}},
-	{8, {SDL_SCANCODE_9}},
-	{9, {SDL_SCANCODE_T}},
-	{10, {SDL_SCANCODE_G}},
-	{11, {SDL_SCANCODE_B}}};
+	{ 0, { SDL_SCANCODE_1 }},
+	{ 1, { SDL_SCANCODE_2 }},
+	{ 2, { SDL_SCANCODE_3 }},
+	{ 3, { SDL_SCANCODE_4 }},
+	{ 4, { SDL_SCANCODE_5 }},
+	{ 5, { SDL_SCANCODE_6 }},
+	{ 6, { SDL_SCANCODE_7 }},
+	{ 7, { SDL_SCANCODE_8 }},
+	{ 8, { SDL_SCANCODE_9 }},
+	{ 9, { SDL_SCANCODE_T }},
+	{ 10, { SDL_SCANCODE_G }},
+	{ 11, { SDL_SCANCODE_B }}
+};
 
 class w_prefs_key;
 
-typedef std::multimap<int, w_prefs_key *> prefsKeyMap;
-typedef std::pair<int, w_prefs_key *> prefsKeyMapPair;
+typedef std::multimap<int, w_prefs_key*> prefsKeyMap;
+typedef std::pair<int, w_prefs_key*> prefsKeyMapPair;
 static prefsKeyMap key_w;
 static prefsKeyMap shell_key_w;
 static prefsKeyMap hotkey_w;
 
-class w_prefs_key : public w_key
-{
+class w_prefs_key : public w_key {
 public:
 	w_prefs_key(SDL_Scancode key, w_key::Type event_type) : w_key(key, event_type) {}
 
@@ -1806,8 +1798,7 @@ public:
 	{
 		// Key used for in-game function?
 		int error = NONE;
-		switch (new_key)
-		{
+		switch (new_key) {
 		case SDL_SCANCODE_F1:
 		case SDL_SCANCODE_F2:
 		case SDL_SCANCODE_F3:
@@ -1828,8 +1819,7 @@ public:
 		default:
 			break;
 		}
-		if (error != NONE)
-		{
+		if (error != NONE) {
 			alert_user(infoError, strERRORS, error, 0);
 			return;
 		}
@@ -1840,18 +1830,14 @@ public:
 			return;
 
 		// Remove binding to this key from all other widgets
-		for (auto it = key_w.begin(); it != key_w.end(); ++it)
-		{
-			if (it->second != this && it->second->get_key() == new_key)
-			{
+		for (auto it = key_w.begin(); it != key_w.end(); ++it) {
+			if (it->second != this && it->second->get_key() == new_key) {
 				it->second->set_key(SDL_SCANCODE_UNKNOWN);
 				it->second->dirty = true;
 			}
 		}
-		for (auto it = shell_key_w.begin(); it != shell_key_w.end(); ++it)
-		{
-			if (it->second != this && it->second->get_key() == new_key)
-			{
+		for (auto it = shell_key_w.begin(); it != shell_key_w.end(); ++it) {
+			if (it->second != this && it->second->get_key() == new_key) {
 				it->second->set_key(SDL_SCANCODE_UNKNOWN);
 				it->second->dirty = true;
 			}
@@ -1870,18 +1856,15 @@ public:
 
 static void load_default_keys(void *arg)
 {
-	for (int i = 0; i < NUM_KEYS; i++)
-	{
+	for (int i = 0; i < NUM_KEYS; i++) {
 		SDL_Scancode kcode = SDL_SCANCODE_UNKNOWN;
 		SDL_Scancode mcode = SDL_SCANCODE_UNKNOWN;
 		SDL_Scancode jcode = SDL_SCANCODE_UNKNOWN;
-		for (auto it = default_key_bindings[i].begin(); it != default_key_bindings[i].end(); ++it)
-		{
+		for (auto it = default_key_bindings[i].begin(); it != default_key_bindings[i].end(); ++it) {
 			SDL_Scancode code = *it;
 			if (code == SDL_SCANCODE_UNKNOWN)
 				continue;
-			switch (w_key::event_type_for_key(code))
-			{
+			switch (w_key::event_type_for_key(code)) {
 			case w_key::MouseButton:
 				mcode = code;
 				break;
@@ -1895,11 +1878,9 @@ static void load_default_keys(void *arg)
 			}
 		}
 		auto range = key_w.equal_range(i);
-		for (auto ik = range.first; ik != range.second; ++ik)
-		{
+		for (auto ik = range.first; ik != range.second; ++ik) {
 			w_prefs_key *pk = ik->second;
-			switch (pk->event_type)
-			{
+			switch (pk->event_type) {
 			case w_key::MouseButton:
 				pk->set_key(mcode);
 				break;
@@ -1914,18 +1895,15 @@ static void load_default_keys(void *arg)
 		}
 	}
 
-	for (int i = 0; i < NUMBER_OF_SHELL_KEYS; i++)
-	{
+	for (int i = 0; i < NUMBER_OF_SHELL_KEYS; i++) {
 		SDL_Scancode kcode = SDL_SCANCODE_UNKNOWN;
 		SDL_Scancode mcode = SDL_SCANCODE_UNKNOWN;
 		SDL_Scancode jcode = SDL_SCANCODE_UNKNOWN;
-		for (auto it = default_shell_key_bindings[i].begin(); it != default_shell_key_bindings[i].end(); ++it)
-		{
+		for (auto it = default_shell_key_bindings[i].begin(); it != default_shell_key_bindings[i].end(); ++it) {
 			SDL_Scancode code = *it;
 			if (code == SDL_SCANCODE_UNKNOWN)
 				continue;
-			switch (w_key::event_type_for_key(code))
-			{
+			switch (w_key::event_type_for_key(code)) {
 			case w_key::MouseButton:
 				mcode = code;
 				break;
@@ -1939,11 +1917,9 @@ static void load_default_keys(void *arg)
 			}
 		}
 		auto range = shell_key_w.equal_range(i);
-		for (auto ik = range.first; ik != range.second; ++ik)
-		{
+		for (auto ik = range.first; ik != range.second; ++ik) {
 			w_prefs_key *pk = ik->second;
-			switch (pk->event_type)
-			{
+			switch (pk->event_type) {
 			case w_key::MouseButton:
 				pk->set_key(mcode);
 				break;
@@ -1963,13 +1939,11 @@ static void load_default_keys(void *arg)
 		SDL_Scancode kcode = SDL_SCANCODE_UNKNOWN;
 		SDL_Scancode mcode = SDL_SCANCODE_UNKNOWN;
 		SDL_Scancode jcode = SDL_SCANCODE_UNKNOWN;
-		for (auto it = default_hotkey_bindings[i].begin(); it != default_hotkey_bindings[i].end(); ++it)
-		{
+		for (auto it = default_hotkey_bindings[i].begin(); it != default_hotkey_bindings[i].end(); ++it) {
 			SDL_Scancode code = *it;
 			if (code == SDL_SCANCODE_UNKNOWN)
 				continue;
-			switch (w_key::event_type_for_key(code))
-			{
+			switch (w_key::event_type_for_key(code)) {
 			case w_key::MouseButton:
 				mcode = code;
 				break;
@@ -1983,11 +1957,9 @@ static void load_default_keys(void *arg)
 			}
 		}
 		auto range = hotkey_w.equal_range(i);
-		for (auto ik = range.first; ik != range.second; ++ik)
-		{
+		for (auto ik = range.first; ik != range.second; ++ik) {
 			w_prefs_key *pk = ik->second;
-			switch (pk->event_type)
-			{
+			switch (pk->event_type) {
 			case w_key::MouseButton:
 				pk->set_key(mcode);
 				break;
@@ -2018,8 +1990,7 @@ static void unset_scancode(SDL_Scancode code)
 	}
 }
 
-enum
-{
+enum {
 	KEYBOARD_TABS,
 	TAB_KEYS,
 	TAB_MORE_KEYS
@@ -2032,7 +2003,7 @@ static w_toggle *mouse_raw_w;
 static w_toggle *mouse_vertical_w;
 static w_toggle *mouse_accel_w;
 static w_toggle *mouse_precision_w;
-static bool inside_callback = false; // prevent circular changes
+static bool inside_callback = false;  // prevent circular changes
 
 static void mouse_feel_details_changed(void *arg)
 {
@@ -2113,45 +2084,37 @@ static bool apply_mouse_feel(int selection)
 	switch (selection)
 	{
 	case 0:
-		if (true != input_preferences->raw_mouse_input)
-		{
+			if (true != input_preferences->raw_mouse_input) {
 			input_preferences->raw_mouse_input = true;
 			changed = true;
 		}
-		if (_mouse_accel_classic != input_preferences->mouse_accel_type)
-		{
+			if (_mouse_accel_classic != input_preferences->mouse_accel_type) {
 			input_preferences->mouse_accel_type = _mouse_accel_classic;
 			changed = true;
 		}
-		if (true != input_preferences->classic_vertical_aim)
-		{
+			if (true != input_preferences->classic_vertical_aim) {
 			input_preferences->classic_vertical_aim = true;
 			changed = true;
 		}
-		if (false != input_preferences->extra_mouse_precision)
-		{
+			if (false != input_preferences->extra_mouse_precision) {
 			input_preferences->extra_mouse_precision = false;
 			changed = true;
 		}
 		break;
 	case 1:
-		if (true != input_preferences->raw_mouse_input)
-		{
+			if (true != input_preferences->raw_mouse_input) {
 			input_preferences->raw_mouse_input = true;
 			changed = true;
 		}
-		if (_mouse_accel_none != input_preferences->mouse_accel_type)
-		{
+			if (_mouse_accel_none != input_preferences->mouse_accel_type) {
 			input_preferences->mouse_accel_type = _mouse_accel_none;
 			changed = true;
 		}
-		if (false != input_preferences->classic_vertical_aim)
-		{
+			if (false != input_preferences->classic_vertical_aim) {
 			input_preferences->classic_vertical_aim = false;
 			changed = true;
 		}
-		if (true != input_preferences->extra_mouse_precision)
-		{
+			if (true != input_preferences->extra_mouse_precision) {
 			input_preferences->extra_mouse_precision = true;
 			changed = true;
 		}
@@ -2172,22 +2135,20 @@ static void mouse_custom_dialog(void *arg)
 	table_placer *table = new table_placer(2, get_theme_space(ITEM_WIDGET), true);
 	table->col_flags(0, placeable::kAlignRight);
 
-	float hSensitivity = ((float)input_preferences->sens_horizontal) / FIXED_ONE;
-	if (hSensitivity <= 0.0f)
-		hSensitivity = 1.0f;
+	float hSensitivity = ((float) input_preferences->sens_horizontal) / FIXED_ONE;
+	if (hSensitivity <= 0.0f) hSensitivity = 1.0f;
 	float hSensitivityLog = std::log(hSensitivity);
 	int hSliderPosition =
-		(int)((hSensitivityLog - kMinSensitivityLog) * (1000.0f / kSensitivityLogRange) + 0.5f);
+		(int) ((hSensitivityLog - kMinSensitivityLog) * (1000.0f / kSensitivityLogRange) + 0.5f);
 	w_sens_slider *mouse_h_sens_w = new w_sens_slider(1000, hSliderPosition);
 	table->dual_add(mouse_h_sens_w->label("水平感度"), d);
 	table->dual_add(mouse_h_sens_w, d);
 
-	float vSensitivity = ((float)input_preferences->sens_vertical) / FIXED_ONE;
-	if (vSensitivity <= 0.0f)
-		vSensitivity = 1.0f;
+	float vSensitivity = ((float) input_preferences->sens_vertical) / FIXED_ONE;
+	if (vSensitivity <= 0.0f) vSensitivity = 1.0f;
 	float vSensitivityLog = std::log(vSensitivity);
 	int vSliderPosition =
-		(int)((vSensitivityLog - kMinSensitivityLog) * (1000.0f / kSensitivityLogRange) + 0.5f);
+		(int) ((vSensitivityLog - kMinSensitivityLog) * (1000.0f / kSensitivityLogRange) + 0.5f);
 	w_sens_slider *mouse_v_sens_w = new w_sens_slider(1000, vSliderPosition);
 	table->dual_add(mouse_v_sens_w->label("垂直感度"), d);
 	table->dual_add(mouse_v_sens_w, d);
@@ -2238,76 +2199,65 @@ static void mouse_custom_dialog(void *arg)
 	mouse_feel_details_changed(NULL);
 
 	// Run dialog
-	if (d.run() == 0)
-	{ // Accepted
+	if (d.run() == 0) {	// Accepted
 		bool changed = false;
 
 		int hPos = mouse_h_sens_w->get_selection();
-		float hLog = kMinSensitivityLog + ((float)hPos) * (kSensitivityLogRange / 1000.0f);
+		float hLog = kMinSensitivityLog + ((float) hPos) * (kSensitivityLogRange / 1000.0f);
 		_fixed hNorm = _fixed(std::exp(hLog) * FIXED_ONE);
-		if (hNorm != input_preferences->sens_horizontal)
-		{
+		if (hNorm != input_preferences->sens_horizontal) {
 			input_preferences->sens_horizontal = hNorm;
 			changed = true;
 		}
 
 		int vPos = mouse_v_sens_w->get_selection();
-		float vLog = kMinSensitivityLog + ((float)vPos) * (kSensitivityLogRange / 1000.0f);
+		float vLog = kMinSensitivityLog + ((float) vPos) * (kSensitivityLogRange / 1000.0f);
 		_fixed vNorm = _fixed(std::exp(vLog) * FIXED_ONE);
-		if (vNorm != input_preferences->sens_vertical)
-		{
+		if (vNorm != input_preferences->sens_vertical) {
 			input_preferences->sens_vertical = vNorm;
 			changed = true;
 		}
 
 		uint16 flags = input_preferences->modifiers;
-		if (mouse_v_invert_w->get_selection())
-		{
+		if (mouse_v_invert_w->get_selection()) {
 			flags |= _inputmod_invert_mouse;
-		}
-		else
-		{
+		} else {
 			flags &= ~_inputmod_invert_mouse;
 		}
-		if (flags != input_preferences->modifiers)
-		{
+		if (flags != input_preferences->modifiers) {
 			input_preferences->modifiers = flags;
 			changed = true;
 		}
 
-		if (mouse_raw_w->get_selection() != input_preferences->raw_mouse_input)
-		{
+		if (mouse_raw_w->get_selection() != input_preferences->raw_mouse_input) {
 			input_preferences->raw_mouse_input = mouse_raw_w->get_selection();
 			changed = true;
 		}
 
-		if (mouse_accel_w->get_selection() != input_preferences->mouse_accel_type)
-		{
+		if (mouse_accel_w->get_selection() != input_preferences->mouse_accel_type) {
 			input_preferences->mouse_accel_type = mouse_accel_w->get_selection();
 			changed = true;
 		}
 
 		bool vert = mouse_vertical_w->get_selection();
-		if (vert != input_preferences->classic_vertical_aim)
-		{
+		if (vert != input_preferences->classic_vertical_aim) {
 			input_preferences->classic_vertical_aim = vert;
 			changed = true;
 		}
 
 		bool precision = (mouse_precision_w->get_selection() == 0);
-		if (precision != input_preferences->extra_mouse_precision)
-		{
+		if (precision != input_preferences->extra_mouse_precision) {
 			input_preferences->extra_mouse_precision = precision;
 			changed = true;
 		}
 
-		if (changed)
-		{
+		if (changed) {
 			write_preferences();
 		}
 		update_mouse_feel(NULL);
 	}
 }
+
 
 static void controller_details_dialog(void *arg)
 {
@@ -2319,14 +2269,13 @@ static void controller_details_dialog(void *arg)
 	table_placer *table = new table_placer(2, get_theme_space(ITEM_WIDGET), true);
 	table->col_flags(0, placeable::kAlignRight);
 
-	float joySensitivity = ((float)input_preferences->controller_sensitivity) / FIXED_ONE;
-	if (joySensitivity <= 0.0f)
-		joySensitivity = 1.0f;
+	float joySensitivity = ((float) input_preferences->controller_sensitivity) / FIXED_ONE;
+	if (joySensitivity <= 0.0f) joySensitivity = 1.0f;
 	float joySensitivityLog = std::log(joySensitivity);
 	int joySliderPosition =
-		(int)((joySensitivityLog - kMinSensitivityLog) * (1000.0f / kSensitivityLogRange) + 0.5f);
+	(int) ((joySensitivityLog - kMinSensitivityLog) * (1000.0f / kSensitivityLogRange) + 0.5f);
 
-	w_sens_slider *sens_joy_w = new w_sens_slider(1000, joySliderPosition);
+	w_sens_slider* sens_joy_w = new w_sens_slider(1000, joySliderPosition);
 	table->dual_add(sens_joy_w->label("照準感度"), d);
 	table->dual_add(sens_joy_w, d);
 
@@ -2346,33 +2295,30 @@ static void controller_details_dialog(void *arg)
 	d.set_widget_placer(placer);
 
 	// Run dialog
-	if (d.run() == 0)
-	{ // Accepted
+	if (d.run() == 0) {	// Accepted
 		bool changed = false;
 
 		int sensPos = sens_joy_w->get_selection();
-		float sensLog = kMinSensitivityLog + ((float)sensPos) * (kSensitivityLogRange / 1000.0f);
+		float sensLog = kMinSensitivityLog + ((float) sensPos) * (kSensitivityLogRange / 1000.0f);
 		_fixed sensNorm = _fixed(std::exp(sensLog) * FIXED_ONE);
-		if (sensNorm != input_preferences->controller_sensitivity)
-		{
+		if (sensNorm != input_preferences->controller_sensitivity) {
 			input_preferences->controller_sensitivity = sensNorm;
 			changed = true;
 		}
 
 		int deadPos = dead_joy_w->get_selection();
 		int deadNorm = deadPos * 655.36f;
-		if (deadNorm != input_preferences->controller_deadzone)
-		{
+		if (deadNorm != input_preferences->controller_deadzone) {
 			input_preferences->controller_deadzone = deadNorm;
 			changed = true;
 		}
 
-		if (changed)
-		{
+		if (changed) {
 			write_preferences();
 		}
 	}
 }
+
 
 static void controls_dialog(void *arg)
 {
@@ -2388,24 +2334,17 @@ static void controls_dialog(void *arg)
 	placer->add(new w_spacer());
 
 	// create all key widgets
-	for (int i = 0; i < NUM_KEYS; i++)
-	{
+	for (int i = 0; i < NUM_KEYS; i++) {
 		SDL_Scancode kcode = SDL_SCANCODE_UNKNOWN;
 		SDL_Scancode mcode = SDL_SCANCODE_UNKNOWN;
 		SDL_Scancode jcode = SDL_SCANCODE_UNKNOWN;
-		for (std::set<SDL_Scancode>::const_iterator bit = input_preferences->key_bindings[i].begin(); bit != input_preferences->key_bindings[i].end(); ++bit)
-		{
+		for (std::set<SDL_Scancode>::const_iterator bit = input_preferences->key_bindings[i].begin(); bit != input_preferences->key_bindings[i].end(); ++bit) {
 			SDL_Scancode code = *bit;
-			if (code >= AO_SCANCODE_BASE_JOYSTICK_BUTTON && code < (AO_SCANCODE_BASE_JOYSTICK_BUTTON + NUM_SDL_JOYSTICK_BUTTONS))
-			{
+			if (code >= AO_SCANCODE_BASE_JOYSTICK_BUTTON && code < (AO_SCANCODE_BASE_JOYSTICK_BUTTON + NUM_SDL_JOYSTICK_BUTTONS)) {
 				jcode = code;
-			}
-			else if (code >= AO_SCANCODE_BASE_MOUSE_BUTTON && code < (AO_SCANCODE_BASE_MOUSE_BUTTON + NUM_SDL_MOUSE_BUTTONS))
-			{
+			} else if (code >= AO_SCANCODE_BASE_MOUSE_BUTTON && code < (AO_SCANCODE_BASE_MOUSE_BUTTON + NUM_SDL_MOUSE_BUTTONS)) {
 				mcode = code;
-			}
-			else
-			{
+			} else {
 				kcode = code;
 			}
 		}
@@ -2413,24 +2352,17 @@ static void controls_dialog(void *arg)
 		key_w.insert(prefsKeyMapPair(i, new w_prefs_key(mcode, w_key::MouseButton)));
 		key_w.insert(prefsKeyMapPair(i, new w_prefs_key(jcode, w_key::JoystickButton)));
 	}
-	for (int i = 0; i < NUMBER_OF_SHELL_KEYS; i++)
-	{
+	for (int i = 0; i < NUMBER_OF_SHELL_KEYS; i++) {
 		SDL_Scancode kcode = SDL_SCANCODE_UNKNOWN;
 		SDL_Scancode mcode = SDL_SCANCODE_UNKNOWN;
 		SDL_Scancode jcode = SDL_SCANCODE_UNKNOWN;
-		for (std::set<SDL_Scancode>::const_iterator bit = input_preferences->shell_key_bindings[i].begin(); bit != input_preferences->shell_key_bindings[i].end(); ++bit)
-		{
+		for (std::set<SDL_Scancode>::const_iterator bit = input_preferences->shell_key_bindings[i].begin(); bit != input_preferences->shell_key_bindings[i].end(); ++bit) {
 			SDL_Scancode code = *bit;
-			if (code >= AO_SCANCODE_BASE_JOYSTICK_BUTTON && code < (AO_SCANCODE_BASE_JOYSTICK_BUTTON + NUM_SDL_JOYSTICK_BUTTONS))
-			{
+			if (code >= AO_SCANCODE_BASE_JOYSTICK_BUTTON && code < (AO_SCANCODE_BASE_JOYSTICK_BUTTON + NUM_SDL_JOYSTICK_BUTTONS)) {
 				jcode = code;
-			}
-			else if (code >= AO_SCANCODE_BASE_MOUSE_BUTTON && code < (AO_SCANCODE_BASE_MOUSE_BUTTON + NUM_SDL_MOUSE_BUTTONS))
-			{
+			} else if (code >= AO_SCANCODE_BASE_MOUSE_BUTTON && code < (AO_SCANCODE_BASE_MOUSE_BUTTON + NUM_SDL_MOUSE_BUTTONS)) {
 				mcode = code;
-			}
-			else
-			{
+			} else {
 				kcode = code;
 			}
 		}
@@ -2444,19 +2376,13 @@ static void controls_dialog(void *arg)
 		SDL_Scancode kcode = SDL_SCANCODE_UNKNOWN;
 		SDL_Scancode mcode = SDL_SCANCODE_UNKNOWN;
 		SDL_Scancode jcode = SDL_SCANCODE_UNKNOWN;
-		for (std::set<SDL_Scancode>::const_iterator bit = input_preferences->hotkey_bindings[i].begin(); bit != input_preferences->hotkey_bindings[i].end(); ++bit)
-		{
+		for (std::set<SDL_Scancode>::const_iterator bit = input_preferences->hotkey_bindings[i].begin(); bit != input_preferences->hotkey_bindings[i].end(); ++bit) {
 			SDL_Scancode code = *bit;
-			if (code >= AO_SCANCODE_BASE_JOYSTICK_BUTTON && code < (AO_SCANCODE_BASE_JOYSTICK_BUTTON + NUM_SDL_JOYSTICK_BUTTONS))
-			{
+			if (code >= AO_SCANCODE_BASE_JOYSTICK_BUTTON && code < (AO_SCANCODE_BASE_JOYSTICK_BUTTON + NUM_SDL_JOYSTICK_BUTTONS)) {
 				jcode = code;
-			}
-			else if (code >= AO_SCANCODE_BASE_MOUSE_BUTTON && code < (AO_SCANCODE_BASE_MOUSE_BUTTON + NUM_SDL_MOUSE_BUTTONS))
-			{
+			} else if (code >= AO_SCANCODE_BASE_MOUSE_BUTTON && code < (AO_SCANCODE_BASE_MOUSE_BUTTON + NUM_SDL_MOUSE_BUTTONS)) {
 				mcode = code;
-			}
-			else
-			{
+			} else {
 				kcode = code;
 			}
 		}
@@ -2465,7 +2391,7 @@ static void controls_dialog(void *arg)
 		hotkey_w.insert(prefsKeyMapPair(i, new w_prefs_key(jcode, w_key::JoystickButton)));
 	}
 
-	tab_placer *tabs = new tab_placer();
+	tab_placer* tabs = new tab_placer();
 
 	std::vector<std::string> labels = {"照準", "移動", "行動", "ホットキー", "インターフェース", "その他"};
 	w_tab *tab_w = new w_tab(labels, tabs);
@@ -2484,30 +2410,22 @@ static void controls_dialog(void *arg)
 	move_table->dual_add(new w_label("マウス"), d);
 	move_table->dual_add(new w_label("コントローラー"), d);
 
-	std::vector<int> move_keys = {0, 1, 4, 5, -1, 16, 15, 17};
-	for (auto it = move_keys.begin(); it != move_keys.end(); ++it)
-	{
-		if (*it < 0)
-		{
+	std::vector<int> move_keys = { 0, 1, 4, 5, -1, 16, 15, 17 };
+	for (auto it = move_keys.begin(); it != move_keys.end(); ++it) {
+		if (*it < 0) {
 			move_table->add_row(new w_spacer(), true);
-		}
-		else if (*it >= 100)
-		{
+		} else if (*it >= 100) {
 			int i = *it - 100;
 			move_table->dual_add(new w_label(shell_action_name[i]), d);
 			auto range = shell_key_w.equal_range(i);
-			for (auto ik = range.first; ik != range.second; ++ik)
-			{
+			for (auto ik = range.first; ik != range.second; ++ik) {
 				move_table->dual_add(ik->second, d);
 			}
-		}
-		else
-		{
+		} else {
 			int i = *it;
 			move_table->dual_add(new w_label(action_name[i]), d);
 			auto range = key_w.equal_range(i);
-			for (auto ik = range.first; ik != range.second; ++ik)
-			{
+			for (auto ik = range.first; ik != range.second; ++ik) {
 				move_table->dual_add(ik->second, d);
 			}
 		}
@@ -2539,35 +2457,25 @@ static void controls_dialog(void *arg)
 	look_table->dual_add(new w_label("マウス"), d);
 	look_table->dual_add(new w_label("コントローラー"), d);
 
-	std::vector<int> look_keys = {8, 9, 2, 3, -1, 6, 7, 10};
-	for (auto it = look_keys.begin(); it != look_keys.end(); ++it)
-	{
-		if (*it < 0)
-		{
+	std::vector<int> look_keys = { 8, 9, 2, 3, -1, 6, 7, 10 };
+	for (auto it = look_keys.begin(); it != look_keys.end(); ++it) {
+		if (*it < 0) {
 			look_table->add_row(new w_spacer(), true);
-		}
-		else if (*it >= 100)
-		{
+		} else if (*it >= 100) {
 			int i = *it - 100;
 			look_table->dual_add(new w_label(shell_action_name[i]), d);
 			auto range = shell_key_w.equal_range(i);
-			for (auto ik = range.first; ik != range.second; ++ik)
-			{
+			for (auto ik = range.first; ik != range.second; ++ik) {
 				look_table->dual_add(ik->second, d);
 			}
-		}
-		else
-		{
+		} else {
 			int i = *it;
 			look_table->dual_add(new w_label(action_name[i]), d);
 			auto range = key_w.equal_range(i);
-			for (auto ik = range.first; ik != range.second; ++ik)
-			{
-				if (ik->second->event_type == w_key::MouseButton)
-				{
-					w_text_entry *txt = NULL;
-					switch (i)
-					{
+			for (auto ik = range.first; ik != range.second; ++ik) {
+				if (ik->second->event_type == w_key::MouseButton) {
+					w_text_entry* txt = NULL;
+					switch (i) {
 					case 8:
 						txt = new w_text_entry(12, "上");
 						break;
@@ -2583,8 +2491,7 @@ static void controls_dialog(void *arg)
 					default:
 						break;
 					}
-					if (txt)
-					{
+					if (txt) {
 						txt->set_enabled(false);
 						txt->set_min_width(50);
 						look_table->dual_add(txt, d);
@@ -2601,7 +2508,7 @@ static void controls_dialog(void *arg)
 	table_placer *look_options = new table_placer(2, get_theme_space(ITEM_WIDGET), true);
 	look_options->col_flags(0, placeable::kAlignRight);
 
-	w_toggle *auto_recenter_w = new w_toggle(!(input_preferences->modifiers & _inputmod_dont_auto_recenter));
+	w_toggle* auto_recenter_w = new w_toggle(!(input_preferences->modifiers & _inputmod_dont_auto_recenter));
 	look_options->dual_add(auto_recenter_w->label("視点の自動リセンター"), d);
 	look_options->dual_add(auto_recenter_w, d);
 
@@ -2656,30 +2563,22 @@ static void controls_dialog(void *arg)
 	actions_table->dual_add(new w_label("マウス"), d);
 	actions_table->dual_add(new w_label("コントローラー"), d);
 
-	std::vector<int> actions_keys = {13, 14, 11, 12, -1, 18, -1, 20, 108};
-	for (auto it = actions_keys.begin(); it != actions_keys.end(); ++it)
-	{
-		if (*it < 0)
-		{
+	std::vector<int> actions_keys = { 13, 14, 11, 12, -1, 18, -1, 20, 108 };
+	for (auto it = actions_keys.begin(); it != actions_keys.end(); ++it) {
+		if (*it < 0) {
 			actions_table->add_row(new w_spacer(), true);
-		}
-		else if (*it >= 100)
-		{
+		} else if (*it >= 100) {
 			int i = *it - 100;
 			actions_table->dual_add(new w_label(shell_action_name[i]), d);
 			auto range = shell_key_w.equal_range(i);
-			for (auto ik = range.first; ik != range.second; ++ik)
-			{
+			for (auto ik = range.first; ik != range.second; ++ik) {
 				actions_table->dual_add(ik->second, d);
 			}
-		}
-		else
-		{
+		} else {
 			int i = *it;
 			actions_table->dual_add(new w_label(action_name[i]), d);
 			auto range = key_w.equal_range(i);
-			for (auto ik = range.first; ik != range.second; ++ik)
-			{
+			for (auto ik = range.first; ik != range.second; ++ik) {
 				actions_table->dual_add(ik->second, d);
 			}
 		}
@@ -2701,8 +2600,8 @@ static void controls_dialog(void *arg)
 	actions->dual_add(new w_static_text("自動的にオンになります。シングルプレイヤーモードでどちらかをオフにすると、"), d);
 	actions->dual_add(new w_static_text("映画の録画が自動的に無効化されます。"), d);
 
-	vertical_placer *hotkeys = new vertical_placer();
-	table_placer *hotkey_table = new table_placer(4, get_theme_space(ITEM_WIDGET), true);
+	vertical_placer* hotkeys = new vertical_placer();
+	table_placer* hotkey_table = new table_placer(4, get_theme_space(ITEM_WIDGET), true);
 	hotkey_table->col_flags(0, placeable::kAlignRight);
 	hotkey_table->col_flags(1, placeable::kAlignLeft);
 	hotkey_table->col_flags(2, placeable::kAlignLeft);
@@ -2743,11 +2642,9 @@ static void controls_dialog(void *arg)
 	interface_table->dual_add(new w_label("マウス"), d);
 	interface_table->dual_add(new w_label("コントローラー"), d);
 
-	std::vector<int> interface_keys = {19, 105, 106, -1, 103, 104, -1, 100, 101, -1, 102, 107, 109, -1, -2};
-	for (auto it = interface_keys.begin(); it != interface_keys.end(); ++it)
-	{
-		if (*it == -2)
-		{
+	std::vector<int> interface_keys = { 19, 105, 106, -1, 103, 104, -1, 100, 101, -1, 102, 107, 109, -1, -2 };
+	for (auto it = interface_keys.begin(); it != interface_keys.end(); ++it) {
+		if (*it == -2) {
 			interface_table->dual_add(new w_label("ゲームを終了"), d);
 			w_prefs_key *kb = new w_prefs_key(SDL_SCANCODE_ESCAPE, w_key::KeyboardKey);
 			kb->set_enabled(false);
@@ -2756,28 +2653,20 @@ static void controls_dialog(void *arg)
 			w_prefs_key *cn = new w_prefs_key(AO_SCANCODE_JOYSTICK_ESCAPE, w_key::JoystickButton);
 			cn->set_enabled(false);
 			interface_table->dual_add(cn, d);
-		}
-		else if (*it < 0)
-		{
+		} else if (*it < 0) {
 			interface_table->add_row(new w_spacer(), true);
-		}
-		else if (*it >= 100)
-		{
+		} else if (*it >= 100) {
 			int i = *it - 100;
 			interface_table->dual_add(new w_label(shell_action_name[i]), d);
 			auto range = shell_key_w.equal_range(i);
-			for (auto ik = range.first; ik != range.second; ++ik)
-			{
+			for (auto ik = range.first; ik != range.second; ++ik) {
 				interface_table->dual_add(ik->second, d);
 			}
-		}
-		else
-		{
+		} else {
 			int i = *it;
 			interface_table->dual_add(new w_label(action_name[i]), d);
 			auto range = key_w.equal_range(i);
-			for (auto ik = range.first; ik != range.second; ++ik)
-			{
+			for (auto ik = range.first; ik != range.second; ++ik) {
 				interface_table->dual_add(ik->second, d);
 			}
 		}
@@ -2795,41 +2684,28 @@ static void controls_dialog(void *arg)
 	table_placer *other_menu = new table_placer(2, get_theme_space(ITEM_WIDGET), false);
 	other_menu->col_flags(0, placeable::kAlignRight);
 	other_menu->col_flags(1, placeable::kAlignLeft);
-	std::vector<std::string> menu_shortcuts = { "N",
-												"新規ゲーム開始",
+	std::vector<std::string> menu_shortcuts = {
+		"N", "新規ゲーム開始",
 #if (defined(__APPLE__) && defined(__MACH__))
-												"Cmd-Option-N",
-												"レベル選択",
+		"Cmd-Option-N", "レベル選択",
 #else
-												"Ctrl+Shift+N",
-												"レベル選択",
+		"Ctrl+Shift+N", "レベル選択",
 #endif
-												"O",
-												"保存したゲームを再開",
-												"G",
-												"ネットワークゲーム集合",
-												"J",
-												"ネットワークゲーム参加",
-												"R",
-												"保存した映画の再生",
-												"P",
-												"環境設定",
-												"Q",
-												"終了",
-												"C",
-												"シナリオクレジット",
-												"A",
-												"Aleph Oneについて",
+		"O", "保存したゲームを再開",
+		"G", "ネットワークゲーム集合",
+		"J", "ネットワークゲーム参加",
+		"R", "保存した映画の再生",
+		"P", "環境設定",
+		"Q", "終了",
+		"C", "シナリオクレジット",
+		"A", "Aleph Oneについて",
 #if (defined(__APPLE__) && defined(__MACH__))
-												"Cmd-Return",
-												"フルスクリーン切り替え",
+		"Cmd-Return", "フルスクリーン切り替え",
 #else
-												"Alt+Enter",
-												"フルスクリーン切り替え",
+		"Alt+Enter", "フルスクリーン切り替え",
 #endif
 	};
-	for (auto it = menu_shortcuts.begin(); it != menu_shortcuts.end(); ++it)
-	{
+	for (auto it = menu_shortcuts.begin(); it != menu_shortcuts.end(); ++it) {
 		other_menu->dual_add(new w_label(it->c_str()), d);
 	}
 	other_table->add(other_menu, true);
@@ -2837,32 +2713,22 @@ static void controls_dialog(void *arg)
 	table_placer *other_game = new table_placer(2, get_theme_space(ITEM_WIDGET), false);
 	other_game->col_flags(0, placeable::kAlignRight);
 	other_game->col_flags(1, placeable::kAlignLeft);
-	std::vector<std::string> game_shortcuts = { "F1",
-												"解像度を下げる",
-												"F2",
-												"解像度を上げる",
-												"F8",
-												"クロスヘアー",
-												"F9",
-												"スクリーンショット",
-												"F10",
-												"デバッグ情報",
-												"F11",
-												"明るさを下げる",
-												"F12",
-												"明るさを上げる",
+	std::vector<std::string> game_shortcuts = {
+		"F1", "解像度を下げる",
+		"F2", "解像度を上げる",
+		"F8", "クロスヘアー",
+		"F9", "スクリーンショット",
+		"F10", "デバッグ情報",
+		"F11", "明るさを下げる",
+		"F12", "明るさを上げる",
 #if (defined(__APPLE__) && defined(__MACH__))
-												"Cmd-Return",
-												"フルスクリーン切り替え",
+		"Cmd-Return", "フルスクリーン切り替え",
 #else
-												"Alt+Enter",
-												"フルスクリーン切り替え",
+		"Alt+Enter", "フルスクリーン切り替え",
 #endif
-												"Escape",
-												"ゲーム終了"
+		"Escape", "ゲーム終了"
 	};
-	for (auto it = game_shortcuts.begin(); it != game_shortcuts.end(); ++it)
-	{
+	for (auto it = game_shortcuts.begin(); it != game_shortcuts.end(); ++it) {
 		other_game->dual_add(new w_label(it->c_str()), d);
 	}
 	other_table->add(other_game, true);
@@ -2894,32 +2760,24 @@ static void controls_dialog(void *arg)
 	enter_joystick();
 
 	// Run dialog
-	if (d.run() == 0)
-	{ // Accepted
+	if (d.run() == 0) {	// Accepted
 		bool changed = false;
 
-		uint16 flags = input_preferences->modifiers & (_inputmod_use_button_sounds | _inputmod_invert_mouse);
-		if (always_run_w->get_selection())
-			flags |= _inputmod_interchange_run_walk;
-		if (always_swim_w->get_selection())
-			flags |= _inputmod_interchange_swim_sink;
-		if (!(weapon_w->get_selection()))
-			flags |= _inputmod_dont_switch_to_new_weapon;
-		if (!(auto_recenter_w->get_selection()))
-			flags |= _inputmod_dont_auto_recenter;
+		uint16 flags = input_preferences->modifiers & (_inputmod_use_button_sounds|_inputmod_invert_mouse);
+		if (always_run_w->get_selection()) flags |= _inputmod_interchange_run_walk;
+		if (always_swim_w->get_selection()) flags |= _inputmod_interchange_swim_sink;
+		if (!(weapon_w->get_selection())) flags |= _inputmod_dont_switch_to_new_weapon;
+		if (!(auto_recenter_w->get_selection())) flags |= _inputmod_dont_auto_recenter;
 
-		if (flags != input_preferences->modifiers)
-		{
+		if (flags != input_preferences->modifiers) {
 			input_preferences->modifiers = flags;
 			changed = true;
 		}
 
-		for (int i = 0; i < NUM_KEYS; i++)
-		{
+		for (int i = 0; i < NUM_KEYS; i++) {
 			input_preferences->key_bindings[i].clear();
 		}
-		for (int i = 0; i < NUMBER_OF_SHELL_KEYS; i++)
-		{
+		for (int i = 0; i < NUMBER_OF_SHELL_KEYS; i++) {
 			input_preferences->shell_key_bindings[i].clear();
 		}
 
@@ -2928,24 +2786,20 @@ static void controls_dialog(void *arg)
 			input_preferences->hotkey_bindings[i].clear();
 		}
 
-		for (auto it = key_w.begin(); it != key_w.end(); ++it)
-		{
+		for (auto it = key_w.begin(); it != key_w.end(); ++it) {
 			int i = it->first;
 			SDL_Scancode key = it->second->get_key();
-			if (key != SDL_SCANCODE_UNKNOWN)
-			{
+			if (key != SDL_SCANCODE_UNKNOWN) {
 				unset_scancode(key);
 				input_preferences->key_bindings[i].insert(key);
 				changed = true;
 			}
 		}
 
-		for (auto it = shell_key_w.begin(); it != shell_key_w.end(); ++it)
-		{
+		for (auto it = shell_key_w.begin(); it != shell_key_w.end(); ++it) {
 			int i = it->first;
 			SDL_Scancode key = it->second->get_key();
-			if (key != SDL_SCANCODE_UNKNOWN)
-			{
+			if (key != SDL_SCANCODE_UNKNOWN) {
 				unset_scancode(key);
 				input_preferences->shell_key_bindings[i].insert(key);
 				changed = true;
@@ -2965,21 +2819,18 @@ static void controls_dialog(void *arg)
 		}
 
 		int16 device = enable_mouse_w->get_selection() ? _mouse_yaw_pitch : _keyboard_or_game_pad;
-		if (input_preferences->input_device != device)
-		{
+		if (input_preferences->input_device != device) {
 			input_preferences->input_device = device;
 			changed = true;
 		}
 
 		bool jaim = (joystick_aiming_w->get_selection() == 0);
-		if (input_preferences->controller_analog != jaim)
-		{
+		if (input_preferences->controller_analog != jaim) {
 			input_preferences->controller_analog = jaim;
 			changed = true;
 		}
 
-		if (apply_mouse_feel(mouse_feel_w->get_selection()))
-		{
+		if (apply_mouse_feel(mouse_feel_w->get_selection())) {
 			changed = true;
 		}
 
@@ -3001,12 +2852,12 @@ static void plugins_dialog(void *)
 	placer->add(new w_spacer, true);
 
 	std::vector<Plugin> plugins(Plugins::instance()->begin(), Plugins::instance()->end());
-	w_plugins *plugins_w = new w_plugins(plugins, 400, 7);
+	w_plugins* plugins_w = new w_plugins(plugins, 400, 7);
 	placer->dual_add(plugins_w, d);
 
 	placer->add(new w_spacer, true);
 
-	horizontal_placer *button_placer = new horizontal_placer;
+	horizontal_placer* button_placer = new horizontal_placer;
 	w_button *accept_w = new w_button("了承", dialog_ok, &d);
 	button_placer->dual_add(accept_w, d);
 	w_button *cancel_w = new w_button("キャンセル", dialog_cancel, &d);
@@ -3017,18 +2868,15 @@ static void plugins_dialog(void *)
 	d.set_widget_placer(placer);
 	d.activate_widget(plugins_w);
 
-	if (d.run() == 0)
-	{
+	if (d.run() == 0) {
 		bool changed = false;
 		Plugins::iterator plugin = Plugins::instance()->begin();
-		for (Plugins::iterator it = plugins.begin(); it != plugins.end(); ++it, ++plugin)
-		{
+		for (Plugins::iterator it = plugins.begin(); it != plugins.end(); ++it, ++plugin) {
 			changed |= (plugin->enabled != it->enabled);
 			plugin->enabled = it->enabled;
 		}
 
-		if (changed)
-		{
+		if (changed) {
 			Plugins::instance()->invalidate();
 			write_preferences();
 
@@ -3039,6 +2887,7 @@ static void plugins_dialog(void *)
 	}
 }
 
+
 /*
  *  Environment dialog
  */
@@ -3047,7 +2896,8 @@ static const char *film_profile_labels[] = {
 	"Aleph One",
 	"Marathon 2",
 	"Marathon Infinity",
-	0};
+	0
+};
 
 static void environment_dialog(void *arg)
 {
@@ -3091,7 +2941,7 @@ static void environment_dialog(void *arg)
 #ifndef MAC_APP_STORE
 	table->add_row(new w_spacer, true);
 	table->dual_add_row(new w_static_text("ソロスクリプト"), d);
-	w_enabling_toggle *use_solo_lua_w = new w_enabling_toggle(environment_preferences->use_solo_lua);
+	w_enabling_toggle* use_solo_lua_w = new w_enabling_toggle(environment_preferences->use_solo_lua);
 	table->dual_add(use_solo_lua_w->label("ソロスクリプトを使用"), d);
 	table->dual_add(use_solo_lua_w, d);
 
@@ -3105,12 +2955,12 @@ static void environment_dialog(void *arg)
 	table->add_row(new w_spacer, true);
 	table->dual_add_row(new w_static_text("フィルム再生"), d);
 
-	w_select *film_profile_w = new w_select(environment_preferences->film_profile, film_profile_labels);
+	w_select* film_profile_w = new w_select(environment_preferences->film_profile, film_profile_labels);
 	table->dual_add(film_profile_w->label("デフォルト再生プロファイル"), d);
 	table->dual_add(film_profile_w, d);
 
 #ifndef MAC_APP_STORE
-	w_enabling_toggle *use_replay_net_lua_w = new w_enabling_toggle(environment_preferences->use_replay_net_lua);
+	w_enabling_toggle* use_replay_net_lua_w = new w_enabling_toggle(environment_preferences->use_replay_net_lua);
 	table->dual_add(use_replay_net_lua_w->label("フィルムでのネットスクリプト"), d);
 	table->dual_add(use_replay_net_lua_w, d);
 
@@ -3137,8 +2987,7 @@ static void environment_dialog(void *arg)
 #endif
 
 	w_select *max_saves_w = new w_select(0, max_saves_labels);
-	for (int i = 0; max_saves_labels[i] != NULL; ++i)
-	{
+	for (int i = 0; max_saves_labels[i] != NULL; ++i) {
 		if (max_saves_values[i] == environment_preferences->maximum_quick_saves)
 			max_saves_w->set_selection(i);
 	}
@@ -3164,44 +3013,39 @@ static void environment_dialog(void *arg)
 	// Run dialog
 	bool theme_changed = false;
 	FileSpecifier old_theme;
-	const Plugin *theme_plugin = Plugins::instance()->find_theme();
+	const Plugin* theme_plugin = Plugins::instance()->find_theme();
 	if (theme_plugin)
 	{
 		old_theme = theme_plugin->directory + theme_plugin->theme;
 	}
 
-	if (d.run() == 0)
-	{ // Accepted
+	if (d.run() == 0) {	// Accepted
 		bool changed = false;
 
 #ifndef MAC_APP_STORE
 		const char *path = map_w->get_path();
-		if (strcmp(path, environment_preferences->map_file))
-		{
+		if (strcmp(path, environment_preferences->map_file)) {
 			strncpy(environment_preferences->map_file, path, 256);
 			environment_preferences->map_checksum = read_wad_file_checksum(map_w->get_file_specifier());
 			changed = true;
 		}
 
 		path = physics_w->get_path();
-		if (strcmp(path, environment_preferences->physics_file))
-		{
+		if (strcmp(path, environment_preferences->physics_file)) {
 			strncpy(environment_preferences->physics_file, path, 256);
 			environment_preferences->physics_checksum = read_wad_file_checksum(physics_w->get_file_specifier());
 			changed = true;
 		}
 
 		path = shapes_w->get_path();
-		if (strcmp(path, environment_preferences->shapes_file))
-		{
+		if (strcmp(path, environment_preferences->shapes_file)) {
 			strncpy(environment_preferences->shapes_file, path, 256);
 			environment_preferences->shapes_mod_date = shapes_w->get_file_specifier().GetDate();
 			changed = true;
 		}
 
 		path = sounds_w->get_path();
-		if (strcmp(path, environment_preferences->sounds_file))
-		{
+		if (strcmp(path, environment_preferences->sounds_file)) {
 			strncpy(environment_preferences->sounds_file, path, 256);
 			environment_preferences->sounds_mod_date = sounds_w->get_file_specifier().GetDate();
 			changed = true;
@@ -3222,8 +3066,7 @@ static void environment_dialog(void *arg)
 		}
 
 		path = solo_lua_w->get_file().GetPath();
-		if (strcmp(path, environment_preferences->solo_lua_file))
-		{
+		if (strcmp(path, environment_preferences->solo_lua_file)) {
 			strncpy(environment_preferences->solo_lua_file, path, 256);
 			changed = true;
 		}
@@ -3236,8 +3079,7 @@ static void environment_dialog(void *arg)
 		}
 
 		path = replay_net_lua_w->get_file().GetPath();
-		if (strcmp(path, network_preferences->netscript_file))
-		{
+		if (strcmp(path, network_preferences->netscript_file)) {
 			strncpy(network_preferences->netscript_file, path, 256);
 			changed = true;
 		}
@@ -3273,8 +3115,7 @@ static void environment_dialog(void *arg)
 
 		bool saves_changed = false;
 		int saves = max_saves_values[max_saves_w->get_selection()];
-		if (saves != environment_preferences->maximum_quick_saves)
-		{
+		if (saves != environment_preferences->maximum_quick_saves) {
 			environment_preferences->maximum_quick_saves = saves;
 			saves_changed = true;
 		}
@@ -3291,8 +3132,7 @@ static void environment_dialog(void *arg)
 		if (changed)
 			load_environment_from_preferences();
 
-		if (theme_changed)
-		{
+		if (theme_changed) {
 			load_dialog_theme();
 		}
 
@@ -3302,16 +3142,16 @@ static void environment_dialog(void *arg)
 
 	// Redraw parent dialog
 	if (theme_changed)
-		parent->quit(0); // Quit the parent dialog so it won't draw in the old theme
+		parent->quit(0);	// Quit the parent dialog so it won't draw in the old theme
 }
 
+
 extern void hub_set_minimum_send_period(int32);
-extern int32 &hub_get_minimum_send_period();
+extern int32& hub_get_minimum_send_period();
 
 struct set_latency_tolerance
 {
-	void operator()(const std::string &arg) const
-	{
+	void operator() (const std::string& arg) const {
 		hub_set_minimum_send_period(atoi(arg.c_str()));
 		screen_printf("latency tolerance is now %i", atoi(arg.c_str()));
 		write_preferences();
@@ -3320,13 +3160,12 @@ struct set_latency_tolerance
 
 struct get_latency_tolerance
 {
-	void operator()(const std::string &) const
-	{
+	void operator() (const std::string&) const {
 		screen_printf("latency tolerance is %i", hub_get_minimum_send_period());
 	}
 };
 
-void transition_preferences(const DirectorySpecifier &legacy_preferences_dir)
+void transition_preferences(const DirectorySpecifier& legacy_preferences_dir)
 {
 	FileSpecifier prefs;
 	prefs.SetToPreferencesDir();
@@ -3355,12 +3194,12 @@ void initialize_preferences(
 	// In case this function gets called more than once...
 	if (!PrefsInited)
 	{
-		graphics_preferences = new graphics_preferences_data;
-		player_preferences = new player_preferences_data;
-		input_preferences = new input_preferences_data;
+		graphics_preferences= new graphics_preferences_data;
+		player_preferences= new player_preferences_data;
+		input_preferences= new input_preferences_data;
 		sound_preferences = new SoundManager::Parameters;
-		network_preferences = new network_preferences_data;
-		environment_preferences = new environment_preferences_data;
+		network_preferences= new network_preferences_data;
+		environment_preferences= new environment_preferences_data;
 
 		for (int i = 0; i < NUM_KEYS; ++i)
 			input_preferences->key_bindings[i] = std::set<SDL_Scancode>();
@@ -3379,11 +3218,11 @@ void initialize_preferences(
 		PreferenceCommandParser.register_command("get", PreferenceGetCommandParser);
 		Console::instance()->register_command("preferences", PreferenceCommandParser);
 
-		read_preferences();
+		read_preferences ();
 	}
 }
 
-void read_preferences()
+void read_preferences ()
 {
 	// Set to defaults; will be overridden by reading in the XML stuff
 	default_graphics_preferences(graphics_preferences);
@@ -3414,20 +3253,18 @@ void read_preferences()
 	{
 		// copy non-editor prefs
 		FileSpec.SetToPreferencesDir();
-		FileSpec += getcstr(temporary, strFILENAMES, filenamePREFERENCES);
+		FileSpec += getcstr(temporary,strFILENAMES, filenamePREFERENCES);
 		opened = FileSpec.Open(OFile);
 	}
 
-	if (!opened)
-	{
+	if (!opened) {
 		defaults = true;
 		FileSpec.SetNameWithPath("Scripts/Default Preferences.xml");
 		opened = FileSpec.Open(OFile);
 	}
 
 	// legacy defalt prefs
-	if (!opened)
-	{
+	if (!opened) {
 		defaults = true;
 		FileSpec.SetNameWithPath(getcstr(temporary, strFILENAMES, filenamePREFERENCES));
 		opened = FileSpec.Open(OFile);
@@ -3437,8 +3274,7 @@ void read_preferences()
 	if (opened)
 	{
 		OFile.Close();
-		try
-		{
+		try {
 			InfoTree prefs = InfoTree::load_xml(FileSpec);
 			InfoTree root = prefs.get_child("mara_prefs");
 
@@ -3465,24 +3301,17 @@ void read_preferences()
 #endif
 			for (const InfoTree &child : root.children_named("environment"))
 				parse_environment_preferences(child, version);
-		}
-		catch (InfoTree::parse_error ex)
-		{
+			
+		} catch (InfoTree::parse_error ex) {
 			logError("Error parsing preferences file (%s): %s", FileSpec.GetPath(), ex.what());
 			parse_error = true;
-		}
-		catch (InfoTree::path_error ep)
-		{
+		} catch (InfoTree::path_error ep) {
 			logError("Could not find mara_prefs in preferences file (%s): %s", FileSpec.GetPath(), ep.what());
 			parse_error = true;
-		}
-		catch (InfoTree::data_error ed)
-		{
+		} catch (InfoTree::data_error ed) {
 			logError("Unexpected data error in preferences file (%s): %s", FileSpec.GetPath(), ed.what());
 			parse_error = true;
-		}
-		catch (InfoTree::unexpected_error ee)
-		{
+		} catch (InfoTree::unexpected_error ee) {
 			logError("Unexpected error in preferences file (%s): %s", FileSpec.GetPath(), ee.what());
 			parse_error = true;
 		}
@@ -3515,12 +3344,14 @@ void read_preferences()
 	//       error right here, because it's not like we're bothered when we can't load a
 	//       default file.
 	//       (Problem is SDL specific - socre one for Carbon? :) )
-	clear_game_error();
+	clear_game_error ();
 }
+
 
 /*
  *  Write preferences to file
  */
+
 
 InfoTree graphics_preferences_tree()
 {
@@ -3563,11 +3394,11 @@ InfoTree graphics_preferences_tree()
 
 	for (int i = 0; i < 4; ++i)
 		for (int j = 0; j < 2; ++j)
-			root.add_color("landscapes.color", graphics_preferences->OGL_Configure.LscpColors[i][j], 2 * i + j);
+			root.add_color("landscapes.color", graphics_preferences->OGL_Configure.LscpColors[i][j], 2*i+j);
 
 	for (int i = 0; i <= OGL_NUMBER_OF_TEXTURE_TYPES; ++i)
 	{
-		OGL_Texture_Configure &Config = (i == OGL_NUMBER_OF_TEXTURE_TYPES) ? graphics_preferences->OGL_Configure.ModelConfig : graphics_preferences->OGL_Configure.TxtrConfigList[i];
+		OGL_Texture_Configure& Config = (i == OGL_NUMBER_OF_TEXTURE_TYPES) ? graphics_preferences->OGL_Configure.ModelConfig : graphics_preferences->OGL_Configure.TxtrConfigList[i];
 
 		InfoTree tex;
 		tex.put_attr("index", i);
@@ -3593,7 +3424,7 @@ InfoTree player_preferences_tree()
 	root.put_attr("bkgd_music", player_preferences->background_music_on);
 	root.put_attr("crosshairs_active", player_preferences->crosshairs_active);
 
-	ChaseCamData &ChaseCam = player_preferences->ChaseCam;
+	ChaseCamData& ChaseCam = player_preferences->ChaseCam;
 	InfoTree cam;
 	cam.put_attr("behind", ChaseCam.Behind);
 	cam.put_attr("upward", ChaseCam.Upward);
@@ -3604,7 +3435,7 @@ InfoTree player_preferences_tree()
 	cam.put_attr("opacity", ChaseCam.Opacity);
 	root.put_child("chase_cam", cam);
 
-	CrosshairData &Crosshairs = player_preferences->Crosshairs;
+	CrosshairData& Crosshairs = player_preferences->Crosshairs;
 	InfoTree cross;
 	cross.put_attr("thickness", Crosshairs.Thickness);
 	cross.put_attr("from_center", Crosshairs.FromCenter);
@@ -3623,52 +3454,44 @@ static const char *binding_action_name[NUM_KEYS] = {
 	"strafe-right", "glance-left", "glance-right", "look-up", "look-down",
 	"look-ahead", "prev-weapon", "next-weapon", "trigger-1", "trigger-2",
 	"strafe", "run", "look", "action", "map",
-	"microphone"};
+	"microphone"
+};
 static const char *binding_shell_action_name[NUMBER_OF_SHELL_KEYS] = {
 	"inventory-left", "inventory-right", "switch-player-view", "volume-up", "volume-down",
-	"map-zoom-in", "map-zoom-out", "fps", "chat", "net-stats"};
+	"map-zoom-in", "map-zoom-out", "fps", "chat", "net-stats"
+};
 static const char *binding_hotkey_action_name[NUMBER_OF_HOTKEYS] = {
-	"hotkey-1", "hotkey-2", "hotkey-3", "hotkey-4", "hotkey-5", "hotkey-6", "hotkey-7", "hotkey-8", "hotkey-9", "hotkey-10", "hotkey-11", "hotkey-12"};
+	"hotkey-1", "hotkey-2", "hotkey-3", "hotkey-4", "hotkey-5", "hotkey-6", "hotkey-7", "hotkey-8", "hotkey-9", "hotkey-10", "hotkey-11", "hotkey-12"
+};
 static const char *binding_mouse_button_name[NUM_SDL_MOUSE_BUTTONS] = {
 	"mouse-left", "mouse-middle", "mouse-right", "mouse-x1", "mouse-x2",
-	"mouse-scroll-up", "mouse-scroll-down"};
+	"mouse-scroll-up", "mouse-scroll-down"
+};
 
-static const char *get_binding_joystick_button_name(int offset)
+static const char* get_binding_joystick_button_name(int offset)
 {
 	static_assert(SDL_CONTROLLER_BUTTON_MAX <= 21 &&
 					  SDL_CONTROLLER_AXIS_MAX <= 12,
 				  "SDL changed the number of buttons/axes again!");
 
-	static const char *buttons[] = {
-		"controller-a",
-		"controller-b",
-		"controller-x",
-		"controller-y",
-		"controller-back",
-		"controller-guide",
-		"controller-start",
-		"controller-ls",
-		"controller-rs",
-		"controller-lb",
-		"controller-rb",
-		"controller-up",
-		"controller-down",
-		"controller-left",
+	static const char* buttons[] = {
+		"controller-a", "controller-b", "controller-x", "controller-y",
+		"controller-back", "controller-guide", "controller-start",
+		"controller-ls", "controller-rs", "controller-lb", "controller-rb",
+		"controller-up", "controller-down", "controller-left",
 		"controller-right",
 		// new in SDL 2.0.14
-		"controller-misc1",
-		"controller-paddle1",
-		"controller-paddle2",
-		"controller-paddle3",
-		"controller-paddle4",
+		"controller-misc1", "controller-paddle1", "controller-paddle2",
+		"controller-paddle3", "controller-paddle4",
 		"controller-touchpad-button",
 	};
 
-	static const char *axes[] = {
+	static const char* axes[] = {
 		"controller-ls-right", "controller-ls-down", "controller-rs-right",
 		"controller-rs-down", "controller-lt", "controller-rt",
 		"controller-ls-left", "controller-ls-up", "controller-rs-left",
-		"controller-rs-up", "controller-lt-neg", "controller-rt-neg"};
+		"controller-rs-up", "controller-lt-neg", "controller-rt-neg"
+	};
 
 	if (offset < SDL_CONTROLLER_BUTTON_MAX)
 	{
@@ -3738,7 +3561,8 @@ static const char *binding_scancode_name[binding_num_scancodes] = {
 	"mail", "calculator", "computer", "ac-search", "ac-home",
 	"ac-back", "ac-forward", "ac-stop", "ac-refresh", "ac-bookmarks",
 	"brightnessdown", "brightnessup", "displayswitch", "kbdillumtoggle", "kbdillumdown",
-	"kbdillumup", "eject", "sleep", "app1", "app2"};
+	"kbdillumup", "eject", "sleep", "app1", "app2"
+};
 
 static const char *binding_name_for_code(SDL_Scancode code)
 {
@@ -3776,14 +3600,13 @@ static SDL_Scancode code_for_binding_name(std::string name)
 	return SDL_SCANCODE_UNKNOWN;
 }
 
-enum class BindingType
-{
+enum class BindingType {
 	in_game,
 	shell,
 	hotkey
 };
 
-static int index_for_action_name(std::string name, BindingType &binding_type)
+static int index_for_action_name(std::string name, BindingType& binding_type)
 {
 	for (int i = 0; i < NUM_KEYS; ++i)
 	{
@@ -3835,13 +3658,10 @@ InfoTree input_preferences_tree()
 	{
 		std::set<SDL_Scancode> codeset;
 		const char *name;
-		if (i < NUMBER_OF_KEYS)
-		{
+		if (i < NUMBER_OF_KEYS) {
 			codeset = input_preferences->key_bindings[i];
 			name = binding_action_name[i];
-		}
-		else
-		{
+		} else {
 			codeset = input_preferences->shell_key_bindings[i - NUMBER_OF_KEYS];
 			name = binding_shell_action_name[i - NUMBER_OF_KEYS];
 		}
@@ -3857,7 +3677,7 @@ InfoTree input_preferences_tree()
 		}
 	}
 
-	for (auto i = 0; i < NUMBER_OF_HOTKEYS; ++i)
+	for (auto i = 0;i < NUMBER_OF_HOTKEYS; ++i)
 	{
 		for (auto code : input_preferences->hotkey_bindings[i])
 		{
@@ -3923,7 +3743,7 @@ InfoTree network_preferences_tree()
 
 	char passwd[33];
 	for (int i = 0; i < 16; i++)
-		sprintf(&passwd[2 * i], "%.2x", network_preferences->metaserver_password[i] ^ sPasswordMask[i]);
+		sprintf(&passwd[2*i], "%.2x", network_preferences->metaserver_password[i] ^ sPasswordMask[i]);
 	passwd[32] = '\0';
 	root.put_attr("metaserver_password", passwd);
 
@@ -3967,10 +3787,8 @@ InfoTree environment_preferences_tree()
 	root.put_attr("use_native_file_dialogs", environment_preferences->use_native_file_dialogs);
 #endif
 
-	for (Plugins::iterator it = Plugins::instance()->begin(); it != Plugins::instance()->end(); ++it)
-	{
-		if (it->compatible() && !it->enabled)
-		{
+	for (Plugins::iterator it = Plugins::instance()->begin(); it != Plugins::instance()->end(); ++it) {
+		if (it->compatible() && !it->enabled) {
 			InfoTree disable;
 			disable.put_attr_path("path", it->directory.GetPath());
 			root.add_child("disable_plugin", disable);
@@ -4007,19 +3825,15 @@ void write_preferences()
 	}
 	FileSpec += name;
 
-	try
-	{
+	try {
 		fileroot.save_xml(FileSpec);
-	}
-	catch (InfoTree::parse_error ex)
-	{
+	} catch (InfoTree::parse_error ex) {
 		logError("Error saving preferences file (%s): %s", FileSpec.GetPath(), ex.what());
-	}
-	catch (InfoTree::unexpected_error ex)
-	{
+	} catch (InfoTree::unexpected_error ex) {
 		logError("Error saving preferences file (%s): %s", FileSpec.GetPath(), ex.what());
 	}
 }
+
 
 /*
  *  Setup default preferences
@@ -4028,7 +3842,7 @@ void write_preferences()
 static void default_graphics_preferences(graphics_preferences_data *preferences)
 {
 	memset(&preferences->screen_mode, '\0', sizeof(screen_mode_data));
-	preferences->screen_mode.gamma_level = DEFAULT_GAMMA_LEVEL;
+	preferences->screen_mode.gamma_level= DEFAULT_GAMMA_LEVEL;
 
 	preferences->screen_mode.width = 640;
 	preferences->screen_mode.height = 480;
@@ -4045,13 +3859,13 @@ static void default_graphics_preferences(graphics_preferences_data *preferences)
 	preferences->screen_mode.camera_bob = true;
 	preferences->screen_mode.bit_depth = 32;
 
-	preferences->screen_mode.draw_every_other_line = false;
+	preferences->screen_mode.draw_every_other_line= false;
 
 	preferences->screen_mode.fov = 0; // use default
 
 	OGL_SetDefaults(preferences->OGL_Configure);
 
-	preferences->double_corpse_limit = false;
+	preferences->double_corpse_limit= false;
 
 	preferences->software_alpha_blending = _sw_alpha_off;
 	preferences->software_sdl_driver = _sw_driver_default;
@@ -4066,21 +3880,23 @@ static void default_graphics_preferences(graphics_preferences_data *preferences)
 
 static void default_network_preferences(network_preferences_data *preferences)
 {
-	preferences->type = _ethernet;
+	preferences->type= _ethernet;
 
 	preferences->allow_microphone = true;
 	preferences->game_is_untimed = false;
 	preferences->difficulty_level = 2;
-	preferences->game_options = _multiplayer_game | _ammo_replenishes | _weapons_replenish | _specials_replenish | _burn_items_on_death | _force_unique_teams | _live_network_stats;
+	preferences->game_options =	_multiplayer_game | _ammo_replenishes | _weapons_replenish
+		| _specials_replenish | _burn_items_on_death
+		| _force_unique_teams | _live_network_stats;
 	preferences->time_limit = 10 * TICKS_PER_SECOND * 60;
 	preferences->kill_limit = 10;
-	preferences->entry_point = 0;
-	preferences->game_type = _game_of_kill_monsters;
-	preferences->autogather = false;
-	preferences->join_by_address = false;
+	preferences->entry_point= 0;
+	preferences->game_type= _game_of_kill_monsters;
+	preferences->autogather= false;
+	preferences->join_by_address= false;
 	obj_clear(preferences->join_address);
-	preferences->game_port = DEFAULT_GAME_PORT;
-	preferences->game_protocol = _network_game_protocol_default;
+	preferences->game_port= DEFAULT_GAME_PORT;
+	preferences->game_protocol= _network_game_protocol_default;
 #if !defined(DISABLE_NETWORKING)
 	DefaultStarPreferences();
 	DefaultRingPreferences();
@@ -4107,7 +3923,7 @@ static void default_player_preferences(player_preferences_data *preferences)
 {
 	obj_clear(*preferences);
 
-	preferences->difficulty_level = 2;
+	preferences->difficulty_level= 2;
 	strncpy(preferences->name, get_name_from_system().c_str(), PREFERENCES_NAME_LENGTH);
 	preferences->name[PREFERENCES_NAME_LENGTH] = '\0';
 
@@ -4132,7 +3948,7 @@ static void default_player_preferences(player_preferences_data *preferences)
 
 static void default_input_preferences(input_preferences_data *preferences)
 {
-	preferences->input_device = _mouse_yaw_pitch;
+	preferences->input_device= _mouse_yaw_pitch;
 	preferences->key_bindings = default_key_bindings;
 	preferences->shell_key_bindings = default_shell_key_bindings;
 	preferences->hotkey_bindings = default_hotkey_bindings;
@@ -4173,11 +3989,11 @@ static void default_environment_preferences(environment_preferences_data *prefer
 	get_default_sounds_spec(DefaultSoundsFile);
 	get_default_external_resources_spec(DefaultExternalResourcesFile);
 
-	preferences->map_checksum = read_wad_file_checksum(DefaultMapFile);
+	preferences->map_checksum= read_wad_file_checksum(DefaultMapFile);
 	strncpy(preferences->map_file, DefaultMapFile.GetPath(), 256);
 	preferences->map_file[255] = 0;
 
-	preferences->physics_checksum = read_wad_file_checksum(DefaultPhysicsFile);
+	preferences->physics_checksum= read_wad_file_checksum(DefaultPhysicsFile);
 	strncpy(preferences->physics_file, DefaultPhysicsFile.GetPath(), 256);
 	preferences->physics_file[255] = 0;
 
@@ -4207,13 +4023,14 @@ static void default_environment_preferences(environment_preferences_data *prefer
 #endif
 }
 
+
 /*
  *  Validate preferences
  */
 
 static bool validate_graphics_preferences(graphics_preferences_data *preferences)
 {
-	bool changed = false;
+	bool changed= false;
 
 	// Fix bool options
 	preferences->screen_mode.high_resolution = !!preferences->screen_mode.high_resolution;
@@ -4221,10 +4038,10 @@ static bool validate_graphics_preferences(graphics_preferences_data *preferences
 	preferences->screen_mode.draw_every_other_line = !!preferences->screen_mode.draw_every_other_line;
 	preferences->screen_mode.fix_h_not_v = !!preferences->screen_mode.fix_h_not_v;
 
-	if (preferences->screen_mode.gamma_level < 0 || preferences->screen_mode.gamma_level >= NUMBER_OF_GAMMA_LEVELS)
+	if(preferences->screen_mode.gamma_level<0 || preferences->screen_mode.gamma_level>=NUMBER_OF_GAMMA_LEVELS)
 	{
-		preferences->screen_mode.gamma_level = DEFAULT_GAMMA_LEVEL;
-		changed = true;
+		preferences->screen_mode.gamma_level= DEFAULT_GAMMA_LEVEL;
+		changed= true;
 	}
 
 	if (preferences->screen_mode.acceleration != _no_acceleration && preferences->screen_mode.acceleration != _opengl_acceleration)
@@ -4233,8 +4050,8 @@ static bool validate_graphics_preferences(graphics_preferences_data *preferences
 	// OpenGL requires at least 16 bit color depth
 	if (preferences->screen_mode.acceleration != _no_acceleration && preferences->screen_mode.bit_depth == 8)
 	{
-		preferences->screen_mode.bit_depth = 16;
-		changed = true;
+		preferences->screen_mode.bit_depth= 16;
+		changed= true;
 	}
 
 #ifdef TRUE_COLOR_ONLY
@@ -4262,49 +4079,47 @@ static bool validate_graphics_preferences(graphics_preferences_data *preferences
 
 static bool validate_network_preferences(network_preferences_data *preferences)
 {
-	bool changed = false;
+	bool changed= false;
 
 	// Fix bool options
 	preferences->allow_microphone = !!preferences->allow_microphone;
 	preferences->game_is_untimed = !!preferences->game_is_untimed;
 
-	if (preferences->type < 0 || preferences->type > _ethernet)
+	if(preferences->type<0||preferences->type>_ethernet)
 	{
-		if (ethernet_active())
+		if(ethernet_active())
 		{
-			preferences->type = _ethernet;
+			preferences->type= _ethernet;
+		} else {
+			preferences->type= _localtalk;
 		}
-		else
-		{
-			preferences->type = _localtalk;
-		}
-		changed = true;
+		changed= true;
 	}
 
-	if (preferences->game_is_untimed != true && preferences->game_is_untimed != false)
+	if(preferences->game_is_untimed != true && preferences->game_is_untimed != false)
 	{
-		preferences->game_is_untimed = false;
-		changed = true;
+		preferences->game_is_untimed= false;
+		changed= true;
 	}
 
-	if (preferences->allow_microphone != true && preferences->allow_microphone != false)
+	if(preferences->allow_microphone != true && preferences->allow_microphone != false)
 	{
-		preferences->allow_microphone = true;
-		changed = true;
+		preferences->allow_microphone= true;
+		changed= true;
 	}
 
-	if (preferences->game_type < 0 || preferences->game_type >= NUMBER_OF_GAME_TYPES)
+	if(preferences->game_type<0 || preferences->game_type >= NUMBER_OF_GAME_TYPES)
 	{
-		preferences->game_type = _game_of_kill_monsters;
-		changed = true;
+		preferences->game_type= _game_of_kill_monsters;
+		changed= true;
 	}
 
 	// ZZZ: is this relevant anymore now with XML prefs?  if so, should validate autogather, join_by_address, and join_address.
 
-	if (preferences->game_protocol >= NUMBER_OF_NETWORK_GAME_PROTOCOLS)
+	if(preferences->game_protocol >= NUMBER_OF_NETWORK_GAME_PROTOCOLS)
 	{
-		preferences->game_protocol = _network_game_protocol_default;
-		changed = true;
+		preferences->game_protocol= _network_game_protocol_default;
+		changed= true;
 	}
 
 	return changed;
@@ -4320,15 +4135,16 @@ static bool validate_player_preferences(player_preferences_data *preferences)
 
 static bool validate_input_preferences(input_preferences_data *preferences)
 {
-	(void)(preferences);
+	(void) (preferences);
 	return false;
 }
 
 static bool validate_environment_preferences(environment_preferences_data *preferences)
 {
-	(void)(preferences);
+	(void) (preferences);
 	return false;
 }
+
 
 /*
  *  Load the environment
@@ -4339,79 +4155,56 @@ void load_environment_from_preferences(
 	void)
 {
 	FileSpecifier File;
-	struct environment_preferences_data *prefs = environment_preferences;
+	struct environment_preferences_data *prefs= environment_preferences;
 
 	File = prefs->map_file;
-	if (File.Exists())
-	{
+	if (File.Exists()) {
 		set_map_file(File);
-	}
-	else
-	{
+	} else {
 		/* Try to find the checksum */
-		if (find_wad_file_that_has_checksum(File,
-											_typecode_scenario, strPATHS, prefs->map_checksum))
-		{
+		if(find_wad_file_that_has_checksum(File,
+			_typecode_scenario, strPATHS, prefs->map_checksum))	{
 			set_map_file(File);
-		}
-		else
-		{
+		} else {
 			set_to_default_map();
 		}
 	}
 
 	File = prefs->physics_file;
-	if (File.Exists())
-	{
+	if (File.Exists()) {
 		set_physics_file(File);
 		import_definition_structures();
-	}
-	else
-	{
-		if (find_wad_file_that_has_checksum(File,
-											_typecode_physics, strPATHS, prefs->physics_checksum))
-		{
+	} else {
+		if(find_wad_file_that_has_checksum(File,
+			_typecode_physics, strPATHS, prefs->physics_checksum)) {
 			set_physics_file(File);
 			import_definition_structures();
-		}
-		else
-		{
+		} else {
 			/* Didn't find it.  Don't change them.. */
 		}
 	}
 
 	File = prefs->shapes_file;
-	if (File.Exists())
-	{
+	if (File.Exists()) {
 		open_shapes_file(File);
-	}
-	else
-	{
-		if (find_file_with_modification_date(File,
+	} else {
+		if(find_file_with_modification_date(File,
 											 _typecode_shapes, strPATHS, prefs->shapes_mod_date))
 		{
 			open_shapes_file(File);
-		}
-		else
-		{
+		} else {
 			/* What should I do? */
 		}
 	}
 
 	File = prefs->sounds_file;
-	if (File.Exists())
-	{
+	if (File.Exists()) {
 		SoundManager::instance()->OpenSoundFile(File);
-	}
-	else
-	{
-		if (find_file_with_modification_date(File,
-											 _typecode_sounds, strPATHS, prefs->sounds_mod_date))
-		{
+	} else {
+		if(find_file_with_modification_date(File,
+			_typecode_sounds, strPATHS, prefs->sounds_mod_date)) {
 			SoundManager::instance()->OpenSoundFile(File);
-		}
-		else
-		{
+		} else {
 			/* What should I do? */
 		}
 	}
@@ -4424,57 +4217,65 @@ void load_environment_from_preferences(
 	set_external_resources_images_file(File);
 }
 
+
 // LP addition: get these from the preferences data
-ChaseCamData &GetChaseCamData() { return player_preferences->ChaseCam; }
-CrosshairData &GetCrosshairData() { return player_preferences->Crosshairs; }
-OGL_ConfigureData &Get_OGL_ConfigureData() { return graphics_preferences->OGL_Configure; }
+ChaseCamData& GetChaseCamData() {return player_preferences->ChaseCam;}
+CrosshairData& GetCrosshairData() {return player_preferences->Crosshairs;}
+OGL_ConfigureData& Get_OGL_ConfigureData() {return graphics_preferences->OGL_Configure;}
+
 
 // ZZZ: override player-behavior modifiers
 static bool sStandardizeModifiers = false;
 
-void standardize_player_behavior_modifiers()
-{
+
+void
+standardize_player_behavior_modifiers() {
 	sStandardizeModifiers = true;
 }
 
-void restore_custom_player_behavior_modifiers()
-{
+
+void
+restore_custom_player_behavior_modifiers() {
 	sStandardizeModifiers = false;
 }
 
-bool is_player_behavior_standard()
-{
+
+bool
+is_player_behavior_standard() {
 	return !dont_switch_to_new_weapon();
 }
 
+
 // LP addition: modification of Josh Elsasser's dont-switch-weapons patch
 // so as to access preferences stuff here
-bool dont_switch_to_new_weapon()
-{
+bool dont_switch_to_new_weapon() {
 	// ZZZ: let game require standard modifiers for a while
-	if (!sStandardizeModifiers)
-		return TEST_FLAG(input_preferences->modifiers, _inputmod_dont_switch_to_new_weapon);
+    if(!sStandardizeModifiers)
+	    return TEST_FLAG(input_preferences->modifiers,_inputmod_dont_switch_to_new_weapon);
 	else
 		return false;
 }
 
-bool dont_auto_recenter()
-{
+
+bool
+dont_auto_recenter() {
 	return TEST_FLAG(input_preferences->modifiers, _inputmod_dont_auto_recenter);
 }
+
 
 // LP additions: MML-like prefs stuff
 // These parsers are intended to work correctly on both Mac and SDL prefs files;
 // including one crossing over to the other platform (uninterpreted fields become defaults)
 
 // To get around both RGBColor and rgb_color being used in the code
-template <class CType1, class CType2>
-void CopyColor(CType1 &Dest, CType2 &Src)
+template<class CType1, class CType2> void CopyColor(CType1& Dest, CType2& Src)
 {
 	Dest.red = Src.red;
 	Dest.green = Src.green;
 	Dest.blue = Src.blue;
 }
+
+
 
 struct ViewSizeData
 {
@@ -4484,38 +4285,39 @@ struct ViewSizeData
 
 const ViewSizeData LegacyViewSizes[32] =
 	{
-		{320, 160, true},
-		{480, 240, true},
-		{640, 480, true},
-		{640, 480, false},
-		{800, 600, true},
-		{800, 600, false},
-		{1024, 768, true},
-		{1024, 768, false},
-		{1280, 1024, true},
-		{1280, 1024, false},
-		{1600, 1200, true},
-		{1600, 1200, false},
-		{1024, 640, true},
-		{1024, 640, false},
-		{1280, 800, true},
-		{1280, 800, false},
-		{1280, 854, true},
-		{1280, 854, false},
-		{1440, 900, true},
-		{1440, 900, false},
-		{1680, 1050, true},
-		{1680, 1050, false},
-		{1920, 1200, true},
-		{1920, 1200, false},
-		{2560, 1600, true},
-		{2560, 1600, false},
-		{1280, 768, true},
-		{1280, 768, false},
-		{1280, 960, true},
-		{1280, 960, false},
-		{1280, 720, true},
-		{1280, 720, false}};
+	{ 320, 160, true},
+	{ 480, 240, true},
+	{ 640, 480, true},
+	{ 640, 480, false},
+	{ 800, 600, true},
+	{ 800, 600, false},
+	{ 1024, 768, true},
+	{ 1024, 768, false},
+	{ 1280, 1024, true},
+	{ 1280, 1024, false},
+	{ 1600, 1200, true},
+	{ 1600, 1200, false},
+	{ 1024, 640, true},
+	{ 1024, 640, false},
+	{ 1280, 800, true},
+	{ 1280, 800, false},
+	{ 1280, 854, true},
+	{ 1280, 854, false},
+	{ 1440, 900, true},
+	{ 1440, 900, false},
+	{ 1680, 1050, true},
+	{ 1680, 1050, false},
+	{ 1920, 1200, true},
+	{ 1920, 1200, false},
+	{ 2560, 1600, true},
+	{ 2560, 1600, false},
+	{ 1280, 768, true},
+	{ 1280, 768, false},
+	{ 1280, 960, true},
+	{ 1280, 960, false},
+	{ 1280, 720, true},
+	{ 1280, 720, false}
+};
 
 void parse_graphics_preferences(InfoTree root, std::string version)
 {
@@ -4584,9 +4386,9 @@ void parse_graphics_preferences(InfoTree root, std::string version)
 	for (const InfoTree &tex : root.children_named("texture"))
 	{
 		int16 index;
-		if (tex.read_indexed("index", index, OGL_NUMBER_OF_TEXTURE_TYPES + 1))
+		if (tex.read_indexed("index", index, OGL_NUMBER_OF_TEXTURE_TYPES+1))
 		{
-			OGL_Texture_Configure &Config = (index == OGL_NUMBER_OF_TEXTURE_TYPES) ? graphics_preferences->OGL_Configure.ModelConfig : graphics_preferences->OGL_Configure.TxtrConfigList[index];
+			OGL_Texture_Configure& Config = (index == OGL_NUMBER_OF_TEXTURE_TYPES) ? graphics_preferences->OGL_Configure.ModelConfig : graphics_preferences->OGL_Configure.TxtrConfigList[index];
 			tex.read_attr("near_filter", Config.NearFilter);
 			tex.read_attr("far_filter", Config.FarFilter);
 			tex.read_attr("resolution", Config.Resolution);
@@ -4595,6 +4397,7 @@ void parse_graphics_preferences(InfoTree root, std::string version)
 		}
 	}
 }
+
 
 void parse_player_preferences(InfoTree root, std::string version)
 {
@@ -4698,7 +4501,8 @@ SDL_Scancode translate_old_key(int code)
 		SDLK_RCTRL, SDLK_LCTRL, SDLK_RALT, SDLK_LALT, SDLK_RGUI,
 		SDLK_LGUI, SDLK_LGUI, SDLK_RGUI, SDLK_MODE, SDLK_UNKNOWN,
 		SDLK_HELP, SDLK_PRINTSCREEN, SDLK_SYSREQ, SDLK_UNKNOWN, SDLK_MENU,
-		SDLK_POWER, SDLK_CURRENCYUNIT, SDLK_UNDO};
+		SDLK_POWER, SDLK_CURRENCYUNIT, SDLK_UNDO
+	};
 
 	if (code >= 65 && code < 73)
 		return static_cast<SDL_Scancode>(AO_SCANCODE_BASE_MOUSE_BUTTON + (code - 65));
@@ -4825,7 +4629,7 @@ void parse_input_preferences(InfoTree root, std::string version)
 			if (index < 0)
 				continue;
 			SDL_Scancode code = code_for_binding_name(pressed_name);
-			key_binding_map *map;
+			key_binding_map* map;
 
 			switch (binding_type)
 			{
@@ -4901,6 +4705,8 @@ void parse_sound_preferences(InfoTree root, std::string version)
 	root.read_attr("video_export_volume_db", sound_preferences->video_export_volume_db);
 }
 
+
+
 void parse_network_preferences(InfoTree root, std::string version)
 {
 	root.read_attr("microphone", network_preferences->allow_microphone);
@@ -4949,8 +4755,8 @@ void parse_network_preferences(InfoTree root, std::string version)
 		for (int i = 0; i < 15; i++)
 		{
 			unsigned int c;
-			sscanf(obscured_password + i * 2, "%2x", &c);
-			network_preferences->metaserver_password[i] = (char)c ^ sPasswordMask[i];
+			sscanf(obscured_password + i*2, "%2x", &c);
+			network_preferences->metaserver_password[i] = (char) c ^ sPasswordMask[i];
 		}
 		network_preferences->metaserver_password[15] = '\0';
 	}
@@ -5010,9 +4816,9 @@ void parse_environment_preferences(InfoTree root, std::string version)
 	}
 }
 
-extern const char *GetSDLKeyName(SDL_Scancode);
+extern const char* GetSDLKeyName(SDL_Scancode);
 
-const char *get_hotkey_binding(int hotkey, int type)
+const char* get_hotkey_binding(int hotkey, int type)
 {
 
 	auto bindings = input_preferences->hotkey_bindings[hotkey - 1];

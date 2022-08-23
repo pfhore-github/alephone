@@ -112,7 +112,7 @@ Jan 25, 2002 (Br'fin (Jeremy Parsons)):
 #include "SoundManager.h"
 #include "interface.h" // for the error strings.
 #include "shell.h"
-#include "platforms.h"	 // for tagged platforms
+#include "platforms.h" // for tagged platforms
 #include "lightsource.h" // for tagged lightsources
 #include "screen.h"
 
@@ -134,33 +134,30 @@ namespace algo = boost::algorithm;
 namespace io = boost::iostreams;
 
 #define LABEL_INSET 3
-#define LOG_DURATION_BEFORE_TIMEOUT (2 * TICKS_PER_SECOND)
+#define LOG_DURATION_BEFORE_TIMEOUT (2*TICKS_PER_SECOND)
 #define BORDER_HEIGHT 18
 #define BORDER_INSET 9
 #define FUDGE_FACTOR 1
 
 #define MAC_LINE_END 13
 
-enum
-{
+enum {
 	_reading_terminal,
 	_no_terminal_state,
 	NUMBER_OF_TERMINAL_STATES
 };
 
-enum
-{
-	_terminal_is_dirty = 0x01
+enum {
+	_terminal_is_dirty= 0x01
 };
 
-enum
-{
-	_any_abort_key_mask = _action_trigger_state,
-	_terminal_up_arrow = _moving_forward,
-	_terminal_down_arrow = _moving_backward,
-	_terminal_page_down = _turning_right,
-	_terminal_page_up = _turning_left,
-	_terminal_next_state = _left_trigger_state
+enum {
+	_any_abort_key_mask= _action_trigger_state,
+	_terminal_up_arrow= _moving_forward,
+	_terminal_down_arrow= _moving_backward,
+	_terminal_page_down= _turning_right,
+	_terminal_page_up= _turning_left,
+	_terminal_next_state= _left_trigger_state
 };
 
 #define strCOMPUTER_LABELS 135
@@ -179,18 +176,16 @@ enum
 };
 
 #define TERMINAL_IS_DIRTY(term) ((term)->flags & _terminal_is_dirty)
-#define SET_TERMINAL_IS_DIRTY(term, v) ((void)((v) ? ((term)->flags |= _terminal_is_dirty) : ((term)->flags &= ~_terminal_is_dirty)))
+#define SET_TERMINAL_IS_DIRTY(term, v) ((void)((v)? ((term)->flags |= _terminal_is_dirty) : ((term)->flags &= ~_terminal_is_dirty)))
 
 /* Maximum face changes per text grouping.. */
 #define MAXIMUM_FACE_CHANGES_PER_TEXT_GROUPING (128)
 
-enum
-{
-	_text_is_encoded_flag = 0x0001
+enum {
+	_text_is_encoded_flag= 0x0001
 };
 
-enum
-{
+enum {
 	_logon_group,
 	_unfinished_group,
 	_success_group,
@@ -199,38 +194,36 @@ enum
 	_end_group,
 	_interlevel_teleport_group, // permutation is level to go to
 	_intralevel_teleport_group, // permutation is polygon to go to.
-	_checkpoint_group,			// permutation is the goal to show
-	_sound_group,				// permutation is the sound id to play
-	_movie_group,				// permutation is the movie id to play
-	_track_group,				// permutation is the track to play
-	_pict_group,				// permutation is the pict to display
+	_checkpoint_group, // permutation is the goal to show
+	_sound_group, // permutation is the sound id to play
+	_movie_group, // permutation is the movie id to play
+	_track_group, // permutation is the track to play
+	_pict_group, // permutation is the pict to display
 	_logoff_group,
 	_camera_group, //  permutation is the object index
 	_static_group, // permutation is the duration of static.
-	_tag_group,	   // permutation is the tag to activate
+	_tag_group, // permutation is the tag to activate
 
 	NUMBER_OF_GROUP_TYPES
 };
 
 enum // flags to indicate text styles for paragraphs
 {
-	_plain_text = 0x00,
-	_bold_text = 0x01,
-	_italic_text = 0x02,
-	_underline_text = 0x04
+	_plain_text      = 0x00,
+	_bold_text       = 0x01,
+	_italic_text     = 0x02,
+	_underline_text  = 0x04
 };
 
-enum
-{								/* terminal grouping flags */
-  _draw_object_on_right = 0x01, // for drawing checkpoints, picts, movies.
-  _center_object = 0x02,
+enum { /* terminal grouping flags */
+	_draw_object_on_right= 0x01,  // for drawing checkpoints, picts, movies.
+	_center_object= 0x02,
   _group_is_marathon_1 = 0x100
 };
 
-struct terminal_groupings
-{
-	int16 flags;	   /* varies.. */
-	int16 type;		   /* _information_text, _checkpoint_text, _briefing_text, _movie, _sound_bite, _soundtrack */
+struct terminal_groupings {
+	int16 flags; /* varies.. */
+	int16 type; /* _information_text, _checkpoint_text, _briefing_text, _movie, _sound_bite, _soundtrack */
 	int16 permutation; /* checkpoint id for chkpt, level id for _briefing, movie id for movie, sound id for sound, soundtrack id for soundtrack */
 	int16 start_index;
 	int16 length;
@@ -238,8 +231,7 @@ struct terminal_groupings
 };
 const int SIZEOF_terminal_groupings = 12;
 
-struct text_face_data
-{
+struct text_face_data {
 	int16 index;
 	int16 face;
 	int16 color;
@@ -260,23 +252,20 @@ struct player_terminal_data
 	int32 last_action_flag;
 };
 
-struct terminal_key
-{
+struct terminal_key {
 	int16 keycode;
 	int16 offset;
 	int16 mask;
 	int32 action_flag;
 };
 
-struct font_dimensions
-{
+struct font_dimensions {
 	int16 lines_per_screen;
 	int16 character_width;
 };
 
 /* Terminal data loaded from map (maintained by computer_interface.cpp) */
-struct terminal_text_t
-{ // Object describing one terminal
+struct terminal_text_t {	// Object describing one terminal
 	terminal_text_t() {}
 	uint16 flags = 0;
 	int16 lines_per_page = 0;
@@ -293,7 +282,7 @@ short number_of_terminal_texts() { return map_terminal_text.size(); }
 /* internal global structure */
 static struct player_terminal_data *player_terminals;
 
-#define NUMBER_OF_TERMINAL_KEYS (sizeof(terminal_keys) / sizeof(struct terminal_key))
+#define NUMBER_OF_TERMINAL_KEYS (sizeof(terminal_keys)/sizeof(struct terminal_key))
 
 // Get the interface font to use from screen_drawing_<platform>.cpp
 extern TextSpec *_get_font_spec(short font_index);
@@ -331,7 +320,7 @@ static void present_checkpoint_text(terminal_text_t *terminal_text, short curren
 									short current_line);
 static bool find_checkpoint_location(short checkpoint_index, world_point2d *location,
 									 short *polygon_index);
-static void set_text_face(struct text_face_data *text_face);
+static void	set_text_face(struct text_face_data *text_face);
 static void draw_line(char *base_text, short start_index, short end_index, Rect *bounds,
 					  terminal_text_t *terminal_text, short *text_face_start_index,
 					  short line_number);
@@ -341,7 +330,7 @@ static bool calculate_line(terminal_text_t *terminal_text,
 static void handle_reading_terminal_keys(short player_index, int32 action_flags);
 static void calculate_bounds_for_object(short flags, Rect *bounds, Rect *source);
 static void display_picture(short picture_id, Rect *frame, short flags);
-static void display_shape(short shape, Rect *frame);
+static void display_shape(short shape, Rect* frame);
 static void display_picture_with_text(struct player_terminal_data *terminal_data,
 									  Rect *bounds, terminal_text_t *terminal_text, short current_lien);
 static short count_total_lines(terminal_text_t *terminal_text, char *base_text, short width, short start_index, short end_index);
@@ -360,32 +349,36 @@ static void decode_text(terminal_text_t *terminal_text);
 #include "sdl_fonts.h"
 #include "joystick.h" // for AO_SCANCODE_BASE_JOYSTICK_BUTTON
 
+
 // Global variables
 // static const sdl_font_info *terminal_font = NULL;
-static uint32 current_pixel;			   // Current color pixel value
-static uint16 current_style = styleNormal; // Current style flags
+static uint32 current_pixel;				// Current color pixel value
+static uint16 current_style = styleNormal;	// Current style flags
 
 // From screen_sdl.cpp
 extern SDL_Surface *world_pixels;
 
+
 // Terminal key definitions
-static struct terminal_key terminal_keys[] = {
-	{SDL_SCANCODE_UP, 0, 0, _terminal_page_up},			 // arrow up
-	{SDL_SCANCODE_DOWN, 0, 0, _terminal_page_down},		 // arrow down
-	{SDL_SCANCODE_PAGEUP, 0, 0, _terminal_page_up},		 // page up
-	{SDL_SCANCODE_PAGEDOWN, 0, 0, _terminal_page_down},	 // page down
-	{SDL_SCANCODE_TAB, 0, 0, _terminal_next_state},		 // tab
-	{SDL_SCANCODE_KP_ENTER, 0, 0, _terminal_next_state}, // enter
-	{SDL_SCANCODE_RETURN, 0, 0, _terminal_next_state},	 // return
-	{SDL_SCANCODE_SPACE, 0, 0, _terminal_next_state},	 // space
-	{SDL_SCANCODE_ESCAPE, 0, 0, _any_abort_key_mask},	 // escape
+static struct terminal_key terminal_keys[]= {
+	{SDL_SCANCODE_UP, 0, 0, _terminal_page_up},				// arrow up
+	{SDL_SCANCODE_DOWN, 0, 0, _terminal_page_down},			// arrow down
+	{SDL_SCANCODE_PAGEUP, 0, 0, _terminal_page_up},			// page up
+	{SDL_SCANCODE_PAGEDOWN, 0, 0, _terminal_page_down},		// page down
+	{SDL_SCANCODE_TAB, 0, 0, _terminal_next_state},			// tab
+	{SDL_SCANCODE_KP_ENTER, 0, 0, _terminal_next_state},	// enter
+	{SDL_SCANCODE_RETURN, 0, 0, _terminal_next_state},		// return
+	{SDL_SCANCODE_SPACE, 0, 0, _terminal_next_state},		// space
+	{SDL_SCANCODE_ESCAPE, 0, 0, _any_abort_key_mask},		// escape
 	{AO_SCANCODE_JOYSTICK_ESCAPE, 0, 0, _any_abort_key_mask},
 	{AO_SCANCODE_BASE_JOYSTICK_BUTTON + SDL_CONTROLLER_BUTTON_DPAD_UP, 0, 0, _terminal_page_up},
 	{AO_SCANCODE_BASE_JOYSTICK_BUTTON + SDL_CONTROLLER_BUTTON_DPAD_DOWN, 0, 0, _terminal_page_down},
 	{AO_SCANCODE_BASE_JOYSTICK_BUTTON + SDL_CONTROLLER_BUTTON_A, 0, 0, _terminal_next_state},
 	{AO_SCANCODE_BASE_JOYSTICK_BUTTON + SDL_CONTROLLER_BUTTON_X, 0, 0, _terminal_next_state},
 	{AO_SCANCODE_BASE_JOYSTICK_BUTTON + SDL_CONTROLLER_BUTTON_Y, 0, 0, _terminal_next_state},
-	{AO_SCANCODE_BASE_JOYSTICK_BUTTON + SDL_CONTROLLER_BUTTON_B, 0, 0, _any_abort_key_mask}};
+	{AO_SCANCODE_BASE_JOYSTICK_BUTTON + SDL_CONTROLLER_BUTTON_B, 0, 0, _any_abort_key_mask}
+};
+
 
 // Emulation of MacOS functions
 static void InsetRect(Rect *r, int dx, int dy)
@@ -406,7 +399,7 @@ static void OffsetRect(Rect *r, int dx, int dy)
 
 extern SDL_Surface *draw_surface;
 
-static void set_text_face(struct text_face_data *text_face)
+static void	set_text_face(struct text_face_data *text_face)
 {
 	current_style = styleNormal;
 
@@ -421,7 +414,7 @@ static void set_text_face(struct text_face_data *text_face)
 	// Set color
 	SDL_Color color;
 	_get_interface_color(text_face->color + _computer_interface_text_color, &color);
-	current_pixel = SDL_MapRGB(/*world_pixels*/ draw_surface->format, color.r, color.g, color.b);
+	current_pixel = SDL_MapRGB(/*world_pixels*/draw_surface->format, color.r, color.g, color.b);
 }
 
 static uint16 get_face(struct text_face_data *text_face)
@@ -545,10 +538,9 @@ static bool calculate_line(terminal_text_t *terminal_text,
 			{
 				int break_point = index;
 
-				while (break_point > start_index)
-				{
+				while (break_point>start_index) {
 					if (base_text[break_point] == ' ')
-						break; // Non printing
+						break; 	// Non printing
 					if (isJChar(base_text[break_point - 2]))
 					{
 						break_point--;
@@ -558,14 +550,14 @@ static bool calculate_line(terminal_text_t *terminal_text,
 				}
 
 				if (break_point != start_index)
-					index = break_point + 1; // Space at the end of the line
+					index = break_point+1;	// Space at the end of the line
 			}
 		}
 
-		*end_index = index;
-	}
-	else
+		*end_index= index;
+	} else
 		done = true;
+	
 	return done;
 }
 
@@ -574,7 +566,7 @@ static bool calculate_line(terminal_text_t *terminal_text,
 player_terminal_data *get_player_terminal_data(
 	short player_index)
 {
-	struct player_terminal_data *player_terminal = GetMemberWithBounds(player_terminals, player_index, MAXIMUM_NUMBER_OF_PLAYERS);
+	struct player_terminal_data *player_terminal = GetMemberWithBounds(player_terminals,player_index,MAXIMUM_NUMBER_OF_PLAYERS);
 
 	vassert(player_terminal, csprintf(temporary, "player index #%d is out of range", player_index));
 
@@ -584,7 +576,7 @@ player_terminal_data *get_player_terminal_data(
 void initialize_terminal_manager(
 	void)
 {
-	player_terminals = new player_terminal_data[MAXIMUM_NUMBER_OF_PLAYERS];
+	player_terminals= new player_terminal_data[MAXIMUM_NUMBER_OF_PLAYERS];
 	assert(player_terminals);
 	objlist_clear(player_terminals, MAXIMUM_NUMBER_OF_PLAYERS);
 
@@ -596,7 +588,7 @@ void initialize_terminal_manager(
 void initialize_player_terminal_info(
 	short player_index)
 {
-	struct player_terminal_data *terminal = get_player_terminal_data(player_index);
+	struct player_terminal_data *terminal= get_player_terminal_data(player_index);
 
 	//CP Addition: trap for logout!
 	if (terminal->state != _no_terminal_state)
@@ -604,15 +596,15 @@ void initialize_player_terminal_info(
 		L_Call_Terminal_Exit(terminal->terminal_id, player_index);
 	}
 
-	terminal->flags = 0;
-	terminal->phase = NONE;				  // not using a control panel.
-	terminal->state = _no_terminal_state; // And there is no line..
-	terminal->current_group = NONE;
-	terminal->level_completion_state = 0;
-	terminal->current_line = 0;
-	terminal->maximum_line = 0;
-	terminal->terminal_id = 0;
-	terminal->last_action_flag = -1l; /* Eat the first key */
+	terminal->flags= 0;
+	terminal->phase = NONE; // not using a control panel.
+	terminal->state= _no_terminal_state; // And there is no line..
+	terminal->current_group= NONE;
+	terminal->level_completion_state= 0;
+	terminal->current_line= 0;
+	terminal->maximum_line= 0;
+	terminal->terminal_id= 0;
+	terminal->last_action_flag= -1l; /* Eat the first key */
 }
 
 void enter_computer_interface(
@@ -620,8 +612,8 @@ void enter_computer_interface(
 	short text_number,
 	short completion_flag)
 {
-	struct player_terminal_data *terminal = get_player_terminal_data(player_index);
-	struct player_data *player = get_player_data(player_index);
+	struct player_terminal_data *terminal= get_player_terminal_data(player_index);
+	struct player_data *player= get_player_data(player_index);
 
 	// LP addition: if there is no terminal-data chunk, then just make the logon sound and quit
 	/*	if (map_terminal_text.size() == 0)
@@ -637,28 +629,28 @@ void enter_computer_interface(
 		return;
 	}
 
-	if (dynamic_world->player_count == 1)
+	if(dynamic_world->player_count==1)
 	{
 		short lines_per_page;
 
 		/* Reset the lines per page to the actual value for whatever fucked up font that they have */
-		lines_per_page = calculate_lines_per_page();
-		if (lines_per_page != terminal_text->lines_per_page)
+		lines_per_page= calculate_lines_per_page();
+		if(lines_per_page != terminal_text->lines_per_page)
 		{
 			// dprintf("You have one confused font.");
-			terminal_text->lines_per_page = lines_per_page;
+			terminal_text->lines_per_page= lines_per_page;
 		}
 	}
 
 	/* Tell everyone that this player is in the computer interface.. */
-	terminal->state = _reading_terminal;
-	terminal->phase = NONE;
-	terminal->current_group = NONE;
-	terminal->level_completion_state = completion_flag;
-	terminal->current_line = 0;
-	terminal->maximum_line = 1; // any click or keypress will get us out.
-	terminal->terminal_id = text_number;
-	terminal->last_action_flag = -1l; /* Eat the first key */
+	terminal->state= _reading_terminal;
+	terminal->phase= NONE;
+	terminal->current_group= NONE;
+	terminal->level_completion_state= completion_flag;
+	terminal->current_line= 0;
+	terminal->maximum_line= 1; // any click or keypress will get us out.
+	terminal->terminal_id= text_number;
+	terminal->last_action_flag= -1l; /* Eat the first key */
 
 	/* And select the first one. */
 	next_terminal_group(player_index, terminal_text);
@@ -668,19 +660,18 @@ void enter_computer_interface(
 void update_player_for_terminal_mode(
 	short player_index)
 {
-	struct player_terminal_data *terminal = get_player_terminal_data(player_index);
-	if (!terminal)
-		return;
+	struct player_terminal_data *terminal= get_player_terminal_data(player_index);
+	if (!terminal) return;
 
-	if (terminal->state != _no_terminal_state)
+	if(terminal->state != _no_terminal_state)
 	{
 		/* Phase is a timer for logging in and out only.. */
-		switch (terminal->state)
+		switch(terminal->state)
 		{
 		case _reading_terminal:
-			if (terminal->phase != NONE)
+				if(terminal->phase != NONE)
 			{
-				if (--terminal->phase <= 0)
+					if(--terminal->phase<=0)
 				{
 					terminal_text_t *terminal_text = get_indexed_terminal_data(terminal->terminal_id);
 					if (terminal_text == NULL)
@@ -700,11 +691,10 @@ void update_player_keys_for_terminal(
 	short player_index,
 	uint32 action_flags)
 {
-	struct player_terminal_data *terminal = get_player_terminal_data(player_index);
-	if (!terminal)
-		return;
+	struct player_terminal_data *terminal= get_player_terminal_data(player_index);
+	if (!terminal) return;
 
-	switch (terminal->state)
+	switch(terminal->state)
 	{
 	case _reading_terminal:
 		handle_reading_terminal_keys(player_index, action_flags);
@@ -719,16 +709,14 @@ void update_player_keys_for_terminal(
 bool player_in_terminal_mode(
 	short player_index)
 {
-	struct player_terminal_data *terminal = get_player_terminal_data(player_index);
+	struct player_terminal_data *terminal= get_player_terminal_data(player_index);
 	bool in_terminal_mode;
 
-	if (terminal->state == _no_terminal_state)
+	if(terminal->state==_no_terminal_state)
 	{
-		in_terminal_mode = false;
-	}
-	else
-	{
-		in_terminal_mode = true;
+		in_terminal_mode= false;
+	} else {
+		in_terminal_mode= true;
 	}
 
 	return in_terminal_mode;
@@ -736,12 +724,11 @@ bool player_in_terminal_mode(
 
 void _render_computer_interface(void)
 {
-	struct player_terminal_data *terminal_data = get_player_terminal_data(current_player_index);
+	struct player_terminal_data *terminal_data= get_player_terminal_data(current_player_index);
 
-	if (terminal_data->state == _no_terminal_state)
-		return;
+	if (terminal_data->state == _no_terminal_state) return;
 	// assert(terminal_data->state != _no_terminal_state);
-	if (TERMINAL_IS_DIRTY(terminal_data))
+	if(TERMINAL_IS_DIRTY(terminal_data))
 	{
 		SET_TERMINAL_IS_DIRTY(terminal_data, false);
 
@@ -752,22 +739,20 @@ void _render_computer_interface(void)
 		/* Get the terminal text.. */
 		terminal_text = get_indexed_terminal_data(terminal_data->terminal_id);
 		// LP addition: quit if none
-		if (terminal_text == NULL)
-			return;
+		if (terminal_text == NULL) return;
 
-		switch (terminal_data->state)
+		switch(terminal_data->state)
 		{
 		case _reading_terminal:
 			/* Initialize it if it hasn't been done.. */
-			current_group = get_indexed_grouping(terminal_text, terminal_data->current_group);
+				current_group= get_indexed_grouping(terminal_text, terminal_data->current_group);
 			// LP change: just in case...
-			if (!current_group)
-				return;
+				if (!current_group) return;
 
 			/* Draw the borders! */
 			// LP change: draw these after, so as to avoid overdraw bug
 			draw_terminal_borders(terminal_data, false);
-			switch (current_group->type)
+				switch(current_group->type)
 			{
 			case _logon_group:
 			case _logoff_group:
@@ -783,7 +768,7 @@ void _render_computer_interface(void)
 
 			case _information_group:
 				/* Draw as normal... */
-				bounds = get_term_rectangle(_terminal_full_text_rect);
+                        bounds= get_term_rectangle(_terminal_full_text_rect);
 				draw_computer_text(&bounds, terminal_text, terminal_data->current_group,
 								   terminal_data->current_line);
 				break;
@@ -797,7 +782,7 @@ void _render_computer_interface(void)
 			case _end_group:
 			case _interlevel_teleport_group: // permutation is level to go to
 			case _intralevel_teleport_group: // permutation is polygon to go to.
-			case _sound_group:				 // permutation is the sound id to play
+					case _sound_group: // permutation is the sound id to play
 			case _tag_group:
 				// These are all handled elsewhere
 				break;
