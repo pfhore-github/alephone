@@ -1,14 +1,10 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl Written by Christian Bauer and the Aleph One developers.
 
-AC_INIT([Aleph One],
-        m4_esyscmd([ grep '^#define A1_DATE_VERSION' Source_Files/Misc/alephversion.h | sed -e 's/\(.*\"\)\(.*\)\(\"\)/\2/g' | tr -d '\n']),
-        [https://github.com/Aleph-One-Marathon/alephone/issues],
-        [AlephOne],
-        [https://alephone.lhowon.org/])
+AC_INIT([Aleph One],m4_esyscmd([grep '^#define A1_DATE_VERSION' Source_Files/Misc/alephversion.h | sed -e 's/\(.*\"\)\(.*\)\(\"\)/\2/g' | tr -d '\n']),[https://github.com/Aleph-One-Marathon/alephone/issues],[AlephOne],[https://alephone.lhowon.org/])
 AC_CONFIG_SRCDIR([Source_Files/shell.cpp])
 AC_CONFIG_MACRO_DIR([m4])
-AC_PREREQ([2.65])
+AC_PREREQ([2.71])
 
 dnl Detect the canonical host and target build environment.
 AC_CANONICAL_HOST
@@ -16,7 +12,7 @@ AC_CANONICAL_TARGET
 
 dnl Init automake.
 AM_INIT_AUTOMAKE([subdir-objects])
-AM_CONFIG_HEADER([config.h])
+AC_CONFIG_HEADERS([config.h])
 
 dnl Configure options.
 
@@ -54,8 +50,8 @@ AC_PROG_OBJCXX
 AC_PROG_INSTALL
 AC_PROG_RANLIB
 
-dnl Require C++11 or newer and enable C++11 if needed.
-AX_CXX_COMPILE_STDCXX([11], [], [mandatory])
+dnl Require C++17 or newer and enable C++17 if needed.
+AX_CXX_COMPILE_STDCXX([17], [], [mandatory])
 
 dnl Some platform specific stuff.
 AS_CASE([$target],
@@ -173,15 +169,13 @@ AS_IF([test "x$enable_opengl" != "xno"],
                 [*-*-linux*],
                 [ SYS_GL_LIBS="-lGL -lpthread" ],
                 [ SYS_GL_LIBS="-lGL" ])
-        AC_TRY_COMPILE([
+        AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
           #ifndef __DARWIN__
           #include <GL/gl.h>
           #else
           #include <OpenGL/gl.h>
           #endif
-          ],
-          ,
-          [ compiled_opengl=yes ])
+          ]], [[]])],[ compiled_opengl=yes ],[])
         AC_MSG_RESULT($compiled_opengl)
         AS_IF([test "x$compiled_opengl" = "xyes"],
               [ have_opengl=true

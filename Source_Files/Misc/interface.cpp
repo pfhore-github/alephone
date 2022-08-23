@@ -2929,8 +2929,6 @@ void interface_fade_out(
 	assert(current_picture_clut);
 	if(current_picture_clut)
 	{
-		struct color_table *fadeout_animated_color_table;
-
 		/* We have to check this because they could go into preferences and change on us, */
 		/*  the evil swine. */
 		if(current_picture_clut_depth != interface_bit_depth)
@@ -2941,21 +2939,11 @@ void interface_fade_out(
 		}
 		
 		hide_cursor();
-			
-		fadeout_animated_color_table= new color_table;
-		obj_copy(*fadeout_animated_color_table, *current_picture_clut);
 
 		if(fade_music) 
 			Music::instance()->FadeOut(MACHINE_TICKS_PER_SECOND/2);
-		if (fadeout_animated_color_table)
-		{
-			explicit_start_fade(_cinematic_fade_out, current_picture_clut, fadeout_animated_color_table);
-			while (update_fades()) 
-				Music::instance()->Idle();
 
-			/* Oops.  Founda  memory leak.. */
-			delete fadeout_animated_color_table;
-		}
+		full_fade(_cinematic_fade_out, current_picture_clut);
 		
 		if(fade_music) 
 		{
@@ -3188,6 +3176,7 @@ void show_movie(short index)
 		
 		SDL_PauseAudio(false);
 		bool done = false;
+		int64_t movie_waudio_sync = 0;
 		while (!done)
 		{
 			SDL_Event event;
@@ -3221,6 +3210,10 @@ void show_movie(short index)
 			
 			if (vframe)
 			{
+				if (!astream) 
+				{
+					movie_sync = machine_tick_count() - movie_waudio_sync;
+				}
 				if (!vframe->ready)
 				{
 					SDL_ffmpegGetVideoFrame(sffile, vframe);
@@ -3245,6 +3238,8 @@ void show_movie(short index)
 					vframe->ready = 0;
 					if (vframe->last)
 						done = true;
+
+					movie_waudio_sync = machine_tick_count() - vframe->pts;
 				}
 				else 
 				{

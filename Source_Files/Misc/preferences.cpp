@@ -2,7 +2,7 @@
 
 	Copyright (C) 1991-2001 and beyond by Bungie Studios, Inc.
 	and the "Aleph One" developers.
- 
+
 	This program is free software; you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
 	the Free Software Foundation; either version 3 of the License, or
@@ -25,18 +25,18 @@ Apr 30, 2002 (Loren Petrich):
 	Converting to a MML-based preferences system
 
 May 16, 2002 (Woody Zenfell):
-    Added UI/preferences elements for configurable mouse sensitivity
-    Support for "don't auto-recenter" behavior modifier
-    Routines to let other code disable/reenable/query behavior modification
-   
+	Added UI/preferences elements for configurable mouse sensitivity
+	Support for "don't auto-recenter" behavior modifier
+	Routines to let other code disable/reenable/query behavior modification
+
 Jul 21, 2002 (Loren Petrich):
 	AS had added some code to fix the OSX preferences behavior;
 	I modified it so that it would not be used in the Classic version
 
 Apr 10-22, 2003 (Woody Zenfell):
-        Join hinting and autogathering have Preferences entries now
-        Being less obnoxious with unrecognized Prefs stuff
-        Macintosh Enviroprefs popup style can be set in Preferences file
+		Join hinting and autogathering have Preferences entries now
+		Being less obnoxious with unrecognized Prefs stuff
+		Macintosh Enviroprefs popup style can be set in Preferences file
 
 May 22, 2003 (Woody Zenfell):
 	Support for preferences for multiple network game protocols; configurable local game port.
@@ -171,7 +171,7 @@ static void controls_dialog(void *arg);
 static void environment_dialog(void *arg);
 static void plugins_dialog(void *arg);
 static void keyboard_dialog(void *arg);
-//static void texture_options_dialog(void *arg);
+// static void texture_options_dialog(void *arg);
 
 /*
  *  Get user name
@@ -425,7 +425,6 @@ static void crosshair_dialog(void *arg)
 
 	w_slider *green_w = new w_percentage_slider(16, 0);
 	SliderSelectorWidget greenWidget(green_w);
-	;
 	ColorComponentPref greenPref(player_preferences->Crosshairs.Color.green);
 	crosshair_binders->insert<int>(&greenWidget, &greenPref);
 	table->dual_add(green_w->label("緑"), d);
@@ -2509,11 +2508,7 @@ static void controls_dialog(void *arg)
 			auto range = key_w.equal_range(i);
 			for (auto ik = range.first; ik != range.second; ++ik)
 			{
-				if ((ik->second->event_type == w_key::MouseButton) &&
-					(i == 0 || i == 1 || i == 4 || i == 5))
-					move_table->dual_add(new w_label(""), d);
-				else
-					move_table->dual_add(ik->second, d);
+				move_table->dual_add(ik->second, d);
 			}
 		}
 	}
@@ -2976,7 +2971,7 @@ static void controls_dialog(void *arg)
 			changed = true;
 		}
 
-		bool jaim = (joystick_aiming_w->get_selection() == 1);
+		bool jaim = (joystick_aiming_w->get_selection() == 0);
 		if (input_preferences->controller_analog != jaim)
 		{
 			input_preferences->controller_analog = jaim;
