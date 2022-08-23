@@ -40,9 +40,9 @@
 #include <string>
 
 #ifndef NO_STD_NAMESPACE
-using std::map;
-using std::pair;
 using std::vector;
+using std::pair;
+using std::map;
 #endif
 
 #include "preferences.h" // smooth_font
@@ -57,7 +57,7 @@ using std::vector;
 // Global variables
 typedef pair<int, int> id_and_size_t;
 typedef map<id_and_size_t, sdl_font_info *> font_list_t;
-static font_list_t font_list; // List of all loaded fonts
+static font_list_t font_list;				// List of all loaded fonts
 
 typedef pair<TTF_Font *, int> ref_counted_ttf_font_t;
 typedef map<ttf_font_key_t, ref_counted_ttf_font_t> ttf_font_list_t;
@@ -65,6 +65,7 @@ static ttf_font_list_t ttf_font_list;
 
 // From shell_sdl.cpp
 extern vector<DirectorySpecifier> data_search_path;
+
 
 /*
  *  Initialize font management
@@ -293,10 +294,10 @@ static TTF_Font *load_ttf_font(const std::string &path, uint16 style, int16 size
 
 	ttf_font_list[key] = value;
 
-	return font;
+	return font;	
 }
 
-static const char *locate_font(const std::string &path)
+static const char *locate_font(const std::string& path)
 {
 	builtin_fonts_t::iterator j = builtin_fonts.find(path);
 	if (j != builtin_fonts.end() || path == "")
@@ -351,15 +352,12 @@ void sdl_font_info::_unload()
 {
 	// Look for font in list of loaded fonts
 	font_list_t::const_iterator i = font_list.begin(), end = font_list.end();
-	while (i != end)
-	{
-		if (i->second == this)
-		{
+	while (i != end) {
+		if (i->second == this) {
 
 			// Found, decrement reference counter and delete
 			ref_count--;
-			if (ref_count <= 0)
-			{
+			if (ref_count <= 0) {
 				delete this; // !
 				font_list.erase(i->first);
 				return;
@@ -400,7 +398,7 @@ int8 sdl_font_info::char_width(uint16 c, uint16 style) const
 	if (c < first_character || c > last_character)
 		return 0;
 	int8 width = width_table[(c - first_character) * 2 + 1] + ((style & styleBold) ? 1 : 0);
-	if (width == -1) // non-existant character
+	if (width == -1)	// non-existant character
 		width = width_table[(last_character - first_character + 1) * 2 + 1] + ((style & styleBold) ? 1 : 0);
 	return width;
 }
@@ -420,7 +418,7 @@ uint16 sdl_font_info::_text_width(const char *text, size_t length, uint16 style,
 {
 	int width = 0;
 	while (length--)
-		width += char_width(*text++, style);
+		width += char_width(*text++, style); 
 	assert(0 <= width);
 	assert(width == static_cast<int>(static_cast<uint16>(width)));
 	return width;
@@ -431,8 +429,7 @@ int sdl_font_info::_trunc_text(const char *text, int max_width, uint16 style) co
 	int width = 0;
 	int num = 0;
 	char c;
-	while ((c = *text++) != 0)
-	{
+	while ((c = *text++) != 0) {
 		width += char_width(c, style);
 		if (width > max_width)
 			break;
@@ -483,8 +480,7 @@ int ttf_font_info::_trunc_text(const char *text, int max_width, uint16 style) co
 	static uint16 temp[1024];
 	mac_roman_to_unicode(text, temp, 1024);
 	TTF_SizeUNICODE(get_ttf(style), temp, &width, 0);
-	if (width < max_width)
-		return strlen(text);
+	if (width < max_width) return strlen(text);
 
 	int num = strlen(text) - 1;
 
@@ -516,10 +512,9 @@ uint16 font_info::text_width(const char *text, size_t length, uint16 style, bool
 		return _text_width(text, length, style, utf8);
 }
 
-static inline bool style_code(char c)
+static 	inline bool style_code(char c)
 {
-	switch (tolower(c))
-	{
+	switch(tolower(c)) {
 	case 'p':
 	case 'b':
 	case 'i':
@@ -536,10 +531,9 @@ static inline bool style_code(char c)
 class style_separator
 {
 public:
-	bool operator()(std::string::const_iterator &next, std::string::const_iterator end, std::string &token)
+	bool operator() (std::string::const_iterator& next, std::string::const_iterator end, std::string& token)
 	{
-		if (next == end)
-			return false;
+		if (next == end) return false;
 
 		token = std::string();
 
@@ -557,7 +551,7 @@ public:
 		++next;
 
 		// add characters until we hit a token
-		for (; next != end && !(*next == '|' && next + 1 != end && style_code(*(next + 1))); ++next)
+		for (;next != end && !(*next == '|' && next + 1 != end && style_code(*(next + 1))); ++next)
 		{
 			token += *next;
 		}
@@ -565,15 +559,16 @@ public:
 		return true;
 	}
 
-	void reset() {}
+	void reset() { }
+
 };
 
-static inline bool is_style_token(const std::string &token)
+static inline bool is_style_token(const std::string& token)
 {
 	return (token.size() == 2 && token[0] == '|' && style_code(token[1]));
 }
 
-static void update_style(uint16 &style, const std::string &token)
+static void update_style(uint16& style, const std::string& token)
 {
 	if (tolower(token[1]) == 'p')
 		style &= ~(styleBold | styleItalic);
@@ -589,7 +584,8 @@ static void update_style(uint16 &style, const std::string &token)
 	}
 }
 
-int font_info::draw_styled_text(SDL_Surface *s, const std::string &text, size_t length, int x, int y, uint32 pixel, uint16 style, bool utf8) const
+
+int font_info::draw_styled_text(SDL_Surface *s, const std::string& text, size_t length, int x, int y, uint32 pixel, uint16 style, bool utf8) const 
 {
 	int width = 0;
 	boost::tokenizer<style_separator> tok(text.begin(), text.begin() + length);
@@ -612,7 +608,7 @@ int font_info::draw_styled_text(SDL_Surface *s, const std::string &text, size_t 
 	return width;
 }
 
-int font_info::styled_text_width(const std::string &text, size_t length, uint16 style, bool utf8) const
+int font_info::styled_text_width(const std::string& text, size_t length, uint16 style, bool utf8) const 
 {
 	int width = 0;
 	boost::tokenizer<style_separator> tok(text.begin(), text.begin() + length);
@@ -634,7 +630,7 @@ int font_info::styled_text_width(const std::string &text, size_t length, uint16 
 		return width;
 }
 
-int font_info::trunc_styled_text(const std::string &text, int max_width, uint16 style) const
+int font_info::trunc_styled_text(const std::string& text, int max_width, uint16 style) const
 {
 	if (style & styleShadow)
 	{
@@ -664,7 +660,7 @@ int font_info::trunc_styled_text(const std::string &text, int max_width, uint16 
 	return length;
 }
 
-std::string font_info::style_at(const std::string &text, std::string::const_iterator pos, uint16 style) const
+std::string font_info::style_at(const std::string& text, std::string::const_iterator pos, uint16 style) const
 {
 	boost::tokenizer<style_separator> tok(text.begin(), pos);
 	for (boost::tokenizer<style_separator>::iterator it = tok.begin(); it != tok.end(); ++it)
@@ -672,7 +668,7 @@ std::string font_info::style_at(const std::string &text, std::string::const_iter
 		if (is_style_token(*it))
 			update_style(style, *it);
 	}
-
+	
 	if (style & styleBold)
 		return string("|b");
 	else if (style & styleItalic)

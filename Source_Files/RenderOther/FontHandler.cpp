@@ -447,7 +447,7 @@ void FontSpecifier::OGL_Deregister(FontSpecifier *F)
 
 #endif // def HAVE_OPENGL
 
-#include <stdio.h>
+
 // Draw text without worrying about OpenGL vs. SDL mode.
 int FontSpecifier::DrawText(SDL_Surface *s, const char *text, int x, int y, uint32 pixel, bool)
 {
@@ -457,6 +457,7 @@ int FontSpecifier::DrawText(SDL_Surface *s, const char *text, int x, int y, uint
 		return draw_text(s, text, x, y, pixel, this->Info, this->Style, true);
 
 #ifdef HAVE_OPENGL
+		
 	uint8 r, g, b;
 	SDL_GetRGB(pixel, s->format, &r, &g, &b);
 	glColor4ub(r, g, b, 255);

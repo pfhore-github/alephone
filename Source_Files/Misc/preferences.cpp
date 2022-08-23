@@ -2,7 +2,7 @@
 
 	Copyright (C) 1991-2001 and beyond by Bungie Studios, Inc.
 	and the "Aleph One" developers.
-
+ 
 	This program is free software; you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
 	the Free Software Foundation; either version 3 of the License, or
@@ -25,18 +25,18 @@ Apr 30, 2002 (Loren Petrich):
 	Converting to a MML-based preferences system
 
 May 16, 2002 (Woody Zenfell):
-	Added UI/preferences elements for configurable mouse sensitivity
-	Support for "don't auto-recenter" behavior modifier
-	Routines to let other code disable/reenable/query behavior modification
-
+    Added UI/preferences elements for configurable mouse sensitivity
+    Support for "don't auto-recenter" behavior modifier
+    Routines to let other code disable/reenable/query behavior modification
+   
 Jul 21, 2002 (Loren Petrich):
 	AS had added some code to fix the OSX preferences behavior;
 	I modified it so that it would not be used in the Classic version
 
 Apr 10-22, 2003 (Woody Zenfell):
-		Join hinting and autogathering have Preferences entries now
-		Being less obnoxious with unrecognized Prefs stuff
-		Macintosh Enviroprefs popup style can be set in Preferences file
+        Join hinting and autogathering have Preferences entries now
+        Being less obnoxious with unrecognized Prefs stuff
+        Macintosh Enviroprefs popup style can be set in Preferences file
 
 May 22, 2003 (Woody Zenfell):
 	Support for preferences for multiple network game protocols; configurable local game port.
@@ -288,7 +288,7 @@ class ColorComponentPref : public Bindable<int>
 {
 public:
 	ColorComponentPref(uint16& pref) : m_pref(pref) { }
-
+	
 	virtual int bind_export() {
 		return (m_pref >> 12);
 	}
@@ -305,7 +305,7 @@ class OpacityPref : public Bindable<int>
 {
 public:
 	OpacityPref(float& pref) : m_pref(pref) { }
-
+	
 	virtual int bind_export() {
 		return (static_cast<int>(floor(m_pref * 16)));
 	}
@@ -337,7 +337,7 @@ public:
 	w_crosshair_slider(int num_items, int sel) : w_slider(num_items, sel) {
 		init_formatted_value();
 	}
-
+	
 	virtual std::string formatted_value(void) {
 		std::ostringstream ss;
 		ss << (selection + 1);
@@ -531,7 +531,7 @@ static void player_dialog(void *arg)
 	placer->add(new w_spacer(), true);
 
 	horizontal_placer *button_placer = new horizontal_placer;
-
+	
 	w_button *ok_button = new w_button("了承", dialog_ok, &d);
 	ok_button->set_identifier(iOK);
 	button_placer->dual_add(ok_button, d);
@@ -575,7 +575,7 @@ static void player_dialog(void *arg)
 			player_preferences->team = team;
 			changed = true;
 		}
-
+		
 		bool crosshair = crosshairs_active_w->get_selection();
 		if (crosshair != player_preferences->crosshairs_active) {
 			player_preferences->crosshairs_active = crosshair;
@@ -600,23 +600,23 @@ const int iSIGNUP_PASSWORD_W = 22;
 static void proc_account_link(void *arg)
 {
 	dialog *d = static_cast<dialog *>(arg);
-
+	
 	HTTPClient conn;
 	HTTPClient::parameter_map params;
 	w_text_entry *username_w = static_cast<w_text_entry *>(d->get_widget_by_id(iONLINE_USERNAME_W));
 	w_text_entry *password_w = static_cast<w_text_entry *>(d->get_widget_by_id(iONLINE_PASSWORD_W));
-
+	
 	params["username"] = username_w->get_text();
 	params["password"] = password_w->get_text();
 	params["salt"] = "";
-
+	
 	std::string url = A1_METASERVER_SETTINGS_URL;
 	if (conn.Post(A1_METASERVER_LOGIN_URL, params))
 	{
 		std::string token = boost::algorithm::hex(conn.Response());
 		url += "?token=" + token;
 	}
-
+	
 	toggle_fullscreen(false);
 	launch_url_in_browser(url.c_str());
 	d->draw();
@@ -628,7 +628,7 @@ static void signup_dialog_ok(void *arg)
 	w_text_entry *email_w = static_cast<w_text_entry *>(d->get_widget_by_id(iSIGNUP_EMAIL_W));
 	w_text_entry *login_w = static_cast<w_text_entry *>(d->get_widget_by_id(iSIGNUP_USERNAME_W));
 	w_password_entry *password_w = static_cast<w_password_entry *>(d->get_widget_by_id(iSIGNUP_PASSWORD_W));
-
+	
 	// check that fields are filled out
 	if (strlen(email_w->get_text()) == 0)
 	{
@@ -650,7 +650,7 @@ static void signup_dialog_ok(void *arg)
 		params["email"] = email_w->get_text();
 		params["username"] = login_w->get_text();
 		params["password"] = password_w->get_text();
-
+		
 		if (conn.Post(A1_METASERVER_SIGNUP_URL, params))
 		{
 			if (conn.Response() == "OK")
@@ -679,42 +679,42 @@ static void signup_dialog(void *arg)
 	vertical_placer *placer = new vertical_placer;
 	placer->dual_add(new w_title("アカウント登録"), d);
 	placer->add(new w_spacer());
-
+	
 	table_placer *table = new table_placer(2, get_theme_space(ITEM_WIDGET), true);
 	table->col_flags(0, placeable::kAlignRight);
 	table->col_flags(1, placeable::kAlignLeft);
-
+	
 	w_text_entry *email_w = new w_text_entry(256, "");
 	email_w->set_identifier(iSIGNUP_EMAIL_W);
 	table->dual_add(email_w->label("メールアドレス"), d);
 	table->dual_add(email_w, d);
-
+	
 	w_text_entry *login_w = new w_text_entry(network_preferences_data::kMetaserverLoginLength, network_preferences->metaserver_login);
 	login_w->set_identifier(iSIGNUP_USERNAME_W);
 	table->dual_add(login_w->label("ユーザ名"), d);
 	table->dual_add(login_w, d);
-
+	
 	w_password_entry *password_w = new w_password_entry(network_preferences_data::kMetaserverLoginLength, network_preferences->metaserver_password);
 	password_w->set_identifier(iSIGNUP_PASSWORD_W);
 	table->dual_add(password_w->label("パスワード"), d);
 	table->dual_add(password_w, d);
-
+	
 	table->add_row(new w_spacer(), true);
 	placer->add(table, true);
-
+	
 	horizontal_placer *button_placer = new horizontal_placer;
-
+	
 	w_button *ok_button = new w_button("登録", signup_dialog_ok, &d);
 	ok_button->set_identifier(iOK);
 	button_placer->dual_add(ok_button, d);
 	button_placer->dual_add(new w_button("キャンセル", dialog_cancel, &d), d);
-
+	
 	placer->add(button_placer, true);
-
+	
 	d.set_widget_placer(placer);
-
+	
 	clear_screen();
-
+	
 	if (d.run() == 0)
 	{
 		// account was successfully created, update parent fields with new account info
@@ -733,51 +733,51 @@ static void online_dialog(void *arg)
 	vertical_placer *placer = new vertical_placer;
 	placer->dual_add(new w_title("インターネットゲーム設定"), d);
 	placer->add(new w_spacer());
-
+	
 	tab_placer* tabs = new tab_placer();
-
+	
 	std::vector<std::string> labels;
 	labels.push_back("アカウント");
 	labels.push_back("ゲーム前ロビー");
 	labels.push_back("統計");
 	w_tab *tab_w = new w_tab(labels, tabs);
-
+	
 	placer->dual_add(tab_w, d);
 	placer->add(new w_spacer(), true);
-
+	
 	vertical_placer *account = new vertical_placer();
 	table_placer *account_table = new table_placer(2, get_theme_space(ITEM_WIDGET), true);
 	account_table->col_flags(0, placeable::kAlignRight);
 	account_table->col_flags(1, placeable::kAlignLeft);
-
+	
 	w_text_entry *login_w = new w_text_entry(network_preferences_data::kMetaserverLoginLength, network_preferences->metaserver_login);
 	login_w->set_identifier(iONLINE_USERNAME_W);
 	account_table->dual_add(login_w->label("ユーザ名"), d);
 	account_table->dual_add(login_w, d);
-
+	
 	w_password_entry *password_w = new w_password_entry(network_preferences_data::kMetaserverLoginLength, network_preferences->metaserver_password);
 	password_w->set_identifier(iONLINE_PASSWORD_W);
 	account_table->dual_add(password_w->label("パスワード"), d);
 	account_table->dual_add(password_w, d);
-
+	
 	w_hyperlink *account_link_w = new w_hyperlink("", "私のlhowon.orgアカウントページへ飛ぶ");
 	account_link_w->set_callback(proc_account_link, &d);
 	account_table->dual_add_row(account_link_w, d);
-
+	
 	account_table->add_row(new w_spacer(), true);
-
+	
 	w_button *signup_button = new w_button("登録", signup_dialog, &d);
 	account_table->dual_add_row(signup_button, d);
-
+	
 	account_table->add_row(new w_spacer(), true);
-
+	
 	account->add(account_table, true);
-
+	
 	vertical_placer *lobby = new vertical_placer();
 	table_placer *lobby_table = new table_placer(2, get_theme_space(ITEM_WIDGET), true);
 	lobby_table->col_flags(0, placeable::kAlignRight);
 	lobby_table->col_flags(1, placeable::kAlignLeft);
-
+	
 	w_text_entry *name_w = new w_text_entry(PREFERENCES_NAME_LENGTH, player_preferences->name);
 	name_w->set_identifier(NAME_W);
 	name_w->set_enter_pressed_callback(dialog_try_ok);
@@ -785,19 +785,19 @@ static void online_dialog(void *arg)
 	name_w->enable_mac_roman_input();
 	lobby_table->dual_add(name_w->label("名前"), d);
 	lobby_table->dual_add(name_w, d);
-
+	
 	w_enabling_toggle *custom_colors_w = new w_enabling_toggle(network_preferences->use_custom_metaserver_colors);
 	lobby_table->dual_add(custom_colors_w->label("カスタムチャットカラー"), d);
 	lobby_table->dual_add(custom_colors_w, d);
-
+	
 	w_color_picker *primary_w = new w_color_picker(network_preferences->metaserver_colors[0]);
 	lobby_table->dual_add(primary_w->label("プライマリ"), d);
 	lobby_table->dual_add(primary_w, d);
-
+	
 	w_color_picker *secondary_w = new w_color_picker(network_preferences->metaserver_colors[1]);
 	lobby_table->dual_add(secondary_w->label("セカンダリ"), d);
 	lobby_table->dual_add(secondary_w, d);
-
+	
 	custom_colors_w->add_dependent_widget(primary_w);
 	custom_colors_w->add_dependent_widget(secondary_w);
 
@@ -806,76 +806,76 @@ static void online_dialog(void *arg)
 	lobby_table->dual_add(mute_guests_w, d);
 
 	lobby_table->add_row(new w_spacer(), true);
-
+	
 	w_toggle *join_meta_w = new w_toggle(network_preferences->join_metaserver_by_default);
 	lobby_table->dual_add(join_meta_w->label("ゲーム前ロビーにデフォルトで参加する"), d);
 	lobby_table->dual_add(join_meta_w, d);
-
+	
 	lobby_table->add_row(new w_spacer(), true);
-
+	
 	lobby->add(lobby_table, true);
-
+	
 	vertical_placer *stats = new vertical_placer();
 	stats->dual_add(new w_hyperlink(A1_LEADERBOARD_URL, "リーダーボードへ飛ぶ"), d);
 	stats->add(new w_spacer(), true);
-
+	
 	horizontal_placer *stats_box = new horizontal_placer();
-
+	
 	w_toggle *allow_stats_w = new w_toggle(network_preferences->allow_stats);
 	stats_box->dual_add(allow_stats_w, d);
 	stats_box->dual_add(allow_stats_w->label("Lhowon.orgへ統計を送信"), d);
-
+	
 	stats->add(stats_box, true);
 	stats->add(new w_spacer(), true);
-
+	
 	stats->dual_add(new w_static_text("リーダーボードで競争するためには"), d);
 	stats->dual_add(new w_static_text("オンラインアカウントが必要で"), d);
 	stats->dual_add(new w_static_text("統計プラグインをインストールして有効にする必要があります"), d);
 
 	stats->add(new w_spacer(), true);
 	stats->dual_add(new w_button("プラグイン", plugins_dialog, &d), d);
-
+	
 	stats->add(new w_spacer(), true);
-
+	
 	tabs->add(account, true);
 	tabs->add(lobby, true);
 	tabs->add(stats, true);
-
+	
 	placer->add(tabs, true);
 	placer->add(new w_spacer(), true);
 
 	horizontal_placer *button_placer = new horizontal_placer;
-
-	w_button *ok_button = new w_button("了承", dialog_ok, &d);
+	
+	w_button* ok_button = new w_button("了承", dialog_ok, &d);
 	ok_button->set_identifier(iOK);
 	button_placer->dual_add(ok_button, d);
 	button_placer->dual_add(new w_button("キャンセル", dialog_cancel, &d), d);
-
+	
 	placer->add(button_placer, true);
-
+	
 	d.set_widget_placer(placer);
-
+	
 	// Clear screen
 	clear_screen();
-
+	
 	// Run dialog
 	if (d.run() == 0) {	// Accepted
 		bool changed = false;
-
+		
 		const char *name = name_w->get_text();
 		if (strcmp(name, player_preferences->name)) {
 			strncpy(player_preferences->name, name, PREFERENCES_NAME_LENGTH);
 			player_preferences->name[PREFERENCES_NAME_LENGTH] = '\0';
 			changed = true;
 		}
-
+		
 		const char *metaserver_login = login_w->get_text();
 		if (strcmp(metaserver_login, network_preferences->metaserver_login)) {
 			strncpy(network_preferences->metaserver_login, metaserver_login, network_preferences_data::kMetaserverLoginLength-1);
 			network_preferences->metaserver_login[network_preferences_data::kMetaserverLoginLength-1] = '\0';
 			changed = true;
 		}
-
+		
 		// clear password if login has been cleared
 		if (!strlen(metaserver_login)) {
 			if (strlen(network_preferences->metaserver_password)) {
@@ -890,14 +890,14 @@ static void online_dialog(void *arg)
 				changed = true;
 			}
 		}
-
+		
 		bool use_custom_metaserver_colors = custom_colors_w->get_selection();
 		if (use_custom_metaserver_colors != network_preferences->use_custom_metaserver_colors)
 		{
 			network_preferences->use_custom_metaserver_colors = use_custom_metaserver_colors;
 			changed = true;
 		}
-
+		
 		if (use_custom_metaserver_colors)
 		{
 			rgb_color primary_color = primary_w->get_selection();
@@ -906,7 +906,7 @@ static void online_dialog(void *arg)
 				network_preferences->metaserver_colors[0] = primary_color;
 				changed = true;
 			}
-
+			
 			rgb_color secondary_color = secondary_w->get_selection();
 			if (secondary_color.red != network_preferences->metaserver_colors[1].red || secondary_color.green != network_preferences->metaserver_colors[1].green || secondary_color.blue != network_preferences->metaserver_colors[1].blue)			{
 				network_preferences->metaserver_colors[1] = secondary_color;
@@ -914,21 +914,21 @@ static void online_dialog(void *arg)
 			}
 			
 		}
-
+		
 		bool mute_metaserver_guests = mute_guests_w->get_selection() == 1;
 		if (mute_metaserver_guests != network_preferences->mute_metaserver_guests)
 		{
 			network_preferences->mute_metaserver_guests = mute_metaserver_guests;
 			changed = true;
 		}
-
+		
 		bool join_meta = join_meta_w->get_selection() == 1;
 		if (join_meta != network_preferences->join_metaserver_by_default)
 		{
 			network_preferences->join_metaserver_by_default = join_meta;
 			changed = true;
 		}
-
+		
 		bool allow_stats = allow_stats_w->get_selection() == 1;
 		if (allow_stats != network_preferences->allow_stats)
 		{
@@ -936,7 +936,7 @@ static void online_dialog(void *arg)
 			Plugins::instance()->invalidate();
 			changed = true;
 		}
-
+		
 		
 		if (changed)
 			write_preferences();
@@ -976,28 +976,28 @@ static const int16_t fps_target_values[] = {
 static const char *gamma_labels[9] = {
 	"とても暗い", "暗い", "やや暗い", "通常", "やや明るい", "明るい", "より明るい", "とても明るい", NULL};
 
-static const char *renderer_labels[] = {
+static const char* renderer_labels[] = {
 	"ソフトウェア", "OpenGL", NULL};
 
-static const char *hud_scale_labels[] = {
-	"通常", "２倍", "最大", NULL};
+static const char* hud_scale_labels[] = {
+"通常", "２倍", "最大", NULL};
 
-static const char *term_scale_labels[] = {
-	"通常", "２倍", "最大", NULL};
+static const char* term_scale_labels[] = {
+"通常", "２倍", "最大", NULL};
 
-static const char *mouse_accel_labels[] = {
+static const char* mouse_accel_labels[] = {
 	"オフ", "Classic", NULL};
 
-static const char *max_saves_labels[] = {
-	"20", "100", "500", "無制限", NULL};
-
+static const char* max_saves_labels[] = {
+	"20", "100", "500", "無制限", NULL
+};
 static const uint32 max_saves_values[] = {
 	20, 100, 500, 0
 };
 
 
 enum {
-	iRENDERING_SYSTEM = 1000
+    iRENDERING_SYSTEM = 1000
 };
 
 static const vector<string> build_stringvector_from_cstring_array (const char** label_array)
@@ -1005,7 +1005,7 @@ static const vector<string> build_stringvector_from_cstring_array (const char** 
 	std::vector<std::string> label_vector;
 	for (int i = 0; label_array[i] != NULL; ++i)
 		label_vector.push_back(std::string(label_array[i]));
-
+		
 	return label_vector;
 }
 
@@ -1039,7 +1039,7 @@ static void software_rendering_options_dialog(void* arg)
 	table->dual_add(sw_alpha_blending_w->label("液体を半透明化"), d);
 	table->dual_add(sw_alpha_blending_w, d);
 
-	w_select *ephemera_quality_w = new w_select(graphics_preferences->ephemera_quality, ephemera_quality_labels);
+	w_select* ephemera_quality_w = new w_select(graphics_preferences->ephemera_quality, ephemera_quality_labels);
 	table->dual_add(ephemera_quality_w->label("スクリプトによる効果の品質"), d);
 	table->dual_add(ephemera_quality_w, d);
 
@@ -1097,7 +1097,7 @@ static void software_rendering_options_dialog(void* arg)
 			graphics_preferences->ephemera_quality = ephemera_quality_w->get_selection();
 			changed = true;
 		}
-
+		
 		if (changed)
 			write_preferences();
 	}
@@ -1109,17 +1109,17 @@ static void rendering_options_dialog_demux(void* arg)
 	int theSelectedRenderer = get_selection_control_value((dialog*) arg, iRENDERING_SYSTEM) - 1;
 
 	switch(theSelectedRenderer) {
-	case _no_acceleration:
-		software_rendering_options_dialog(arg);
-		break;
+		case _no_acceleration:
+			software_rendering_options_dialog(arg);
+			break;
 
-	case _opengl_acceleration:
+		case _opengl_acceleration:
 			OpenGLDialog::Create (theSelectedRenderer)->OpenGLPrefsByRunning ();
-		break;
+			break;
 
-	default:
-		assert(false);
-		break;
+		default:
+			assert(false);
+			break;
 	}
 }
 
@@ -1171,7 +1171,7 @@ static void graphics_dialog(void *arg)
 	table_placer *table = new table_placer(2, get_theme_space(ITEM_WIDGET), true);
 	table->col_flags(0, placeable::kAlignRight);
 	table->col_flags(1, placeable::kAlignLeft);
-
+	
 	w_select* renderer_w = new w_select(graphics_preferences->screen_mode.acceleration, renderer_labels);
 	renderer_w->set_identifier(iRENDERING_SYSTEM);
 #ifndef HAVE_OPENGL
@@ -1191,7 +1191,7 @@ static void graphics_dialog(void *arg)
 		size_w->set_selection(Screen::instance()->FindMode(graphics_preferences->screen_mode.width, graphics_preferences->screen_mode.height) + 1);
 	table->dual_add(size_w->label("画面の大きさ"), d);
 	table->dual_add(size_w, d);
-
+		
 	w_toggle *fullscreen_w = new w_toggle(!graphics_preferences->screen_mode.fullscreen);
 	table->dual_add(fullscreen_w->label("ウィンドウモード"), d);
 	table->dual_add(fullscreen_w, d);
@@ -1222,7 +1222,7 @@ static void graphics_dialog(void *arg)
 	table->dual_add(fps_target_w, d);
 
 	table->add_row(new w_spacer(), true);
-
+	
 	w_toggle *fixh_w = new w_toggle(!graphics_preferences->screen_mode.fix_h_not_v);
 	table->dual_add(fixh_w->label("垂直視野を制限"), d);
 	table->dual_add(fixh_w, d);
@@ -1252,7 +1252,7 @@ static void graphics_dialog(void *arg)
 	table->dual_add_row(new w_static_text("*サードパーティのシナリオの効果と干渉するかもしれません"), d);
 
 	table->add_row(new w_spacer(), true);
-
+	
 	w_toggle *bob_w = new w_toggle(graphics_preferences->screen_mode.camera_bob);
 	table->dual_add(bob_w->label("カメラ振動"), d);
 	table->dual_add(bob_w, d);
@@ -1262,20 +1262,20 @@ static void graphics_dialog(void *arg)
 	w_enabling_toggle *hud_w = new w_enabling_toggle(graphics_preferences->screen_mode.hud);
 	table->dual_add(hud_w->label("HUDを表示"), d);
 	table->dual_add(hud_w, d);
-
+	
 	w_select_popup *hud_scale_w = new w_select_popup();
 	hud_scale_w->set_labels(build_stringvector_from_cstring_array(hud_scale_labels));
 	hud_scale_w->set_selection(graphics_preferences->screen_mode.hud_scale_level);
 	table->dual_add(hud_scale_w->label("HUDサイズ"), d);
 	table->dual_add(hud_scale_w, d);
 	hud_w->add_dependent_widget(hud_scale_w);
-
+	
 	w_select_popup *term_scale_w = new w_select_popup();
 	term_scale_w->set_labels(build_stringvector_from_cstring_array(term_scale_labels));
 	term_scale_w->set_selection(graphics_preferences->screen_mode.term_scale_level);
 	table->dual_add(term_scale_w->label("ターミナルサイズ"), d);
 	table->dual_add(term_scale_w, d);
-
+	
 	w_toggle *map_w = new w_toggle(graphics_preferences->screen_mode.translucent_map);
 	table->dual_add(map_w->label("マップを重ねる"), d);
 	table->dual_add(map_w, d);
@@ -1297,31 +1297,31 @@ static void graphics_dialog(void *arg)
 	button_placer->dual_add(new w_button("キャンセル", dialog_cancel, &d), d);
 
 	placer->add(button_placer, true);
-
+    
 	d.set_widget_placer(placer);
-
+	
 	// Clear screen
 	clear_screen();
-
-	// Run dialog
+    
+    // Run dialog
     if (d.run() == 0) {	// Accepted
-		bool changed = false;
-
-		bool fullscreen = fullscreen_w->get_selection() == 0;
+	    bool changed = false;
+	    
+	    bool fullscreen = fullscreen_w->get_selection() == 0;
 	    if (fullscreen != graphics_preferences->screen_mode.fullscreen) {
-			graphics_preferences->screen_mode.fullscreen = fullscreen;
-			changed = true;
-		}
+		    graphics_preferences->screen_mode.fullscreen = fullscreen;
+		    changed = true;
+	    }
 
-		short renderer = static_cast<short>(renderer_w->get_selection());
-		assert(renderer >= 0);
+	    short renderer = static_cast<short>(renderer_w->get_selection());
+	    assert(renderer >= 0);
 	    if(renderer != graphics_preferences->screen_mode.acceleration) {
-			graphics_preferences->screen_mode.acceleration = renderer;
+		    graphics_preferences->screen_mode.acceleration = renderer;
 		    if (renderer) graphics_preferences->screen_mode.bit_depth = 32;
-			changed = true;
-		}
-
-		short resolution = static_cast<short>(size_w->get_selection());
+		    changed = true;
+	    }
+	    
+	    short resolution = static_cast<short>(size_w->get_selection());
 		if (resolution == 0)
 		{
 			if (!graphics_preferences->screen_mode.auto_resolution) {
@@ -1329,25 +1329,25 @@ static void graphics_dialog(void *arg)
 				changed = true;
 			}
 		}
-		else if (Screen::instance()->ModeWidth(resolution - 1) != graphics_preferences->screen_mode.width || Screen::instance()->ModeHeight(resolution - 1) != graphics_preferences->screen_mode.height || graphics_preferences->screen_mode.auto_resolution)
-		{
-			graphics_preferences->screen_mode.width = Screen::instance()->ModeWidth(resolution - 1);
-			graphics_preferences->screen_mode.height = Screen::instance()->ModeHeight(resolution - 1);
+	    else if (Screen::instance()->ModeWidth(resolution - 1) != graphics_preferences->screen_mode.width || Screen::instance()->ModeHeight(resolution - 1) != graphics_preferences->screen_mode.height || graphics_preferences->screen_mode.auto_resolution)
+	    {
+		    graphics_preferences->screen_mode.width = Screen::instance()->ModeWidth(resolution - 1);
+		    graphics_preferences->screen_mode.height = Screen::instance()->ModeHeight(resolution - 1);
 			graphics_preferences->screen_mode.auto_resolution = false;
-			changed = true;
-		}
-
+		    changed = true;
+	    }
+	    
 		bool high_dpi = high_dpi_w->get_selection() != 0;
 		if (high_dpi != graphics_preferences->screen_mode.high_dpi) {
 			graphics_preferences->screen_mode.high_dpi = high_dpi;
 			changed = true;
 		}
-
-		short gamma = static_cast<short>(gamma_w->get_selection());
+		
+	    short gamma = static_cast<short>(gamma_w->get_selection());
 	    if (gamma != graphics_preferences->screen_mode.gamma_level) {
-			graphics_preferences->screen_mode.gamma_level = gamma;
-			changed = true;
-		}
+		    graphics_preferences->screen_mode.gamma_level = gamma;
+		    changed = true;
+	    }
 
 		auto fps_target = fps_target_values[fps_target_w->get_selection()];
 		if (fps_target != graphics_preferences->fps_target)
@@ -1355,40 +1355,40 @@ static void graphics_dialog(void *arg)
 			graphics_preferences->fps_target = fps_target;
 			changed = true;
 		}
-
-		bool fix_h_not_v = fixh_w->get_selection() == 0;
+		
+        bool fix_h_not_v = fixh_w->get_selection() == 0;
         if (fix_h_not_v != graphics_preferences->screen_mode.fix_h_not_v) {
-			graphics_preferences->screen_mode.fix_h_not_v = fix_h_not_v;
-			changed = true;
-		}
+            graphics_preferences->screen_mode.fix_h_not_v = fix_h_not_v;
+            changed = true;
+        }
 
-		bool hud = hud_w->get_selection() != 0;
-		if (hud != graphics_preferences->screen_mode.hud)
-		{
-			graphics_preferences->screen_mode.hud = hud;
-			changed = true;
-		}
-
-		short hud_scale = static_cast<short>(hud_scale_w->get_selection());
-		if (hud_scale != graphics_preferences->screen_mode.hud_scale_level)
-		{
-			graphics_preferences->screen_mode.hud_scale_level = hud_scale;
-			changed = true;
-		}
-
-		short term_scale = static_cast<short>(term_scale_w->get_selection());
-		if (term_scale != graphics_preferences->screen_mode.term_scale_level)
-		{
-			graphics_preferences->screen_mode.term_scale_level = term_scale;
-			changed = true;
-		}
-
+	    bool hud = hud_w->get_selection() != 0;
+	    if (hud != graphics_preferences->screen_mode.hud)
+	    {
+		    graphics_preferences->screen_mode.hud = hud;
+		    changed = true;
+	    }
+	    
+	    short hud_scale = static_cast<short>(hud_scale_w->get_selection());
+	    if (hud_scale != graphics_preferences->screen_mode.hud_scale_level)
+	    {
+		    graphics_preferences->screen_mode.hud_scale_level = hud_scale;
+		    changed = true;
+	    }
+	    
+	    short term_scale = static_cast<short>(term_scale_w->get_selection());
+	    if (term_scale != graphics_preferences->screen_mode.term_scale_level)
+	    {
+		    graphics_preferences->screen_mode.term_scale_level = term_scale;
+		    changed = true;
+	    }
+		
 		bool translucent_map = map_w->get_selection() != 0;
 		if (translucent_map != graphics_preferences->screen_mode.translucent_map) {
 			graphics_preferences->screen_mode.translucent_map = translucent_map;
 			changed = true;
 		}
-
+	    
 		bool camera_bob = bob_w->get_selection() != 0;
 		if (camera_bob != graphics_preferences->screen_mode.camera_bob) {
 			graphics_preferences->screen_mode.camera_bob = camera_bob;
@@ -1401,15 +1401,15 @@ static void graphics_dialog(void *arg)
 			graphics_preferences->screen_mode.fov = fov;
 			changed = true;
 		}
-
+		
 	    if (changed) {
-			write_preferences();
-			change_screen_mode(&graphics_preferences->screen_mode, true);
-			clear_screen(true);
-			parent->layout();
+		    write_preferences();
+		    change_screen_mode(&graphics_preferences->screen_mode, true);
+		    clear_screen(true);
+		    parent->layout();
 		    parent->draw();		// DirectX seems to need this
-		}
-	}
+	    }
+    }
 }
 
 /*
@@ -1521,13 +1521,13 @@ static void sound_dialog(void *arg)
 	table->add_row(new w_spacer(), true);
 	table->dual_add_row(new w_static_text("ネットワークマイク"), d);
 
-	w_toggle *mute_while_transmitting_w = new w_toggle(!sound_preferences->mute_while_transmitting);
+	w_toggle* mute_while_transmitting_w = new w_toggle(!sound_preferences->mute_while_transmitting);
 	table->dual_add(mute_while_transmitting_w->label("ヘッドセットマイクモード"), d);
 	table->dual_add(mute_while_transmitting_w, d);
 
 	table->add_row(new w_spacer(), true);
 	table->dual_add_row(new w_static_text("実験中のサウンドオプション"), d);
-	w_toggle *zrd_w = new w_toggle(TEST_FLAG(sound_preferences->flags, _zero_restart_delay));
+		w_toggle *zrd_w = new w_toggle(TEST_FLAG(sound_preferences->flags, _zero_restart_delay));
 	table->dual_add(zrd_w->label("リスタートディレイをゼロに"), d);
 	table->dual_add(zrd_w, d);
 
@@ -1538,7 +1538,7 @@ static void sound_dialog(void *arg)
 	horizontal_placer *button_placer = new horizontal_placer;
 	button_placer->dual_add(new w_button("了承", dialog_ok, &d), d);
 	button_placer->dual_add(new w_button("キャンセル", dialog_cancel, &d), d);
-
+	
 	placer->add(button_placer, true);
 
 	d.set_widget_placer(placer);
@@ -1595,7 +1595,7 @@ static void sound_dialog(void *arg)
 		}
 
 		if (changed) {
-			//			set_sound_manager_parameters(sound_preferences);
+//			set_sound_manager_parameters(sound_preferences);
 			SoundManager::instance()->SetParameters(*sound_preferences);
 			write_preferences();
 		}
@@ -1616,7 +1616,7 @@ public:
 	w_sens_slider(int num_items, int sel) : w_slider(num_items, sel) {
 		init_formatted_value();
 	}
-
+	
 	virtual std::string formatted_value(void) {
 		std::ostringstream ss;
 		float val = std::exp(selection * kSensitivityLogRange / 1000.0f + kMinSensitivityLog);
@@ -1638,7 +1638,7 @@ public:
 	w_deadzone_slider(int num_items, int sel) : w_slider(num_items, sel) {
 		init_formatted_value();
 	}
-
+	
 	virtual std::string formatted_value(void) {
 		std::ostringstream ss;
 		ss << selection << "%";
@@ -1815,7 +1815,7 @@ public:
 		case AO_SCANCODE_JOYSTICK_ESCAPE:
 			error = keyIsUsedAlready;
 			break;
-
+			
 		default:
 			break;
 		}
@@ -1842,7 +1842,7 @@ public:
 				it->second->dirty = true;
 			}
 		}
-
+		
 		for (auto it = hotkey_w.begin(); it != hotkey_w.end(); ++it)
 		{
 			if (it->second != this && it->second->get_key() == new_key)
@@ -1865,32 +1865,32 @@ static void load_default_keys(void *arg)
 			if (code == SDL_SCANCODE_UNKNOWN)
 				continue;
 			switch (w_key::event_type_for_key(code)) {
-			case w_key::MouseButton:
-				mcode = code;
-				break;
-			case w_key::JoystickButton:
-				jcode = code;
-				break;
-			case w_key::KeyboardKey:
-			default:
-				kcode = code;
-				break;
+				case w_key::MouseButton:
+					mcode = code;
+					break;
+				case w_key::JoystickButton:
+					jcode = code;
+					break;
+				case w_key::KeyboardKey:
+				default:
+					kcode = code;
+					break;
 			}
 		}
 		auto range = key_w.equal_range(i);
 		for (auto ik = range.first; ik != range.second; ++ik) {
 			w_prefs_key *pk = ik->second;
 			switch (pk->event_type) {
-			case w_key::MouseButton:
-				pk->set_key(mcode);
-				break;
-			case w_key::JoystickButton:
-				pk->set_key(jcode);
-				break;
-			case w_key::KeyboardKey:
-			default:
-				pk->set_key(kcode);
-				break;
+				case w_key::MouseButton:
+					pk->set_key(mcode);
+					break;
+				case w_key::JoystickButton:
+					pk->set_key(jcode);
+					break;
+				case w_key::KeyboardKey:
+				default:
+					pk->set_key(kcode);
+					break;
 			}
 		}
 	}
@@ -1904,32 +1904,32 @@ static void load_default_keys(void *arg)
 			if (code == SDL_SCANCODE_UNKNOWN)
 				continue;
 			switch (w_key::event_type_for_key(code)) {
-			case w_key::MouseButton:
-				mcode = code;
-				break;
-			case w_key::JoystickButton:
-				jcode = code;
-				break;
-			case w_key::KeyboardKey:
-			default:
-				kcode = code;
-				break;
+				case w_key::MouseButton:
+					mcode = code;
+					break;
+				case w_key::JoystickButton:
+					jcode = code;
+					break;
+				case w_key::KeyboardKey:
+				default:
+					kcode = code;
+					break;
 			}
 		}
 		auto range = shell_key_w.equal_range(i);
 		for (auto ik = range.first; ik != range.second; ++ik) {
 			w_prefs_key *pk = ik->second;
 			switch (pk->event_type) {
-			case w_key::MouseButton:
-				pk->set_key(mcode);
-				break;
-			case w_key::JoystickButton:
-				pk->set_key(jcode);
-				break;
-			case w_key::KeyboardKey:
-			default:
-				pk->set_key(kcode);
-				break;
+				case w_key::MouseButton:
+					pk->set_key(mcode);
+					break;
+				case w_key::JoystickButton:
+					pk->set_key(jcode);
+					break;
+				case w_key::KeyboardKey:
+				default:
+					pk->set_key(kcode);
+					break;
 			}
 		}
 	}
@@ -1944,32 +1944,32 @@ static void load_default_keys(void *arg)
 			if (code == SDL_SCANCODE_UNKNOWN)
 				continue;
 			switch (w_key::event_type_for_key(code)) {
-			case w_key::MouseButton:
-				mcode = code;
-				break;
-			case w_key::JoystickButton:
-				jcode = code;
-				break;
-			case w_key::KeyboardKey:
-			default:
-				kcode = code;
-				break;
+				case w_key::MouseButton:
+					mcode = code;
+					break;
+				case w_key::JoystickButton:
+					jcode = code;
+					break;
+				case w_key::KeyboardKey:
+				default:
+					kcode = code;
+					break;
 			}
 		}
 		auto range = hotkey_w.equal_range(i);
 		for (auto ik = range.first; ik != range.second; ++ik) {
 			w_prefs_key *pk = ik->second;
 			switch (pk->event_type) {
-			case w_key::MouseButton:
-				pk->set_key(mcode);
-				break;
-			case w_key::JoystickButton:
-				pk->set_key(jcode);
-				break;
-			case w_key::KeyboardKey:
-			default:
-				pk->set_key(kcode);
-				break;
+				case w_key::MouseButton:
+					pk->set_key(mcode);
+					break;
+				case w_key::JoystickButton:
+					pk->set_key(jcode);
+					break;
+				case w_key::KeyboardKey:
+				default:
+					pk->set_key(kcode);
+					break;
 			}
 		}
 	}
@@ -2012,20 +2012,20 @@ static void mouse_feel_details_changed(void *arg)
 	inside_callback = true;
 	switch (mouse_feel_details_w->get_selection())
 	{
-	case 0:
-		mouse_raw_w->set_selection(1);
-		mouse_accel_w->set_selection(1);
-		mouse_vertical_w->set_selection(1);
-		mouse_precision_w->set_selection(1);
-		break;
-	case 1:
-		mouse_raw_w->set_selection(1);
-		mouse_accel_w->set_selection(0);
-		mouse_vertical_w->set_selection(0);
-		mouse_precision_w->set_selection(0);
-		break;
-	default:
-		break;
+		case 0:
+			mouse_raw_w->set_selection(1);
+			mouse_accel_w->set_selection(1);
+			mouse_vertical_w->set_selection(1);
+			mouse_precision_w->set_selection(1);
+			break;
+		case 1:
+			mouse_raw_w->set_selection(1);
+			mouse_accel_w->set_selection(0);
+			mouse_vertical_w->set_selection(0);
+			mouse_precision_w->set_selection(0);
+			break;
+		default:
+			break;
 	}
 	inside_callback = false;
 }
@@ -2083,44 +2083,44 @@ static bool apply_mouse_feel(int selection)
 	bool changed = false;
 	switch (selection)
 	{
-	case 0:
+		case 0:
 			if (true != input_preferences->raw_mouse_input) {
-			input_preferences->raw_mouse_input = true;
-			changed = true;
-		}
+				input_preferences->raw_mouse_input = true;
+				changed = true;
+			}
 			if (_mouse_accel_classic != input_preferences->mouse_accel_type) {
-			input_preferences->mouse_accel_type = _mouse_accel_classic;
-			changed = true;
-		}
+				input_preferences->mouse_accel_type = _mouse_accel_classic;
+				changed = true;
+			}
 			if (true != input_preferences->classic_vertical_aim) {
-			input_preferences->classic_vertical_aim = true;
-			changed = true;
-		}
+				input_preferences->classic_vertical_aim = true;
+				changed = true;
+			}
 			if (false != input_preferences->extra_mouse_precision) {
-			input_preferences->extra_mouse_precision = false;
-			changed = true;
-		}
-		break;
-	case 1:
+				input_preferences->extra_mouse_precision = false;
+				changed = true;
+			}
+			break;
+		case 1:
 			if (true != input_preferences->raw_mouse_input) {
-			input_preferences->raw_mouse_input = true;
-			changed = true;
-		}
+				input_preferences->raw_mouse_input = true;
+				changed = true;
+			}
 			if (_mouse_accel_none != input_preferences->mouse_accel_type) {
-			input_preferences->mouse_accel_type = _mouse_accel_none;
-			changed = true;
-		}
+				input_preferences->mouse_accel_type = _mouse_accel_none;
+				changed = true;
+			}
 			if (false != input_preferences->classic_vertical_aim) {
-			input_preferences->classic_vertical_aim = false;
-			changed = true;
-		}
+				input_preferences->classic_vertical_aim = false;
+				changed = true;
+			}
 			if (true != input_preferences->extra_mouse_precision) {
-			input_preferences->extra_mouse_precision = true;
-			changed = true;
-		}
-		break;
-	default:
-		break;
+				input_preferences->extra_mouse_precision = true;
+				changed = true;
+			}
+			break;
+		default:
+			break;
 	}
 	return changed;
 }
@@ -2131,10 +2131,10 @@ static void mouse_custom_dialog(void *arg)
 	vertical_placer *placer = new vertical_placer;
 	placer->dual_add(new w_title("マウス拡張"), d);
 	placer->add(new w_spacer());
-
+	
 	table_placer *table = new table_placer(2, get_theme_space(ITEM_WIDGET), true);
 	table->col_flags(0, placeable::kAlignRight);
-
+	
 	float hSensitivity = ((float) input_preferences->sens_horizontal) / FIXED_ONE;
 	if (hSensitivity <= 0.0f) hSensitivity = 1.0f;
 	float hSensitivityLog = std::log(hSensitivity);
@@ -2166,27 +2166,27 @@ static void mouse_custom_dialog(void *arg)
 	mouse_feel_details_w->set_popup_callback(mouse_feel_details_changed, NULL);
 	table->dual_add(mouse_feel_details_w->label("マウスの感覚"), d);
 	table->dual_add(mouse_feel_details_w, d);
-
+	
 	mouse_raw_w = new w_toggle(input_preferences->raw_mouse_input);
 	mouse_raw_w->set_selection_changed_callback(update_mouse_feel_details);
 	table->dual_add(mouse_raw_w->label("生入力モード"), d);
 	table->dual_add(mouse_raw_w, d);
-
+	
 	mouse_accel_w = new w_toggle(input_preferences->mouse_accel_type == _mouse_accel_classic);
 	mouse_accel_w->set_selection_changed_callback(update_mouse_feel_details);
 	table->dual_add(mouse_accel_w->label("加速"), d);
 	table->dual_add(mouse_accel_w, d);
-
+	
 	mouse_vertical_w = new w_toggle(input_preferences->classic_vertical_aim);
 	mouse_vertical_w->set_selection_changed_callback(update_mouse_feel_details);
 	table->dual_add(mouse_vertical_w->label("垂直速度を調整"), d);
 	table->dual_add(mouse_vertical_w, d);
-
+	
 	mouse_precision_w = new w_toggle(!input_preferences->extra_mouse_precision);
 	mouse_precision_w->set_selection_changed_callback(update_mouse_feel_details);
 	table->dual_add(mouse_precision_w->label("武器照準に表示をスナップ"), d);
 	table->dual_add(mouse_precision_w, d);
-
+	
 	placer->add(table);
 	placer->add(new w_spacer(), true);
 
@@ -2197,11 +2197,11 @@ static void mouse_custom_dialog(void *arg)
 
 	d.set_widget_placer(placer);
 	mouse_feel_details_changed(NULL);
-
+	
 	// Run dialog
 	if (d.run() == 0) {	// Accepted
 		bool changed = false;
-
+		
 		int hPos = mouse_h_sens_w->get_selection();
 		float hLog = kMinSensitivityLog + ((float) hPos) * (kSensitivityLogRange / 1000.0f);
 		_fixed hNorm = _fixed(std::exp(hLog) * FIXED_ONE);
@@ -2209,7 +2209,7 @@ static void mouse_custom_dialog(void *arg)
 			input_preferences->sens_horizontal = hNorm;
 			changed = true;
 		}
-
+		
 		int vPos = mouse_v_sens_w->get_selection();
 		float vLog = kMinSensitivityLog + ((float) vPos) * (kSensitivityLogRange / 1000.0f);
 		_fixed vNorm = _fixed(std::exp(vLog) * FIXED_ONE);
@@ -2228,23 +2228,23 @@ static void mouse_custom_dialog(void *arg)
 			input_preferences->modifiers = flags;
 			changed = true;
 		}
-
+		
 		if (mouse_raw_w->get_selection() != input_preferences->raw_mouse_input) {
 			input_preferences->raw_mouse_input = mouse_raw_w->get_selection();
 			changed = true;
 		}
-
+		
 		if (mouse_accel_w->get_selection() != input_preferences->mouse_accel_type) {
 			input_preferences->mouse_accel_type = mouse_accel_w->get_selection();
 			changed = true;
 		}
-
+		
 		bool vert = mouse_vertical_w->get_selection();
 		if (vert != input_preferences->classic_vertical_aim) {
 			input_preferences->classic_vertical_aim = vert;
 			changed = true;
 		}
-
+		
 		bool precision = (mouse_precision_w->get_selection() == 0);
 		if (precision != input_preferences->extra_mouse_precision) {
 			input_preferences->extra_mouse_precision = precision;
@@ -2265,10 +2265,10 @@ static void controller_details_dialog(void *arg)
 	vertical_placer *placer = new vertical_placer;
 	placer->dual_add(new w_title("コントローラー拡張"), d);
 	placer->add(new w_spacer());
-
+	
 	table_placer *table = new table_placer(2, get_theme_space(ITEM_WIDGET), true);
 	table->col_flags(0, placeable::kAlignRight);
-
+	
 	float joySensitivity = ((float) input_preferences->controller_sensitivity) / FIXED_ONE;
 	if (joySensitivity <= 0.0f) joySensitivity = 1.0f;
 	float joySensitivityLog = std::log(joySensitivity);
@@ -2278,12 +2278,12 @@ static void controller_details_dialog(void *arg)
 	w_sens_slider* sens_joy_w = new w_sens_slider(1000, joySliderPosition);
 	table->dual_add(sens_joy_w->label("照準感度"), d);
 	table->dual_add(sens_joy_w, d);
-
+	
 	int joyDeadzone = (int)((input_preferences->controller_deadzone / 655.36f) + 0.5f);
-	w_deadzone_slider *dead_joy_w = new w_deadzone_slider(11, joyDeadzone);
+	w_deadzone_slider* dead_joy_w = new w_deadzone_slider(11, joyDeadzone);
 	table->dual_add(dead_joy_w->label("アナログ・デッドゾーン"), d);
 	table->dual_add(dead_joy_w, d);
-
+	
 	table->add_row(new w_spacer(), true);
 	placer->add(table, true);
 
@@ -2291,9 +2291,9 @@ static void controller_details_dialog(void *arg)
 	button_placer->dual_add(new w_button("了承", dialog_ok, &d), d);
 	button_placer->dual_add(new w_button("キャンセル", dialog_cancel, &d), d);
 	placer->add(button_placer, true);
-
+	
 	d.set_widget_placer(placer);
-
+	
 	// Run dialog
 	if (d.run() == 0) {	// Accepted
 		bool changed = false;
@@ -2305,7 +2305,7 @@ static void controller_details_dialog(void *arg)
 			input_preferences->controller_sensitivity = sensNorm;
 			changed = true;
 		}
-
+		
 		int deadPos = dead_joy_w->get_selection();
 		int deadNorm = deadPos * 655.36f;
 		if (deadNorm != input_preferences->controller_deadzone) {
@@ -2332,7 +2332,7 @@ static void controls_dialog(void *arg)
 	vertical_placer *placer = new vertical_placer;
 	placer->dual_add(new w_title("コントロール"), d);
 	placer->add(new w_spacer());
-
+	
 	// create all key widgets
 	for (int i = 0; i < NUM_KEYS; i++) {
 		SDL_Scancode kcode = SDL_SCANCODE_UNKNOWN;
@@ -2370,7 +2370,7 @@ static void controls_dialog(void *arg)
 		shell_key_w.insert(prefsKeyMapPair(i, new w_prefs_key(mcode, w_key::MouseButton)));
 		shell_key_w.insert(prefsKeyMapPair(i, new w_prefs_key(jcode, w_key::JoystickButton)));
 	}
-
+	
 	for (int i = 0; i < NUMBER_OF_HOTKEYS; ++i)
 	{
 		SDL_Scancode kcode = SDL_SCANCODE_UNKNOWN;
@@ -2390,15 +2390,15 @@ static void controls_dialog(void *arg)
 		hotkey_w.insert(prefsKeyMapPair(i, new w_prefs_key(mcode, w_key::MouseButton)));
 		hotkey_w.insert(prefsKeyMapPair(i, new w_prefs_key(jcode, w_key::JoystickButton)));
 	}
-
+	
 	tab_placer* tabs = new tab_placer();
-
+	
 	std::vector<std::string> labels = {"照準", "移動", "行動", "ホットキー", "インターフェース", "その他"};
 	w_tab *tab_w = new w_tab(labels, tabs);
-
+	
 	placer->dual_add(tab_w, d);
 	placer->add(new w_spacer(), true);
-
+	
 	vertical_placer *move = new vertical_placer();
 	table_placer *move_table = new table_placer(4, get_theme_space(ITEM_WIDGET), true);
 	move_table->col_flags(0, placeable::kAlignRight);
@@ -2409,7 +2409,7 @@ static void controls_dialog(void *arg)
 	move_table->dual_add(new w_label("キーボード"), d);
 	move_table->dual_add(new w_label("マウス"), d);
 	move_table->dual_add(new w_label("コントローラー"), d);
-
+	
 	std::vector<int> move_keys = { 0, 1, 4, 5, -1, 16, 15, 17 };
 	for (auto it = move_keys.begin(); it != move_keys.end(); ++it) {
 		if (*it < 0) {
@@ -2432,18 +2432,18 @@ static void controls_dialog(void *arg)
 	}
 	move->add(move_table, true);
 	move->add(new w_spacer(), true);
-
+	
 	table_placer *move_options = new table_placer(2, get_theme_space(ITEM_WIDGET), true);
 	move_options->col_flags(0, placeable::kAlignRight);
 
 	w_toggle *always_run_w = new w_toggle(input_preferences->modifiers & _inputmod_interchange_run_walk);
 	move_options->dual_add(always_run_w->label("常時走行"), d);
 	move_options->dual_add(always_run_w, d);
-
+	
 	w_toggle *always_swim_w = new w_toggle(TEST_FLAG(input_preferences->modifiers, _inputmod_interchange_swim_sink));
 	move_options->dual_add(always_swim_w->label("常時泳ぐ"), d);
 	move_options->dual_add(always_swim_w, d);
-
+	
 	move->add(move_options, true);
 
 	vertical_placer *look = new vertical_placer();
@@ -2456,7 +2456,7 @@ static void controls_dialog(void *arg)
 	look_table->dual_add(new w_label("キーボード"), d);
 	look_table->dual_add(new w_label("マウス"), d);
 	look_table->dual_add(new w_label("コントローラー"), d);
-
+	
 	std::vector<int> look_keys = { 8, 9, 2, 3, -1, 6, 7, 10 };
 	for (auto it = look_keys.begin(); it != look_keys.end(); ++it) {
 		if (*it < 0) {
@@ -2476,20 +2476,20 @@ static void controls_dialog(void *arg)
 				if (ik->second->event_type == w_key::MouseButton) {
 					w_text_entry* txt = NULL;
 					switch (i) {
-					case 8:
-						txt = new w_text_entry(12, "上");
-						break;
-					case 9:
-						txt = new w_text_entry(12, "下");
-						break;
-					case 2:
-						txt = new w_text_entry(12, "左");
-						break;
-					case 3:
-						txt = new w_text_entry(12, "右");
-						break;
-					default:
-						break;
+						case 8:
+							txt = new w_text_entry(12, "上");
+							break;
+						case 9:
+							txt = new w_text_entry(12, "下");
+							break;
+						case 2:
+							txt = new w_text_entry(12, "左");
+							break;
+						case 3:
+							txt = new w_text_entry(12, "右");
+							break;
+						default:
+							break;
 					}
 					if (txt) {
 						txt->set_enabled(false);
@@ -2504,16 +2504,16 @@ static void controls_dialog(void *arg)
 	}
 	look->add(look_table, true);
 	look->add(new w_spacer(), true);
-
+	
 	table_placer *look_options = new table_placer(2, get_theme_space(ITEM_WIDGET), true);
 	look_options->col_flags(0, placeable::kAlignRight);
-
+	
 	w_toggle* auto_recenter_w = new w_toggle(!(input_preferences->modifiers & _inputmod_dont_auto_recenter));
 	look_options->dual_add(auto_recenter_w->label("視点の自動リセンター"), d);
 	look_options->dual_add(auto_recenter_w, d);
-
+	
 	look_options->add_row(new w_spacer(), true);
-
+	
 	table_placer *mouse_options = new table_placer(2, get_theme_space(ITEM_WIDGET), true);
 	mouse_options->col_flags(0, placeable::kAlignRight);
 	mouse_options->col_flags(1, placeable::kAlignLeft);
@@ -2521,22 +2521,22 @@ static void controls_dialog(void *arg)
 	w_toggle *enable_mouse_w = new w_toggle(input_preferences->input_device == _mouse_yaw_pitch);
 	mouse_options->dual_add(enable_mouse_w->label("マウスの上下"), d);
 	mouse_options->dual_add(enable_mouse_w, d);
-
+	
 	mouse_feel_w = new w_select_popup();
 	mouse_feel_w->set_labels(mouse_feel_labels);
 	update_mouse_feel(NULL);
 	mouse_options->dual_add(mouse_feel_w->label("マウスの左右"), d);
 	mouse_options->dual_add(mouse_feel_w, d);
-
+	
 	mouse_options->add_row(new w_spacer(), true);
 	mouse_options->dual_add_row(new w_button("マウス拡張", mouse_custom_dialog, &d), d);
-
+	
 	look_options->add(mouse_options, true);
-
+	
 	table_placer *controller_options = new table_placer(2, get_theme_space(ITEM_WIDGET), true);
 	controller_options->col_flags(0, placeable::kAlignRight);
 	controller_options->col_flags(1, placeable::kAlignLeft);
-
+	
 	controller_options->dual_add_row(new w_label(""), d);
 	std::vector<std::string> joystick_aiming_labels = {"アナログスティックとして扱う", "十字キーとして扱う"};
 	w_select_popup *joystick_aiming_w = new w_select_popup();
@@ -2544,14 +2544,14 @@ static void controls_dialog(void *arg)
 	joystick_aiming_w->set_selection(input_preferences->controller_analog ? 0 : 1);
 	controller_options->dual_add(joystick_aiming_w->label("コントローラでの振り向き"), d);
 	controller_options->dual_add(joystick_aiming_w, d);
-
+	
 	controller_options->add_row(new w_spacer(), true);
 	controller_options->dual_add_row(new w_button("コントローラー拡張", controller_details_dialog, &d), d);
-
+	
 	look_options->add(controller_options, true);
 
 	look->add(look_options, true);
-
+	
 	vertical_placer *actions = new vertical_placer();
 	table_placer *actions_table = new table_placer(4, get_theme_space(ITEM_WIDGET), true);
 	actions_table->col_flags(0, placeable::kAlignRight);
@@ -2562,7 +2562,7 @@ static void controls_dialog(void *arg)
 	actions_table->dual_add(new w_label("キーボード"), d);
 	actions_table->dual_add(new w_label("マウス"), d);
 	actions_table->dual_add(new w_label("コントローラー"), d);
-
+	
 	std::vector<int> actions_keys = { 13, 14, 11, 12, -1, 18, -1, 20, 108 };
 	for (auto it = actions_keys.begin(); it != actions_keys.end(); ++it) {
 		if (*it < 0) {
@@ -2585,16 +2585,16 @@ static void controls_dialog(void *arg)
 	}
 	actions->add(actions_table, true);
 	actions->add(new w_spacer(), true);
-
+	
 	table_placer *actions_options = new table_placer(2, get_theme_space(ITEM_WIDGET), true);
 	actions_options->col_flags(0, placeable::kAlignRight);
 
 	w_toggle *weapon_w = new w_toggle(!(input_preferences->modifiers & _inputmod_dont_switch_to_new_weapon));
 	actions_options->dual_add(weapon_w->label("武器の自動切り替え"), d);
 	actions_options->dual_add(weapon_w, d);
-
+	
 	actions->add(actions_options, true);
-
+	
 	actions->add(new w_spacer(), true);
 	actions->dual_add(new w_static_text("注意：武器の自動切換えと、視点の自動リセンターは、ネットワークプレイで"), d);
 	actions->dual_add(new w_static_text("自動的にオンになります。シングルプレイヤーモードでどちらかをオフにすると、"), d);
@@ -2615,9 +2615,9 @@ static void controls_dialog(void *arg)
 	{
 		if (i == 9)
 		{
-			hotkey_table->add_row(new w_spacer(), true);
+			hotkey_table->add_row(new w_spacer(), true);			
 		}
-
+		
 		hotkey_table->dual_add(new w_label(hotkey_action_name[i]), d);
 		auto range = hotkey_w.equal_range(i);
 		for (auto ik = range.first; ik != range.second; ++ik)
@@ -2641,7 +2641,7 @@ static void controls_dialog(void *arg)
 	interface_table->dual_add(new w_label("キーボード"), d);
 	interface_table->dual_add(new w_label("マウス"), d);
 	interface_table->dual_add(new w_label("コントローラー"), d);
-
+	
 	std::vector<int> interface_keys = { 19, 105, 106, -1, 103, 104, -1, 100, 101, -1, 102, 107, 109, -1, -2 };
 	for (auto it = interface_keys.begin(); it != interface_keys.end(); ++it) {
 		if (*it == -2) {
@@ -2742,7 +2742,7 @@ static void controls_dialog(void *arg)
 	tabs->add(iface, true);
 	tabs->add(other, true);
 	placer->add(tabs, true);
-
+	
 	placer->add(new w_spacer(), true);
 	placer->dual_add(new w_button("デフォルトにリセットする", load_default_keys, &d), d);
 	placer->add(new w_spacer(), true);
@@ -2762,13 +2762,13 @@ static void controls_dialog(void *arg)
 	// Run dialog
 	if (d.run() == 0) {	// Accepted
 		bool changed = false;
-
+		
 		uint16 flags = input_preferences->modifiers & (_inputmod_use_button_sounds|_inputmod_invert_mouse);
 		if (always_run_w->get_selection()) flags |= _inputmod_interchange_run_walk;
 		if (always_swim_w->get_selection()) flags |= _inputmod_interchange_swim_sink;
 		if (!(weapon_w->get_selection())) flags |= _inputmod_dont_switch_to_new_weapon;
 		if (!(auto_recenter_w->get_selection())) flags |= _inputmod_dont_auto_recenter;
-
+		
 		if (flags != input_preferences->modifiers) {
 			input_preferences->modifiers = flags;
 			changed = true;
@@ -2817,23 +2817,23 @@ static void controls_dialog(void *arg)
 				changed = true;
 			}
 		}
-
+		
 		int16 device = enable_mouse_w->get_selection() ? _mouse_yaw_pitch : _keyboard_or_game_pad;
 		if (input_preferences->input_device != device) {
 			input_preferences->input_device = device;
 			changed = true;
 		}
-
+		
 		bool jaim = (joystick_aiming_w->get_selection() == 0);
 		if (input_preferences->controller_analog != jaim) {
 			input_preferences->controller_analog = jaim;
 			changed = true;
 		}
-
+		
 		if (apply_mouse_feel(mouse_feel_w->get_selection())) {
 			changed = true;
 		}
-
+	
 		if (changed)
 			write_preferences();
 	}
@@ -2854,7 +2854,7 @@ static void plugins_dialog(void *)
 	std::vector<Plugin> plugins(Plugins::instance()->begin(), Plugins::instance()->end());
 	w_plugins* plugins_w = new w_plugins(plugins, 400, 7);
 	placer->dual_add(plugins_w, d);
-
+	
 	placer->add(new w_spacer, true);
 
 	horizontal_placer* button_placer = new horizontal_placer;
@@ -2892,7 +2892,7 @@ static void plugins_dialog(void *)
  *  Environment dialog
  */
 
-static const char *film_profile_labels[] = {
+static const char* film_profile_labels[] = {
 	"Aleph One",
 	"Marathon 2",
 	"Marathon Infinity",
@@ -2912,7 +2912,7 @@ static void environment_dialog(void *arg)
 
 	table_placer *table = new table_placer(2, get_theme_space(ITEM_WIDGET), true);
 	table->col_flags(0, placeable::kAlignRight);
-
+	
 #ifndef MAC_APP_STORE
 	w_env_select *map_w = new w_env_select(environment_preferences->map_file, "利用可能なマップ", _typecode_scenario, &d);
 	table->dual_add(map_w->label("マップ"), d);
@@ -2930,7 +2930,7 @@ static void environment_dialog(void *arg)
 	table->dual_add(sounds_w->label("サウンド"), d);
 	table->dual_add(sounds_w, d);
 
-	w_env_select *resources_w = new w_env_select(environment_preferences->resources_file, "利用可能なファイル", _typecode_unknown, &d);
+	w_env_select* resources_w = new w_env_select(environment_preferences->resources_file, "利用可能なファイル", _typecode_unknown, &d);
 	table->dual_add(resources_w->label("外部リソース"), d);
 	table->dual_add(resources_w, d);
 #endif
@@ -2954,23 +2954,23 @@ static void environment_dialog(void *arg)
 
 	table->add_row(new w_spacer, true);
 	table->dual_add_row(new w_static_text("フィルム再生"), d);
-
+	
 	w_select* film_profile_w = new w_select(environment_preferences->film_profile, film_profile_labels);
 	table->dual_add(film_profile_w->label("デフォルト再生プロファイル"), d);
 	table->dual_add(film_profile_w, d);
-
+	
 #ifndef MAC_APP_STORE
 	w_enabling_toggle* use_replay_net_lua_w = new w_enabling_toggle(environment_preferences->use_replay_net_lua);
 	table->dual_add(use_replay_net_lua_w->label("フィルムでのネットスクリプト"), d);
 	table->dual_add(use_replay_net_lua_w, d);
-
+	
 	w_file_chooser *replay_net_lua_w = new w_file_chooser("スクリプトを選択", _typecode_netscript);
 	replay_net_lua_w->set_file(network_preferences->netscript_file);
 	table->dual_add(replay_net_lua_w->label("ネットスクリプトファイル"), d);
 	table->dual_add(replay_net_lua_w, d);
 	use_replay_net_lua_w->add_dependent_widget(replay_net_lua_w);
 #endif
-
+	
 	table->add_row(new w_spacer, true);
 	table->dual_add_row(new w_static_text("オプション"), d);
 
@@ -3050,21 +3050,21 @@ static void environment_dialog(void *arg)
 			environment_preferences->sounds_mod_date = sounds_w->get_file_specifier().GetDate();
 			changed = true;
 		}
-
+		
 		path = resources_w->get_path();
 		if (strcmp(path, environment_preferences->resources_file) != 0)
 		{
 			strncpy(environment_preferences->resources_file, path, 256);
 			changed = true;
 		}
-
+		
 		bool use_solo_lua = use_solo_lua_w->get_selection() != 0;
 		if (use_solo_lua != environment_preferences->use_solo_lua)
 		{
 			environment_preferences->use_solo_lua = use_solo_lua;
 			changed = true;
 		}
-
+		
 		path = solo_lua_w->get_file().GetPath();
 		if (strcmp(path, environment_preferences->solo_lua_file)) {
 			strncpy(environment_preferences->solo_lua_file, path, 256);
@@ -3077,14 +3077,14 @@ static void environment_dialog(void *arg)
 			environment_preferences->use_replay_net_lua = use_replay_net_lua;
 			changed = true;
 		}
-
+		
 		path = replay_net_lua_w->get_file().GetPath();
 		if (strcmp(path, network_preferences->netscript_file)) {
 			strncpy(network_preferences->netscript_file, path, 256);
 			changed = true;
 		}
 #endif
-
+		
 		FileSpecifier new_theme;
 		theme_plugin = Plugins::instance()->find_theme();
 		if (theme_plugin)
@@ -3109,7 +3109,7 @@ static void environment_dialog(void *arg)
 		if (film_profile_w->get_selection() != environment_preferences->film_profile)
 		{
 			environment_preferences->film_profile = static_cast<FilmProfileType>(film_profile_w->get_selection());
-
+		
 			changed = true;
 		}
 
@@ -3200,7 +3200,7 @@ void initialize_preferences(
 		sound_preferences = new SoundManager::Parameters;
 		network_preferences= new network_preferences_data;
 		environment_preferences= new environment_preferences_data;
-
+		
 		for (int i = 0; i < NUM_KEYS; ++i)
 			input_preferences->key_bindings[i] = std::set<SDL_Scancode>();
 		for (int i = 0; i < NUMBER_OF_SHELL_KEYS; ++i)
@@ -3217,7 +3217,7 @@ void initialize_preferences(
 		PreferenceCommandParser.register_command("set", PreferenceSetCommandParser);
 		PreferenceCommandParser.register_command("get", PreferenceGetCommandParser);
 		Console::instance()->register_command("preferences", PreferenceCommandParser);
-
+		
 		read_preferences ();
 	}
 }
@@ -3269,7 +3269,7 @@ void read_preferences ()
 		FileSpec.SetNameWithPath(getcstr(temporary, strFILENAMES, filenamePREFERENCES));
 		opened = FileSpec.Open(OFile);
 	}
-
+	
 	bool parse_error = false;
 	if (opened)
 	{
@@ -3277,7 +3277,7 @@ void read_preferences ()
 		try {
 			InfoTree prefs = InfoTree::load_xml(FileSpec);
 			InfoTree root = prefs.get_child("mara_prefs");
-
+			
 			std::string version = "";
 			root.read_attr("version", version);
 			if (!version.length())
@@ -3286,7 +3286,7 @@ void read_preferences ()
 				logWarning("Reading older preferences of version %s. Preferences will be upgraded to version %s when saved. (%s)", version.c_str(), A1_DATE_VERSION, FileSpec.GetPath());
 			else if (version > A1_DATE_VERSION)
 				logWarning("Reading newer preferences of version %s. Preferences will be downgraded to version %s when saved. (%s)", version.c_str(), A1_DATE_VERSION, FileSpec.GetPath());
-
+			
 			for (const InfoTree &child : root.children_named("graphics"))
 				parse_graphics_preferences(child, version);
 			for (const InfoTree &child : root.children_named("player"))
@@ -3335,7 +3335,7 @@ void read_preferences ()
 	validate_player_preferences(player_preferences);
 	validate_input_preferences(input_preferences);
 	validate_environment_preferences(environment_preferences);
-
+	
 	// jkvw: If we try to load a default file, but can't, we'll have set the game error.
 	//       But that's not useful, because we're just going to try loading the file
 	//       from user preferences.  It used to be this code was only called in initialisation,
@@ -3389,7 +3389,7 @@ InfoTree graphics_preferences_tree()
 	root.put_attr("movie_export_video_bitrate", graphics_preferences->movie_export_video_bitrate);
 	root.put_attr("movie_export_audio_quality", graphics_preferences->movie_export_audio_quality);
 	root.put_attr("scripted_effects_quality", graphics_preferences->ephemera_quality);
-
+	
 	root.add_color("void.color", graphics_preferences->OGL_Configure.VoidColor);
 
 	for (int i = 0; i < 4; ++i)
@@ -3399,7 +3399,7 @@ InfoTree graphics_preferences_tree()
 	for (int i = 0; i <= OGL_NUMBER_OF_TEXTURE_TYPES; ++i)
 	{
 		OGL_Texture_Configure& Config = (i == OGL_NUMBER_OF_TEXTURE_TYPES) ? graphics_preferences->OGL_Configure.ModelConfig : graphics_preferences->OGL_Configure.TxtrConfigList[i];
-
+		
 		InfoTree tex;
 		tex.put_attr("index", i);
 		tex.put_attr("near_filter", Config.NearFilter);
@@ -3415,7 +3415,7 @@ InfoTree graphics_preferences_tree()
 InfoTree player_preferences_tree()
 {
 	InfoTree root;
-
+	
 	root.put_attr_cstr("name", player_preferences->name);
 	root.put_attr("color", player_preferences->color);
 	root.put_attr("team", player_preferences->team);
@@ -3423,7 +3423,7 @@ InfoTree player_preferences_tree()
 	root.put_attr("difficulty", player_preferences->difficulty_level);
 	root.put_attr("bkgd_music", player_preferences->background_music_on);
 	root.put_attr("crosshairs_active", player_preferences->crosshairs_active);
-
+	
 	ChaseCamData& ChaseCam = player_preferences->ChaseCam;
 	InfoTree cam;
 	cam.put_attr("behind", ChaseCam.Behind);
@@ -3434,7 +3434,7 @@ InfoTree player_preferences_tree()
 	cam.put_attr("spring", ChaseCam.Spring);
 	cam.put_attr("opacity", ChaseCam.Opacity);
 	root.put_child("chase_cam", cam);
-
+	
 	CrosshairData& Crosshairs = player_preferences->Crosshairs;
 	InfoTree cross;
 	cross.put_attr("thickness", Crosshairs.Thickness);
@@ -3471,7 +3471,7 @@ static const char *binding_mouse_button_name[NUM_SDL_MOUSE_BUTTONS] = {
 static const char* get_binding_joystick_button_name(int offset)
 {
 	static_assert(SDL_CONTROLLER_BUTTON_MAX <= 21 &&
-					  SDL_CONTROLLER_AXIS_MAX <= 12,
+				  SDL_CONTROLLER_AXIS_MAX <= 12,
 				  "SDL changed the number of buttons/axes again!");
 
 	static const char* buttons[] = {
@@ -3638,7 +3638,7 @@ static int index_for_action_name(std::string name, BindingType& binding_type)
 InfoTree input_preferences_tree()
 {
 	InfoTree root;
-
+	
 	root.put_attr("device", input_preferences->input_device);
 	root.put_attr("modifiers", input_preferences->modifiers);
 	root.put_attr("sens_horizontal", input_preferences->sens_horizontal);
@@ -3649,11 +3649,11 @@ InfoTree input_preferences_tree()
 	root.put_attr("mouse_accel_scale", input_preferences->mouse_accel_scale);
 	root.put_attr("raw_mouse_input", input_preferences->raw_mouse_input);
 	root.put_attr("extra_mouse_precision", input_preferences->extra_mouse_precision);
-
+	
 	root.put_attr("controller_analog", input_preferences->controller_analog);
 	root.put_attr("controller_sensitivity", input_preferences->controller_sensitivity);
 	root.put_attr("controller_deadzone", input_preferences->controller_deadzone);
-
+	
 	for (int i = 0; i < (NUMBER_OF_KEYS + NUMBER_OF_SHELL_KEYS); ++i)
 	{
 		std::set<SDL_Scancode> codeset;
@@ -3665,7 +3665,7 @@ InfoTree input_preferences_tree()
 			codeset = input_preferences->shell_key_bindings[i - NUMBER_OF_KEYS];
 			name = binding_shell_action_name[i - NUMBER_OF_KEYS];
 		}
-
+		
 		for (const SDL_Scancode &code : codeset)
 		{
 			if (code == SDL_SCANCODE_UNKNOWN)
@@ -3692,14 +3692,14 @@ InfoTree input_preferences_tree()
 			root.add_child("binding", key);
 		}
 	}
-
+	
 	return root;
 }
 
 InfoTree sound_preferences_tree()
 {
 	InfoTree root;
-
+	
 	root.put_attr("channels", sound_preferences->channel_count);
 	root.put_attr("volume_db", sound_preferences->volume_db);
 	root.put_attr("music_db", sound_preferences->music_db);
@@ -3709,7 +3709,7 @@ InfoTree sound_preferences_tree()
 	root.put_attr("volume_while_speaking", sound_preferences->volume_while_speaking);
 	root.put_attr("mute_while_transmitting", sound_preferences->mute_while_transmitting);
 	root.put_attr("video_export_volume_db", sound_preferences->video_export_volume_db);
-
+	
 	return root;
 }
 
@@ -3746,7 +3746,7 @@ InfoTree network_preferences_tree()
 		sprintf(&passwd[2*i], "%.2x", network_preferences->metaserver_password[i] ^ sPasswordMask[i]);
 	passwd[32] = '\0';
 	root.put_attr("metaserver_password", passwd);
-
+	
 	root.put_attr("use_custom_metaserver_colors", network_preferences->use_custom_metaserver_colors);
 	root.put_attr("mute_metaserver_guests", network_preferences->mute_metaserver_guests);
 	root.put_attr("join_metaserver_by_default", network_preferences->join_metaserver_by_default);
@@ -3757,7 +3757,7 @@ InfoTree network_preferences_tree()
 
 	root.put_child("star_protocol", StarPreferencesTree());
 	root.put_child("ring_protocol", RingPreferencesTree());
-
+	
 	return root;
 }
 
@@ -3794,7 +3794,7 @@ InfoTree environment_preferences_tree()
 			root.add_child("disable_plugin", disable);
 		}
 	}
-
+	
 	return root;
 }
 
@@ -3802,7 +3802,7 @@ void write_preferences()
 {
 	InfoTree root;
 	root.put_attr("version", A1_DATE_VERSION);
-
+	
 	root.put_child("graphics", graphics_preferences_tree());
 	root.put_child("player", player_preferences_tree());
 	root.put_child("input", input_preferences_tree());
@@ -3811,10 +3811,10 @@ void write_preferences()
 	root.put_child("network", network_preferences_tree());
 #endif
 	root.put_child("environment", environment_preferences_tree());
-
+	
 	InfoTree fileroot;
 	fileroot.put_child("mara_prefs", root);
-
+	
 	FileSpecifier FileSpec;
 	FileSpec.SetToPreferencesDir();
 
@@ -3824,7 +3824,7 @@ void write_preferences()
 		name += " Editor";
 	}
 	FileSpec += name;
-
+	
 	try {
 		fileroot.save_xml(FileSpec);
 	} catch (InfoTree::parse_error ex) {
@@ -3841,7 +3841,7 @@ void write_preferences()
 
 static void default_graphics_preferences(graphics_preferences_data *preferences)
 {
-	memset(&preferences->screen_mode, '\0', sizeof(screen_mode_data));
+  memset(&preferences->screen_mode, '\0', sizeof(screen_mode_data));
 	preferences->screen_mode.gamma_level= DEFAULT_GAMMA_LEVEL;
 
 	preferences->screen_mode.width = 640;
@@ -3858,11 +3858,11 @@ static void default_graphics_preferences(graphics_preferences_data *preferences)
 	preferences->screen_mode.fix_h_not_v = true;
 	preferences->screen_mode.camera_bob = true;
 	preferences->screen_mode.bit_depth = 32;
-
+	
 	preferences->screen_mode.draw_every_other_line= false;
 
 	preferences->screen_mode.fov = 0; // use default
-
+	
 	OGL_SetDefaults(preferences->OGL_Configure);
 
 	preferences->double_corpse_limit= false;
@@ -3926,9 +3926,9 @@ static void default_player_preferences(player_preferences_data *preferences)
 	preferences->difficulty_level= 2;
 	strncpy(preferences->name, get_name_from_system().c_str(), PREFERENCES_NAME_LENGTH);
 	preferences->name[PREFERENCES_NAME_LENGTH] = '\0';
-
+	
 	// LP additions for new fields:
-
+	
 	preferences->ChaseCam.Behind = 1536;
 	preferences->ChaseCam.Upward = 0;
 	preferences->ChaseCam.Rightward = 0;
@@ -3936,7 +3936,7 @@ static void default_player_preferences(player_preferences_data *preferences)
 	preferences->ChaseCam.Damping = 0.5;
 	preferences->ChaseCam.Spring = 0;
 	preferences->ChaseCam.Opacity = 1;
-
+	
 	preferences->Crosshairs.Thickness = 3;
 	preferences->Crosshairs.FromCenter = 2;
 	preferences->Crosshairs.Length = 1;
@@ -3952,7 +3952,7 @@ static void default_input_preferences(input_preferences_data *preferences)
 	preferences->key_bindings = default_key_bindings;
 	preferences->shell_key_bindings = default_shell_key_bindings;
 	preferences->hotkey_bindings = default_hotkey_bindings;
-
+	
 	// LP addition: set up defaults for modifiers:
 	// interchange run and walk, but don't interchange swim and sink.
 	preferences->modifiers = _inputmod_interchange_run_walk;
@@ -3982,21 +3982,21 @@ static void default_environment_preferences(environment_preferences_data *prefer
 	FileSpecifier DefaultSoundsFile;
 	FileSpecifier DefaultPhysicsFile;
 	FileSpecifier DefaultExternalResourcesFile;
-
+    
 	get_default_map_spec(DefaultMapFile);
 	get_default_physics_spec(DefaultPhysicsFile);
 	get_default_shapes_spec(DefaultShapesFile);
 	get_default_sounds_spec(DefaultSoundsFile);
 	get_default_external_resources_spec(DefaultExternalResourcesFile);
-
+	                
 	preferences->map_checksum= read_wad_file_checksum(DefaultMapFile);
 	strncpy(preferences->map_file, DefaultMapFile.GetPath(), 256);
 	preferences->map_file[255] = 0;
-
+	
 	preferences->physics_checksum= read_wad_file_checksum(DefaultPhysicsFile);
 	strncpy(preferences->physics_file, DefaultPhysicsFile.GetPath(), 256);
 	preferences->physics_file[255] = 0;
-
+	
 	preferences->shapes_mod_date = DefaultShapesFile.GetDate();
 	strncpy(preferences->shapes_file, DefaultShapesFile.GetPath(), 256);
 	preferences->shapes_file[255] = 0;
@@ -4036,7 +4036,7 @@ static bool validate_graphics_preferences(graphics_preferences_data *preferences
 	preferences->screen_mode.high_resolution = !!preferences->screen_mode.high_resolution;
 	preferences->screen_mode.fullscreen = !!preferences->screen_mode.fullscreen;
 	preferences->screen_mode.draw_every_other_line = !!preferences->screen_mode.draw_every_other_line;
-	preferences->screen_mode.fix_h_not_v = !!preferences->screen_mode.fix_h_not_v;
+    preferences->screen_mode.fix_h_not_v = !!preferences->screen_mode.fix_h_not_v;
 
 	if(preferences->screen_mode.gamma_level<0 || preferences->screen_mode.gamma_level>=NUMBER_OF_GAMMA_LEVELS)
 	{
@@ -4095,7 +4095,7 @@ static bool validate_network_preferences(network_preferences_data *preferences)
 		}
 		changed= true;
 	}
-
+	
 	if(preferences->game_is_untimed != true && preferences->game_is_untimed != false)
 	{
 		preferences->game_is_untimed= false;
@@ -4114,7 +4114,7 @@ static bool validate_network_preferences(network_preferences_data *preferences)
 		changed= true;
 	}
 
-	// ZZZ: is this relevant anymore now with XML prefs?  if so, should validate autogather, join_by_address, and join_address.
+        // ZZZ: is this relevant anymore now with XML prefs?  if so, should validate autogather, join_by_address, and join_address.
 
 	if(preferences->game_protocol >= NUMBER_OF_NETWORK_GAME_PROTOCOLS)
 	{
@@ -4183,13 +4183,13 @@ void load_environment_from_preferences(
 			/* Didn't find it.  Don't change them.. */
 		}
 	}
-
+	
 	File = prefs->shapes_file;
 	if (File.Exists()) {
 		open_shapes_file(File);
 	} else {
 		if(find_file_with_modification_date(File,
-											 _typecode_shapes, strPATHS, prefs->shapes_mod_date))
+			_typecode_shapes, strPATHS, prefs->shapes_mod_date))
 		{
 			open_shapes_file(File);
 		} else {
@@ -4230,13 +4230,13 @@ static bool sStandardizeModifiers = false;
 
 void
 standardize_player_behavior_modifiers() {
-	sStandardizeModifiers = true;
+    sStandardizeModifiers = true;
 }
 
 
 void
 restore_custom_player_behavior_modifiers() {
-	sStandardizeModifiers = false;
+    sStandardizeModifiers = false;
 }
 
 
@@ -4249,11 +4249,11 @@ is_player_behavior_standard() {
 // LP addition: modification of Josh Elsasser's dont-switch-weapons patch
 // so as to access preferences stuff here
 bool dont_switch_to_new_weapon() {
-	// ZZZ: let game require standard modifiers for a while
+    // ZZZ: let game require standard modifiers for a while
     if(!sStandardizeModifiers)
 	    return TEST_FLAG(input_preferences->modifiers,_inputmod_dont_switch_to_new_weapon);
-	else
-		return false;
+    else
+        return false;
 }
 
 
@@ -4284,7 +4284,7 @@ struct ViewSizeData
 };
 
 const ViewSizeData LegacyViewSizes[32] =
-	{
+{
 	{ 320, 160, true},
 	{ 480, 240, true},
 	{ 640, 480, true},
@@ -4343,7 +4343,7 @@ void parse_graphics_preferences(InfoTree root, std::string version)
 	root.read_attr("scmode_highres", graphics_preferences->screen_mode.high_resolution);
 	root.read_attr("scmode_draw_every_other_line", graphics_preferences->screen_mode.draw_every_other_line);
 	root.read_attr("scmode_fullscreen", graphics_preferences->screen_mode.fullscreen);
-
+	
 	root.read_attr("scmode_fix_h_not_v", graphics_preferences->screen_mode.fix_h_not_v);
 	root.read_attr("scmode_bitdepth", graphics_preferences->screen_mode.bit_depth);
 	root.read_attr("scmode_gamma", graphics_preferences->screen_mode.gamma_level);
@@ -4364,7 +4364,7 @@ void parse_graphics_preferences(InfoTree root, std::string version)
 	root.read_attr("movie_export_video_bitrate", graphics_preferences->movie_export_video_bitrate);
 
 	root.read_attr("scripted_effects_quality", graphics_preferences->ephemera_quality);
-
+	
 	for (const InfoTree &vtree : root.children_named("void"))
 	{
 		for (const InfoTree &color : vtree.children_named("color"))
@@ -4372,7 +4372,7 @@ void parse_graphics_preferences(InfoTree root, std::string version)
 			color.read_color(graphics_preferences->OGL_Configure.VoidColor);
 		}
 	}
-
+	
 	for (const InfoTree &landscape : root.children_named("landscapes"))
 	{
 		for (const InfoTree &color : root.children_named("color"))
@@ -4382,7 +4382,7 @@ void parse_graphics_preferences(InfoTree root, std::string version)
 				color.read_color(graphics_preferences->OGL_Configure.LscpColors[index / 2][index % 2]);
 		}
 	}
-
+	
 	for (const InfoTree &tex : root.children_named("texture"))
 	{
 		int16 index;
@@ -4408,7 +4408,7 @@ void parse_player_preferences(InfoTree root, std::string version)
 	root.read_attr("difficulty", player_preferences->difficulty_level);
 	root.read_attr("bkgd_music", player_preferences->background_music_on);
 	root.read_attr("crosshairs_active", player_preferences->crosshairs_active);
-
+	
 	for (const InfoTree &child : root.children_named("chase_cam"))
 	{
 		child.read_attr("behind", player_preferences->ChaseCam.Behind);
@@ -4419,7 +4419,7 @@ void parse_player_preferences(InfoTree root, std::string version)
 		child.read_attr("spring", player_preferences->ChaseCam.Spring);
 		child.read_attr("opacity", player_preferences->ChaseCam.Opacity);
 	}
-
+	
 	for (const InfoTree &child : root.children_named("crosshairs"))
 	{
 		child.read_attr("thickness", player_preferences->Crosshairs.Thickness);
@@ -4427,7 +4427,7 @@ void parse_player_preferences(InfoTree root, std::string version)
 		child.read_attr("length", player_preferences->Crosshairs.Length);
 		child.read_attr("shape", player_preferences->Crosshairs.Shape);
 		child.read_attr("opacity", player_preferences->Crosshairs.Opacity);
-
+		
 		for (const InfoTree &color : child.children_named("color"))
 			color.read_color(player_preferences->Crosshairs.Color);
 	}
@@ -4523,13 +4523,13 @@ void parse_input_preferences(InfoTree root, std::string version)
 	root.read_attr("sensitivity", input_preferences->sens_vertical);
 	root.read_attr("sens_horizontal", input_preferences->sens_horizontal);
 	root.read_attr("sens_vertical", input_preferences->sens_vertical);
-
+	
 	if (!version.length() || version < "20181113")
 		input_preferences->classic_vertical_aim = true;
 	else if (version < "20190317")
 		input_preferences->classic_vertical_aim = false;
 	root.read_attr("classic_vertical_aim", input_preferences->classic_vertical_aim);
-
+	
 	if (!root.read_attr("classic_aim_speed_limits", input_preferences->classic_aim_speed_limits))
 	{
 		// Assume users with older prefs with "mouse_max_speed" above its default value don't want classic limits
@@ -4549,7 +4549,7 @@ void parse_input_preferences(InfoTree root, std::string version)
 								  input_preferences->mouse_accel_type,
 								  0, NUMBER_OF_MOUSE_ACCEL_TYPES - 1);
 	root.read_attr("mouse_accel_scale", input_preferences->mouse_accel_scale);
-
+	
 	// old prefs mixed "classic vertical aim" with acceleration type
 	if (version >= "20181113" && version < "20190317")
 	{
@@ -4577,7 +4577,7 @@ void parse_input_preferences(InfoTree root, std::string version)
 
 	// remove default key bindings the first time we see one from these prefs
 	std::set<std::pair<BindingType, int>> seen_key;
-
+	
 	// import old key bindings
 	for (const InfoTree &key : root.children_named("sdl_key"))
 	{
@@ -4616,7 +4616,7 @@ void parse_input_preferences(InfoTree root, std::string version)
 			}
 		}
 	}
-
+	
 	for (const InfoTree &key : root.children_named("binding"))
 	{
 		std::string action_name, pressed_name;
@@ -4630,7 +4630,7 @@ void parse_input_preferences(InfoTree root, std::string version)
 				continue;
 			SDL_Scancode code = code_for_binding_name(pressed_name);
 			key_binding_map* map;
-
+			
 			switch (binding_type)
 			{
 			case BindingType::in_game:
@@ -4735,7 +4735,7 @@ void parse_network_preferences(InfoTree root, std::string version)
 			}
 		}
 	}
-
+	
 	root.read_attr("use_speex_netmic_encoder", network_preferences->use_speex_encoder);
 	root.read_attr("use_netscript", network_preferences->use_netscript);
 	root.read_path("netscript_file", network_preferences->netscript_file);
@@ -4748,7 +4748,7 @@ void parse_network_preferences(InfoTree root, std::string version)
 	root.read_cstr("metaserver_login", network_preferences->metaserver_login, 15);
 	root.read_attr("mute_metaserver_guests", network_preferences->mute_metaserver_guests);
 	root.read_cstr("metaserver_clear_password", network_preferences->metaserver_password, 15);
-
+	
 	char obscured_password[33];
 	if (root.read_cstr("metaserver_password", obscured_password, 32))
 	{
@@ -4760,7 +4760,7 @@ void parse_network_preferences(InfoTree root, std::string version)
 		}
 		network_preferences->metaserver_password[15] = '\0';
 	}
-
+	
 	root.read_attr("join_metaserver_by_default", network_preferences->join_metaserver_by_default);
 	root.read_attr("allow_stats", network_preferences->allow_stats);
 
@@ -4770,7 +4770,7 @@ void parse_network_preferences(InfoTree root, std::string version)
 		if (color.read_indexed("index", index, 2))
 			color.read_color(network_preferences->metaserver_colors[index]);
 	}
-
+	
 	for (const InfoTree &child : root.children_named("star_protocol"))
 		StarGameProtocol::ParsePreferencesTree(child, version);
 	for (const InfoTree &child : root.children_named("ring_protocol"))
@@ -4795,17 +4795,17 @@ void parse_environment_preferences(InfoTree root, std::string version)
 	root.read_attr("use_solo_lua", environment_preferences->use_solo_lua);
 	root.read_attr("use_replay_net_lua", environment_preferences->use_replay_net_lua);
 	root.read_attr("hide_alephone_extensions", environment_preferences->hide_extensions);
-
+	
 	uint32 profile = FILM_PROFILE_DEFAULT + 1;
 	root.read_attr("film_profile", profile);
 	if (profile <= FILM_PROFILE_DEFAULT)
 		environment_preferences->film_profile = static_cast<FilmProfileType>(profile);
-
+	
 	root.read_attr("maximum_quick_saves", environment_preferences->maximum_quick_saves);
 #ifdef HAVE_NFD
 	root.read_attr("use_native_file_dialogs", environment_preferences->use_native_file_dialogs);
 #endif
-
+	
 	for (const InfoTree &plugin : root.children_named("disable_plugin"))
 	{
 		char tempstr[256];
@@ -4820,7 +4820,7 @@ extern const char* GetSDLKeyName(SDL_Scancode);
 
 const char* get_hotkey_binding(int hotkey, int type)
 {
-
+	
 	auto bindings = input_preferences->hotkey_bindings[hotkey - 1];
 	for (auto it = bindings.begin(); it != bindings.end(); ++it)
 	{

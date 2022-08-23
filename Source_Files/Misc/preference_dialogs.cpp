@@ -32,7 +32,7 @@ class TexQualityPref : public Bindable<int>
 {
 public:
 	TexQualityPref (int16& pref, int16 normal) : m_pref (pref), m_normal (normal) {}
-
+	
 	virtual int bind_export ()
 	{
 		int result = 0;
@@ -43,12 +43,12 @@ public:
 		}
 		return result;
 	}
-
+	
 	virtual void bind_import (int value)
 	{
 		m_pref = (value == 0) ? 0 : m_normal << (value - 1);
 	}
-
+	
 protected:
 	int16& m_pref;
 	int16 m_normal;
@@ -58,10 +58,10 @@ class ColourPref : public Bindable<RGBColor>
 {
 public:
 	ColourPref (RGBColor& pref) : m_pref (pref) {}
-
+	
 	virtual RGBColor bind_export () { return m_pref; }
 	virtual void bind_import (RGBColor value) { m_pref = value; }
-
+	
 protected:
 	RGBColor& m_pref;
 };
@@ -75,7 +75,7 @@ public:
 		if (m_pref == 5)
 		{
 			return 3;
-		}
+		} 
 		else if (m_pref == 3)
 		{
 			return 2;
@@ -109,12 +109,12 @@ class TimesTwoPref : public Bindable<int>
 {
 public:
 	TimesTwoPref (int16& pref) : m_pref (pref) {}
-
+	
 	virtual int bind_export ()
 	{
 		return (m_pref / 2);
 	}
-
+	
 	virtual void bind_import (int value)
 	{
 		m_pref = value * 2;
@@ -128,7 +128,7 @@ class AnisotropyPref : public Bindable<int>
 {
 public:
 	AnisotropyPref (float& pref) : m_pref (pref) {}
-
+	
 	virtual int bind_export ()
 	{
 		int result = 0;
@@ -139,7 +139,7 @@ public:
 		}
 		return result;
 	}
-
+	
 	virtual void bind_import (int value)
 	{
 		m_pref = (value == 0) ? 0.0 : 1 << (value - 1);
@@ -185,9 +185,9 @@ void OpenGLDialog::OpenGLPrefsByRunning ()
 {
 	m_cancelWidget->set_callback (std::bind (&OpenGLDialog::Stop, this, false));
 	m_okWidget->set_callback (std::bind (&OpenGLDialog::Stop, this, true));
-
+	
 	BinderSet binders;
-
+	
 	BitPref fogPref (graphics_preferences->OGL_Configure.Flags, OGL_Flag_Fog);
 	binders.insert<bool> (m_fogWidget, &fogPref);
 	BitPref colourEffectsPref (graphics_preferences->OGL_Configure.Flags, OGL_Flag_Fader);
@@ -202,33 +202,33 @@ void OpenGLDialog::OpenGLPrefsByRunning ()
 	binders.insert<bool> (m_bumpWidget, &bumpPref);
 	BitPref perspectivePref (graphics_preferences->OGL_Configure.Flags, OGL_Flag_MimicSW, true);
 	binders.insert<bool> (m_perspectiveWidget, &perspectivePref);
-
+	
 	BitPref colourTheVoidPref (graphics_preferences->OGL_Configure.Flags, OGL_Flag_VoidColor);
 	binders.insert<bool> (m_colourTheVoidWidget, &colourTheVoidPref);
 	ColourPref voidColourPref (graphics_preferences->OGL_Configure.VoidColor);
 	binders.insert<RGBColor> (m_voidColourWidget, &voidColourPref);
-
+	
 	TimesTwoPref fsaaPref (graphics_preferences->OGL_Configure.Multisamples);
 	binders.insert<int> (m_fsaaWidget, &fsaaPref);
-
+	
 	AnisotropyPref anisotropyPref (graphics_preferences->OGL_Configure.AnisotropyLevel);
 	binders.insert<int> (m_anisotropicWidget, &anisotropyPref);
 
 	BoolPref sRGBPref (graphics_preferences->OGL_Configure.Use_sRGB);
 	binders.insert<bool> (m_sRGBWidget, &sRGBPref);
-
+	
 	BoolPref geForceFixPref (graphics_preferences->OGL_Configure.GeForceFix);
 	binders.insert<bool> (m_geForceFixWidget, &geForceFixPref);
-
+	
 	BoolPref useNPOTPref (graphics_preferences->OGL_Configure.Use_NPOT);
 	binders.insert<bool> (m_useNPOTWidget, &useNPOTPref);
-
+	
 	BoolPref vsyncPref (graphics_preferences->OGL_Configure.WaitForVSync);
 	binders.insert<bool> (m_vsyncWidget, &vsyncPref);
 
 	Int16Pref ephemeraQualityPref(graphics_preferences->ephemera_quality);
 	binders.insert<int>(m_ephemeraQualityWidget, &ephemeraQualityPref);
-
+	
 	FarFilterPref wallsFarFilterPref (graphics_preferences->OGL_Configure.TxtrConfigList [OGL_Txtr_Wall].FarFilter);
 	binders.insert<int> (m_wallsFilterWidget, &wallsFarFilterPref);
 	FarFilterPref spritesFarFilterPref (graphics_preferences->OGL_Configure.TxtrConfigList [OGL_Txtr_Inhabitant].FarFilter);
@@ -242,7 +242,7 @@ void OpenGLDialog::OpenGLPrefsByRunning ()
 	binders.insert<int> (m_nearFiltersWidget[2], &spriteNearFilterPref);
 	Int16Pref weaponNearFilterPref (graphics_preferences->OGL_Configure.TxtrConfigList[OGL_Txtr_WeaponsInHand].NearFilter);
 	binders.insert<int> (m_nearFiltersWidget[3], &weaponNearFilterPref);
-
+	
 	TexQualityPref wallQualityPref (graphics_preferences->OGL_Configure.TxtrConfigList [0].MaxSize, 128);
 	binders.insert<int> (m_textureQualityWidget [0], &wallQualityPref);
 	TexQualityPref landscapeQualityPref (graphics_preferences->OGL_Configure.TxtrConfigList [1].MaxSize, 256);
@@ -253,7 +253,7 @@ void OpenGLDialog::OpenGLPrefsByRunning ()
 	binders.insert<int> (m_textureQualityWidget [3], &weaponQualityPref);
 	TexQualityPref modelQualityPref (graphics_preferences->OGL_Configure.ModelConfig.MaxSize, 256);
 	binders.insert<int> (m_modelQualityWidget, &modelQualityPref);
-
+	
 	Int16Pref wallResoPref (graphics_preferences->OGL_Configure.TxtrConfigList [0].Resolution);
 	binders.insert<int> (m_textureResolutionWidget [0], &wallResoPref);
 	Int16Pref landscapeResoPref (graphics_preferences->OGL_Configure.TxtrConfigList [1].Resolution);
@@ -272,12 +272,12 @@ void OpenGLDialog::OpenGLPrefsByRunning ()
 	Int16Pref weaponDepthPref(graphics_preferences->OGL_Configure.TxtrConfigList[3].ColorFormat);
 	binders.insert<int> (m_textureDepthWidget[3], &weaponDepthPref);
 	
-
+	
 	// Set initial values from prefs
 	binders.migrate_all_second_to_first ();
-
+	
 	bool result = Run ();
-
+	
 	if (result) {
 		// migrate prefs and save
 		binders.migrate_all_first_to_second ();
@@ -306,7 +306,7 @@ public:
 	w_aniso_slider(int num_items, int sel) : w_slider(num_items, sel) {
 		init_formatted_value();
 	}
-
+	
 	virtual std::string formatted_value(void) {
 		std::ostringstream ss;
 		ss << ((selection == 0) ? 0 : 1 << (selection - 1));
@@ -325,7 +325,7 @@ public:
 		//		placer->dual_add(new w_title("OPENGL OPTIONS"), m_dialog);
 		placer->dual_add(new w_title("OpenGLのオプション"), m_dialog);
 		placer->add(new w_spacer(), true);
-
+		
 		// horizontal_placer *tabs_placer = new horizontal_placer;
 		// w_button *w_general_tab = new w_button("GENERAL");
 		// w_general_tab->set_callback(choose_generic_tab, static_cast<void *>(this));
@@ -344,12 +344,12 @@ public:
 		labels.push_back("拡張");
 		w_tab *tabs = new w_tab(labels, m_tabs);
 		placer->dual_add(tabs, m_dialog);
-
+		
 		placer->add(new w_spacer(), true);
 
 		table_placer *general_table = new table_placer(2, get_theme_space(ITEM_WIDGET), true);
 		general_table->col_flags(0, placeable::kAlignRight);
-
+		
 		w_toggle *fog_w = new w_toggle(false);
 		//		general_table->dual_add(fog_w->label("Fog"), m_dialog);
 		general_table->dual_add(fog_w->label("フォグ"), m_dialog);
@@ -507,7 +507,7 @@ public:
 			else
 				far_filter_wa[i] = NULL;
 		}
-
+		
 		w_label* near_filter_labels[OGL_NUMBER_OF_TEXTURE_TYPES];
 		//		near_filter_labels[OGL_Txtr_Wall] = new w_label("Walls");
 		//		near_filter_labels[OGL_Txtr_Inhabitant] = new w_label("Sprites");
@@ -519,11 +519,11 @@ public:
 		near_filter_labels[OGL_Txtr_WeaponsInHand] = new w_label("手中の武器／HUD");
 
 		table_placer *ftable = new table_placer(3, get_theme_space(ITEM_WIDGET));
-
+		
 		ftable->col_flags(0, placeable::kAlignRight);
 		ftable->col_flags(1, placeable::kAlignLeft);
 		ftable->col_flags(2, placeable::kAlignLeft);
-
+		
 		ftable->add(new w_spacer(), true);
 		//		ftable->dual_add(new w_label("Near"), m_dialog);
 		//		ftable->dual_add(new w_label("Distant"), m_dialog);
@@ -544,16 +544,16 @@ public:
 			else
 				ftable->add(new w_spacer(), true);
 		}
-
+		
 		ftable->col_min_width(1, (ftable->col_width(0) - get_theme_space(ITEM_WIDGET)) / 2);
 		ftable->col_min_width(2, (ftable->col_width(0) - get_theme_space(ITEM_WIDGET)) / 2);
-
+		
 		advanced_placer->add(ftable, true);
 
 		advanced_placer->add(new w_spacer(), true);
 		w_select_popup *texture_resolution_wa[OGL_NUMBER_OF_TEXTURE_TYPES];
 		w_select_popup *texture_depth_wa[OGL_NUMBER_OF_TEXTURE_TYPES];
-		for (int i = 0; i < OGL_NUMBER_OF_TEXTURE_TYPES; i++)
+		for (int i = 0; i < OGL_NUMBER_OF_TEXTURE_TYPES; i++) 
 		{
 			texture_resolution_wa[i] = new w_select_popup();
 			texture_depth_wa[i] = new w_select_popup();
@@ -621,7 +621,7 @@ public:
 		m_tabs->add(general_table, true);
 		m_tabs->add(advanced_placer, true);
 		placer->add(m_tabs, false);
-
+	
 		placer->add(new w_spacer(), true);
 
 		horizontal_placer *button_placer = new horizontal_placer;
@@ -638,7 +638,7 @@ public:
 
 		m_cancelWidget = new ButtonWidget (cancel_w);
 		m_okWidget = new ButtonWidget (ok_w);
-
+		
 		m_fogWidget = new ToggleWidget (fog_w);
 		m_colourEffectsWidget = new ToggleWidget (fader_w);
 		m_transparentLiquidsWidget = new ToggleWidget (liq_w);
@@ -661,7 +661,7 @@ public:
 		m_geForceFixWidget = new ToggleWidget (geforce_fix_w);
 		m_useNPOTWidget = new ToggleWidget (use_npot_w);
 		m_vsyncWidget = new ToggleWidget (vsync_w);
-
+		
 		m_wallsFilterWidget = new SelectSelectorWidget (far_filter_wa[OGL_Txtr_Wall]);
 		m_spritesFilterWidget = new SelectSelectorWidget (far_filter_wa[OGL_Txtr_Inhabitant]);
 
@@ -679,7 +679,7 @@ public:
 	}
 
 	virtual bool Run ()
-	{
+	{	
 		return (m_dialog.run () == 0);
 	}
 
@@ -697,7 +697,7 @@ private:
 		BASIC_TAB,
 		ADVANCED_TAB
 	};
-
+	
 	tab_placer* m_tabs;
 	dialog m_dialog;
 };

@@ -34,7 +34,7 @@
 #include "platforms.h"
 #include "player.h"
 #include "render.h"
-#include "converter.h"
+
 #include <string.h>
 #include <stdlib.h>
 #include <limits.h>
@@ -57,6 +57,7 @@ enum /* render flags */
 // Changed to link properly with code in pathfinding.c
 extern world_point2d *path_peek(short path_index, short *step_count);
 extern short GetNumberOfPaths();
+
 
 // Main rendering routine
 

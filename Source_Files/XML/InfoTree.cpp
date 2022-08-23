@@ -177,6 +177,7 @@ void InfoTree::put_attr_path(std::string key, std::string filepath)
 	contract_symbolic_paths(tempstr, filepath.c_str(), 255);
 	put_attr(key, tempstr);
 }
+
 bool InfoTree::read_cstr(std::string key, char *dest, int maxlen) const
 {
 	std::string str;
