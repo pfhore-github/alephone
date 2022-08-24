@@ -2136,7 +2136,7 @@ static void calculate_bounds_for_object(
 
 #define MAXIMUM_GROUPS_PER_TERMINAL 15
 
-static void calculate_maximum_lines_for_groups(struct terminal_groupings *groups, 
+static void calculate_maximum_lines_for_groups(terminal_text_t* terminal_text, struct terminal_groupings *groups, 
 	short group_count, char *text_base);
 
 class MarathonTerminalCompiler
