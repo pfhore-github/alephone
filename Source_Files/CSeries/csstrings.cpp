@@ -47,7 +47,7 @@
 
 #include <map>
 #include <boost/algorithm/string/replace.hpp>
-
+#include "SDL2/SDL_ttf.h"
 #ifdef __WIN32__
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
@@ -510,55 +510,16 @@ std::vector<std::string> line_wrap(TTF_Font* t, const std::string& str,
 	int size) {
 
 	std::vector<std::string> blks;
-	std::string now;
-	bool in_space = false;
-	for (utf8_iter it(str); !it.end(); ++it) {
-		char32_t c = it.code();
-		std::string s = it.utf8();
-		if (c >= 0x3040 && c <= 0x9fef ||
-			c >= 0x20000 && c <= 0x2ebe0) {
-			blks.push_back(now);
-			blks.push_back(s);
-			now.clear();
-		}
-		else if (isspace(c)) {
-			in_space = true;
-			now += s;
-		}
-		else {
-			if (in_space) {
-				blks.push_back(now);
-				now = s;
-				in_space = false;
-			}
-			else {
-				now += s;
-			}
-		}
+	std::string left = str;
+	while (!left.empty()) {
+		int extent;
+		int count;
+		TTF_MeasureUTF8(t, left.c_str(), size, &extent, &count);
+		blks.push_back(left.substr(0, count));
+		left = left.substr(count);
 	}
-	if (!now.empty()) {
-		blks.push_back(now);
-	}
-	std::vector<std::string> ret;
-	now.clear();
-	int w = 0;
-	for (const auto& blk : blks) {
-		int w2;
-		TTF_SizeUTF8(t, blk.c_str(), &w2, nullptr);
-		if (w + w2 < size) {
-			now += blk;
-			w += w2;
-		}
-		else {
-			ret.push_back(now);
-			now = blk;
-			w = w2;
-		}
-	}
-	if (!now.empty()) {
-		ret.push_back(now);
-	}
-	return ret;
+	
+	return blks;
 
 }
 

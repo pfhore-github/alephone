@@ -1393,15 +1393,15 @@ void TextureManager::PlaceTexture(const ImageDescriptor *Image, bool normal_map)
 		else
 		{
 #if defined(GL_ARB_texture_mirrored_repeat)
-			if (useMirroredRepeat)
+//			if (useMirroredRepeat)
 			{
-				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT_ARB);
+				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
 			}
-			else
+//			else
 #endif
-			{
-				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);			
-			}	
+//			{
+//				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);			
+//			}	
 		}
 		break;
 		
