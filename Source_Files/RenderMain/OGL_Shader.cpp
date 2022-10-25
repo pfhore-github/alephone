@@ -67,6 +67,7 @@ const char* Shader::_uniform_names[NUMBER_OF_UNIFORM_LOCATIONS] =
 	"pass",
 	"usefog",
 	"visibility",
+    "transferFadeOut",
 	"depth",
 	"strictDepthMode",
 	"glow",
@@ -632,6 +633,7 @@ void initDefaultPrograms() {
         "uniform float logicalHeight;\n"
         "uniform float pixelWidth;\n"
         "uniform float pixelHeight;\n"
+        "uniform float transferFadeOut;\n"
         "varying vec3 viewDir;\n"
         "varying vec4 vertexColor;\n"
         "varying float FDxLOG2E;\n"
@@ -660,6 +662,9 @@ void initDefaultPrograms() {
         "   float sb = rand(entropy*sg); \n"
         "   vec3 intensity = vec3(sr, sg, sb); \n"
         "   vec4 color = texture2D(texture0, gl_TexCoord[0].xy);\n"
+        "   float dropFactor = max(max(intensity.r, intensity.g), intensity.b);\n"
+        "   dropFactor = dropFactor*dropFactor*dropFactor;"
+        "   if( dropFactor < transferFadeOut ) {color.a = 0.0;} \n"
         "#ifdef GAMMA_CORRECTED_BLENDING\n"
         "   intensity = intensity * intensity;  // approximation of pow(intensity, 2.2)\n"
         "#endif\n"
@@ -670,6 +675,7 @@ void initDefaultPrograms() {
     defaultFragmentPrograms["invincible_bloom"] = ""
         "uniform sampler2D texture0;\n"
         "uniform float time;\n"
+        "uniform float transferFadeOut;\n"
         "varying vec3 viewDir;\n"
         "varying vec4 vertexColor;\n"
         "varying float FDxLOG2E;\n"
@@ -701,6 +707,9 @@ void initDefaultPrograms() {
         "   if (rand(entropy*sr*sg*sb) > darkBlockProbability) {\n"
         "      intensity = vec3(sr*sr, sg*sg, sb); }\n"
         "   vec4 color = texture2D(texture0, gl_TexCoord[0].xy);\n"
+        "   float dropFactor = max(max(intensity.r, intensity.g), intensity.b);\n"
+        "   dropFactor = dropFactor*dropFactor;"
+        "   if( dropFactor < transferFadeOut ) {color.a = 0.0;} \n"
         "#ifdef GAMMA_CORRECTED_BLENDING\n"
         "   intensity = intensity * intensity;  // approximation of pow(intensity, 2.2)\n"
         "#endif\n"
