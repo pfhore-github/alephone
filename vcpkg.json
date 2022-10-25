@@ -74,5 +74,5 @@
    "overrides": [
         { "name": "sdl2-ttf", "version": "2.20.0" }
     ],
-  "builtin-baseline": "9eb76edabf4b1cb1abfb67823d900daf8112da0f"
+  "builtin-baseline": "6ca56aeb457f033d344a7106cb3f9f1abf8f4e98"
 }
