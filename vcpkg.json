@@ -1,78 +1,75 @@
 {
-  "name": "alephone",
-  "version-date": "2022-01-15",
-  "dependencies": [
-    {
-      "name": "boost-algorithm"
-    },
-    {
-      "name": "boost-uuid"
-    },
-    {
-      "name": "boost-property-tree"
-    },
-    {
-      "name": "boost-iostreams"
-    },
-    {
-      "name": "boost-filesystem"
-    },
-    {
-      "name": "sdl2"
-    },
-    {
-      "name": "sdl2-image",
-      "features": [
-        "libjpeg-turbo"
-      ]
-    },
-    {
-      "name": "sdl2-net"
-    },
-    {
-      "name": "sdl2-ttf",
-       "version>=": "2.20.0"
-    },
-    {
-      "name": "curl",
-      "platform": "windows"
-    },
-    {
-      "name": "glew",
-      "platform": "windows"
-    },
-    {
-      "name": "speex"
-    },
-    {
-      "name": "speexdsp"
-    },
-    {
-      "name": "zziplib"
-    },
-    {
-      "name": "ffmpeg",
-      "features": [
-        "vorbis",
-        "vpx"
-      ]
-    },
-    {
-      "name": "miniupnpc"
-    },
-    {
-      "name": "nativefiledialog"
-    },
-    {
-      "name": "libiconv"
-    },
-    {
-      "name": "libsndfile",
-      "default-features": false
-    }
-  ],
-   "overrides": [
-        { "name": "sdl2-ttf", "version": "2.20.0" }
-    ],
-  "builtin-baseline": "6ca56aeb457f033d344a7106cb3f9f1abf8f4e98"
+   "name":"alephone",
+   "version-date":"2022-01-15",
+   "dependencies":[
+      {
+         "name":"boost-algorithm"
+      },
+      {
+         "name":"boost-uuid"
+      },
+      {
+         "name":"boost-property-tree"
+      },
+      {
+         "name":"boost-iostreams"
+      },
+      {
+         "name":"boost-filesystem"
+      },
+      {
+         "name":"sdl2"
+      },
+      {
+         "name":"sdl2-image",
+         "features":[
+            "libjpeg-turbo"
+         ]
+      },
+      {
+         "name":"sdl2-net"
+      },
+      {
+         "name":"sdl2-ttf",
+         "version>=": "2.20.0"
+      },
+      {
+         "name":"curl",
+         "platform":"windows"
+      },
+      {
+         "name":"glew",
+         "platform":"windows"
+      },
+      {
+         "name":"speex"
+      },
+      {
+         "name":"speexdsp"
+      },
+      {
+         "name":"zziplib"
+      },
+      {
+         "name":"ffmpeg",
+         "features":[
+            "vorbis",
+            "vpx"
+         ]
+      },
+      {
+         "name":"miniupnpc"
+      },
+      {
+         "name":"nativefiledialog"
+      },
+      {
+        "name": "libiconv"
+      },
+	  {
+	      "name":"libsndfile",
+		  "default-features": false
+	  }
+   ],
+   "builtin-baseline":"6ca56aeb457f033d344a7106cb3f9f1abf8f4e98"
 }
