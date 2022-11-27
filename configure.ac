@@ -4,7 +4,7 @@ dnl Written by Christian Bauer and the Aleph One developers.
 AC_INIT([Aleph One],m4_esyscmd([grep '^#define A1_DATE_VERSION' Source_Files/Misc/alephversion.h | sed -e 's/\(.*\"\)\(.*\)\(\"\)/\2/g' | tr -d '\n']),[https://github.com/Aleph-One-Marathon/alephone/issues],[AlephOne],[https://alephone.lhowon.org/])
 AC_CONFIG_SRCDIR([Source_Files/shell.cpp])
 AC_CONFIG_MACRO_DIR([m4])
-AC_PREREQ([2.71])
+AC_PREREQ([2.69])
 
 dnl Detect the canonical host and target build environment.
 AC_CANONICAL_HOST
@@ -79,9 +79,9 @@ dnl Check for headers.
 AC_CHECK_HEADERS([unistd.h pwd.h])
 
 dnl Check for boost functions and libraries.
-AX_BOOST_BASE([1.53.0],
+AX_BOOST_BASE([1.65.0],
               ,
-              [AC_MSG_ERROR([You need Boost 1.53.0 or higher to build Aleph One.])])
+              [AC_MSG_ERROR([You need Boost 1.65.0 or higher to build Aleph One.])])
 AX_BOOST_SYSTEM
 AS_IF([ test "x$BOOST_SYSTEM_LIB" != "x" ],
       [ LIBS="$BOOST_SYSTEM_LIB $LIBS" ],
