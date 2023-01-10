@@ -1540,6 +1540,8 @@ static void draw_terminal_borders(
 		_draw_screen_text(temporary, (screen_rectangle *) &border, _center_vertical, _computer_interface_font, _computer_border_text_color);
 		get_date_string(temporary, current_group->flags);
 		_draw_screen_text(temporary, (screen_rectangle *) &border, _right_justified | _center_vertical, 
+
+		_draw_screen_text(temporary, (screen_rectangle*)&border, _right_justified | _center_vertical,
 			_computer_interface_font, _computer_border_text_color);
 	
 		/* Draw the the bottom rectangle & text */
@@ -1852,7 +1854,12 @@ static void get_date_string(
 	game_time.tm_isdst= 0;
 
 	getcstr(temp_string, strCOMPUTER_LABELS, _date_format);
-	strftime(date_string, 100, temp_string, &game_time);
+	if (strchr(temp_string, '%')) {
+		strftime(date_string, 100, temp_string, &game_time);
+	}
+	else {
+		strncpy(date_string, temp_string, 100);
+	}
 }
 
 static void present_checkpoint_text(

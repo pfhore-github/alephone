@@ -37,7 +37,7 @@ Dec 17, 2000 (Loren Petrich):
 #include "shape_descriptors.h"
 #include "shell.h"
 #include "FontHandler.h"
-
+#include "converter.h"
 
 /* ---------- constants */
 
@@ -293,7 +293,8 @@ private:
 		if (!(color>=0&&color<NUMBER_OF_ANNOTATION_DEFINITIONS)) return;
 		if (!(scale>=OVERHEAD_MAP_MINIMUM_SCALE&&scale<=OVERHEAD_MAP_MAXIMUM_SCALE)) return;
 		annotation_definition& NoteDef = ConfigPtr->annotation_definitions[color];
-		draw_text(*location,NoteDef.color, text,
+		std::string tmpTxt = macroman2utf8(text);
+		draw_text(*location,NoteDef.color, const_cast<char*>(tmpTxt.c_str()),
 			NoteDef.Fonts[scale-OVERHEAD_MAP_MINIMUM_SCALE],_justify_left);
 	}
 	void draw_map_name(

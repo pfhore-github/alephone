@@ -1,3 +1,5 @@
+#ifndef CONVERTER_H_
+#define CONVERTER_H_ 1
 /*
  *  converter.h
  *
@@ -87,4 +89,4 @@ inline bool isJChar(unsigned char text) {
 }
 
 bool isJChar(unsigned char text);
-bool is2ndJChar(unsigned char text);
+#endif
