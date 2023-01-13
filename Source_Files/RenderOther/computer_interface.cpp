@@ -496,7 +496,7 @@ static bool calculate_line(terminal_text_t *terminal_text,
 			struct text_face_data *face_data = get_font_changes_for_index(terminal_text, index);
 			if (face_data)
 			{
-				style = get_face(face_data);
+				style = get_face(face_data ) & ~styleItalic;
 			}
 			TTF_Font *font = ((ttf_font_info *)terminal_font)->m_styles[style];
 			TTF_SizeUTF8(font, next, &advance, NULL);
@@ -1539,7 +1539,6 @@ static void draw_terminal_borders(
 		getcstr(temporary, strCOMPUTER_LABELS, top_message);
 		_draw_screen_text(temporary, (screen_rectangle *) &border, _center_vertical, _computer_interface_font, _computer_border_text_color);
 		get_date_string(temporary, current_group->flags);
-		_draw_screen_text(temporary, (screen_rectangle *) &border, _right_justified | _center_vertical, 
 
 		_draw_screen_text(temporary, (screen_rectangle*)&border, _right_justified | _center_vertical,
 			_computer_interface_font, _computer_border_text_color);
