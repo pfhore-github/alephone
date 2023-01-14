@@ -463,10 +463,36 @@ std::string sjis2utf8(const char* str, size_t len) {
 		*/
 		if (iconv(sjis2utf8, &p, &inbufLeft, &outputBufp, &outbufLeft) == size_t(-1))
 		{
-			// Error when convert shift-jis to UTF-8, so try macroman to UTF-8(only one letter)
-			size_t left = 1;
-			iconv(roman2utf8, &p, &left, &outputBufp, &outbufLeft);
-			--inbufLeft;
+			if ((uint8_t)*p == 0xfd) {
+				p+= 2;
+				*outputBufp++ = *p++;
+				*outputBufp++ = *p++;
+				inbufLeft -= 4;
+				outbufLeft -= 2;
+			}
+			else if ((uint8_t)*p == 0xfe) {
+				p+= 2;
+				*outputBufp++ = *p++;
+				*outputBufp++ = *p++;
+				*outputBufp++ = *p++;
+				inbufLeft -= 5;
+				outbufLeft -= 3;
+			}
+			else if ((uint8_t)*p == 0xff) {
+				p += 2;
+				*outputBufp++ = *p++;
+				*outputBufp++ = *p++;
+				*outputBufp++ = *p++;
+				*outputBufp++ = *p++;
+				inbufLeft -= 6;
+				outbufLeft -= 4;
+			}
+			else {
+				// Error when convert shift-jis to UTF-8, so try macroman to UTF-8(only one letter)
+				size_t left = 1;
+				iconv(roman2utf8, &p, &left, &outputBufp, &outbufLeft);
+				--inbufLeft;
+			}
 		}
 	}
 	output = &outputBuf[0];
@@ -480,7 +506,27 @@ void sjisChar(const char* in, int* step, char* dst) {
 	size_t len;
 	if (*in == 13) { if (step) *step += 1; *dst = 13; return; }
 	if (step) {
-		if (isJChar(*in)) {
+		if ((uint8_t)*in == 0xfd) {
+			*step += 4;
+			dst[0] = in[2];
+			dst[1] = in[3];
+			return;
+		}
+		else if ((uint8_t)*in == 0xfe) {
+			*step += 5;
+			dst[0] = in[2];
+			dst[1] = in[3];
+			dst[2] = in[4];
+			return;
+		}
+		else if ((uint8_t)*in == 0xff) {
+			*step += 6;
+			dst[0] = in[2];
+			dst[1] = in[3];
+			dst[2] = in[4];
+			dst[3] = in[5];
+			return;
+		} else if (isJChar(*in)) {
 			*step += 2;
 			len = 2;
 		}

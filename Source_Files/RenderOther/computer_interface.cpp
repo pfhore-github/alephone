@@ -475,7 +475,16 @@ static struct text_face_data *get_font_changes_for_index(
 	return face_data;
 }
 
+#include <unordered_set>
 #include "converter.h"
+
+static std::unordered_set<std::string> forbidden_jp = {
+	"、", "。", "）", "》", "」", "』", "】", "？", "！"
+};
+struct index_map {
+	std::string text;
+	int index;
+};
 static bool calculate_line(terminal_text_t *terminal_text,
 						   char *base_text, short width, short start_index, short text_end_index, short *end_index)
 {
@@ -485,14 +494,19 @@ static bool calculate_line(terminal_text_t *terminal_text,
 		int index = start_index, running_width = 0;
 		// terminal_font no longer a global, since it may change
 		font_info *terminal_font = GetInterfaceFont(_computer_interface_font);
+		std::vector<index_map> index_tbl;
 		std::string tmp;
 		tmp.reserve(text_end_index - index);
 		while (running_width < width && base_text[index] && base_text[index] != MAC_LINE_END)
 		{
 			uint16 style = current_style;
 			int advance;
-			char next[4] = {0};
+			char next[8] = {0};
+			int ix = index;
 			sjisChar(base_text + index, &index, next);
+			index_map im{ next, ix };
+			index_tbl.push_back(im);
+
 			struct text_face_data *face_data = get_font_changes_for_index(terminal_text, index);
 			if (face_data)
 			{
@@ -511,46 +525,56 @@ static bool calculate_line(terminal_text_t *terminal_text,
 		{
 			if (film_profile.better_terminal_word_wrap)
 			{
-				int break_point = index - 1;
-				while (break_point > start_index)
+				index_map break_point = index_tbl.back();
+				index_tbl.pop_back();
+				while (break_point.index > start_index)
 				{
-					if (base_text[break_point] == ' ')
+					if (break_point.text == " ")
 					{
-						index = break_point + 1; // eat the space
+						index = break_point.index + 1; // eat the space
 						break;
 					}
-					else if (isJChar(base_text[break_point - 2]))
+					else if (break_point.text.size() == 3)
 					{
-						--break_point;
+						if (!forbidden_jp.count(break_point.text)) {
+							index = break_point.index;
+							break;
+						}
+					}
+					else if (break_point.index > start_index + 1 &&
+							 can_break_after(index_tbl.back().text[0]))
+					{
+						index = break_point.index;
 						break;
 					}
-					else if (break_point > start_index + 1 &&
-							 can_break_after(base_text[break_point - 1]))
-					{
-						index = break_point;
-						break;
-					}
-
-					--break_point;
+					break_point = index_tbl.back();
+					index_tbl.pop_back();
 				}
 			}
 			else
 			{
-				int break_point = index;
-
-				while (break_point>start_index) {
-					if (base_text[break_point] == ' ')
-						break; 	// Non printing
-					if (isJChar(base_text[break_point - 2]))
+				index_map break_point = index_tbl.back();
+				index_tbl.pop_back();
+				while (break_point.index > start_index)
+				{
+					if (break_point.text == " ")
 					{
-						break_point--;
+						index = break_point.index + 1; // eat the space
 						break;
 					}
-					break_point--; // this needs to be in front of the test
+					else if (break_point.text.size() == 3)
+					{
+						if (!forbidden_jp.count(break_point.text)) {
+							break;
+						}
+					}
+					index_tbl.pop_back();
+					break_point = index_tbl.back();
 				}
 
-				if (break_point != start_index)
-					index = break_point+1;	// Space at the end of the line
+
+				if (break_point.index != start_index)
+					index = break_point.index +1;	// Space at the end of the line
 			}
 		}
 

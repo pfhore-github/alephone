@@ -38,7 +38,7 @@ class utf8_iter {
 	size_t i;
 public:
 	utf8_iter(const std::string& s) :s(s) ,i(0) {}
-	int offset() const { return i; }
+	size_t offset() const { return i; }
 	std::string utf8() {
 		return s.substr(i, utf8_len(&s[i]));
 	}
