@@ -8,8 +8,6 @@ Makefile.in
 GNUmakefile
 lib*.a
 *.o
-.vs/
-Source_File/.vs/
 /aclocal.m4
 /AlephOne.spec
 /autom4te.cache
@@ -27,12 +25,8 @@ Source_File/.vs/
 /missing
 /stamp-h1
 /Source_Files/CSeries/confpaths.h
-/Source_Files/*/x64/
-/Source_Files/x64/
-/Source_Files/vcpkg_installed_64/*
 /Source_Files/alephone
 /Source_Files/*.exe
 /*.zip
 /*.tar.bz2
-*.obj
 .vscode/
