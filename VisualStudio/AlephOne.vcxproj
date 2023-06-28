@@ -194,7 +194,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
-      <PreprocessorDefinitions>HAVE_SNDFILE;HAVE_NFD;HAVE_MINIUPNPC;MINIUPNP_STATICLIB;CURL_STATICLIB;SPEEX;HAVE_SDL_IMAGE;HAVE_CURL;HAVE_LUA;HAVE_PNG;HAVE_ZZIP;HAVE_FFMPEG;HAVE_OPENGL;SDL;WIN32;__WIN32__;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>HAVE_NFD;HAVE_MINIUPNPC;MINIUPNP_STATICLIB;CURL_STATICLIB;HAVE_SDL_IMAGE;HAVE_CURL;HAVE_LUA;HAVE_PNG;HAVE_ZZIP;HAVE_FFMPEG;HAVE_OPENGL;SDL;WIN32;__WIN32__;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
@@ -207,13 +207,13 @@
       <TargetMachine>MachineX86</TargetMachine>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
-      <AdditionalDependencies>SDL2maind.lib;dwmapi.lib;ws2_32.lib;Strmiids.lib;mfuuid.lib;mfplat.lib;imm32.lib;Setupapi.lib;Iphlpapi.lib;Version.lib;winmm.lib;wldap32.lib;crypt32.lib;Secur32.lib;dsound.lib;opengl32.lib;glu32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>SDL2maind.lib;shlwapi.lib;dwmapi.lib;ws2_32.lib;Strmiids.lib;mfuuid.lib;mfplat.lib;imm32.lib;Setupapi.lib;Iphlpapi.lib;Version.lib;winmm.lib;crypt32.lib;Secur32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <IgnoreSpecificDefaultLibraries>libcmt.lib</IgnoreSpecificDefaultLibraries>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
-      <PreprocessorDefinitions>HAVE_SNDFILE;HAVE_NFD;HAVE_MINIUPNPC;MINIUPNP_STATICLIB;CURL_STATICLIB;SPEEX;HAVE_SDL_IMAGE;HAVE_CURL;HAVE_LUA;HAVE_PNG;HAVE_ZZIP;HAVE_FFMPEG;HAVE_OPENGL;SDL;WIN32;__WIN32__;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>HAVE_NFD;HAVE_MINIUPNPC;MINIUPNP_STATICLIB;CURL_STATICLIB;HAVE_SDL_IMAGE;HAVE_CURL;HAVE_LUA;HAVE_PNG;HAVE_ZZIP;HAVE_FFMPEG;HAVE_OPENGL;SDL;WIN32;__WIN32__;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
@@ -229,14 +229,14 @@
       <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>SDL2main.lib;dwmapi.lib;ws2_32.lib;Strmiids.lib;mfuuid.lib;mfplat.lib;imm32.lib;Setupapi.lib;Iphlpapi.lib;Version.lib;winmm.lib;wldap32.lib;crypt32.lib;Secur32.lib;dsound.lib;opengl32.lib;glu32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>SDL2main.lib;shlwapi.lib;dwmapi.lib;ws2_32.lib;Strmiids.lib;mfuuid.lib;mfplat.lib;imm32.lib;Setupapi.lib;Iphlpapi.lib;Version.lib;winmm.lib;crypt32.lib;Secur32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <IgnoreSpecificDefaultLibraries>libcmtd.lib</IgnoreSpecificDefaultLibraries>
       <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Marathon Infinity|Win32'">
     <ClCompile>
-      <PreprocessorDefinitions>HAVE_SNDFILE;HAVE_NFD;HAVE_MINIUPNPC;MINIUPNP_STATICLIB;CURL_STATICLIB;SPEEX;HAVE_SDL_IMAGE;HAVE_CURL;HAVE_LUA;HAVE_PNG;HAVE_ZZIP;HAVE_FFMPEG;HAVE_OPENGL;SDL;WIN32;__WIN32__;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>HAVE_NFD;HAVE_MINIUPNPC;MINIUPNP_STATICLIB;CURL_STATICLIB;HAVE_SDL_IMAGE;HAVE_CURL;HAVE_LUA;HAVE_PNG;HAVE_ZZIP;HAVE_FFMPEG;HAVE_OPENGL;SDL;WIN32;__WIN32__;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
@@ -251,14 +251,14 @@
       <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>SDL2main.lib;dwmapi.lib;ws2_32.lib;Strmiids.lib;mfuuid.lib;mfplat.lib;imm32.lib;Setupapi.lib;Iphlpapi.lib;Version.lib;winmm.lib;wldap32.lib;crypt32.lib;Secur32.lib;dsound.lib;opengl32.lib;glu32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>SDL2main.lib;shlwapi.lib;dwmapi.lib;ws2_32.lib;Strmiids.lib;mfuuid.lib;mfplat.lib;imm32.lib;Setupapi.lib;Iphlpapi.lib;Version.lib;winmm.lib;crypt32.lib;Secur32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <IgnoreSpecificDefaultLibraries>libcmtd.lib</IgnoreSpecificDefaultLibraries>
       <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Marathon 2|Win32'">
     <ClCompile>
-      <PreprocessorDefinitions>HAVE_SNDFILE;HAVE_NFD;HAVE_MINIUPNPC;MINIUPNP_STATICLIB;CURL_STATICLIB;SPEEX;HAVE_SDL_IMAGE;HAVE_CURL;HAVE_LUA;HAVE_PNG;HAVE_ZZIP;HAVE_FFMPEG;HAVE_OPENGL;SDL;WIN32;__WIN32__;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>HAVE_NFD;HAVE_MINIUPNPC;MINIUPNP_STATICLIB;CURL_STATICLIB;HAVE_SDL_IMAGE;HAVE_CURL;HAVE_LUA;HAVE_PNG;HAVE_ZZIP;HAVE_FFMPEG;HAVE_OPENGL;SDL;WIN32;__WIN32__;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
@@ -273,14 +273,14 @@
       <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>SDL2main.lib;dwmapi.lib;ws2_32.lib;Strmiids.lib;mfuuid.lib;mfplat.lib;imm32.lib;Setupapi.lib;Iphlpapi.lib;Version.lib;winmm.lib;wldap32.lib;crypt32.lib;Secur32.lib;dsound.lib;opengl32.lib;glu32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>SDL2main.lib;shlwapi.lib;dwmapi.lib;ws2_32.lib;Strmiids.lib;mfuuid.lib;mfplat.lib;imm32.lib;Setupapi.lib;Iphlpapi.lib;Version.lib;winmm.lib;crypt32.lib;Secur32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <IgnoreSpecificDefaultLibraries>libcmtd.lib</IgnoreSpecificDefaultLibraries>
       <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Marathon|Win32'">
     <ClCompile>
-      <PreprocessorDefinitions>HAVE_SNDFILE;HAVE_NFD;HAVE_MINIUPNPC;MINIUPNP_STATICLIB;CURL_STATICLIB;SPEEX;HAVE_SDL_IMAGE;HAVE_CURL;HAVE_LUA;HAVE_PNG;HAVE_ZZIP;HAVE_FFMPEG;HAVE_OPENGL;SDL;WIN32;__WIN32__;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>HAVE_NFD;HAVE_MINIUPNPC;MINIUPNP_STATICLIB;CURL_STATICLIB;HAVE_SDL_IMAGE;HAVE_CURL;HAVE_LUA;HAVE_PNG;HAVE_ZZIP;HAVE_FFMPEG;HAVE_OPENGL;SDL;WIN32;__WIN32__;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
@@ -295,7 +295,7 @@
       <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>SDL2main.lib;dwmapi.lib;ws2_32.lib;Strmiids.lib;mfuuid.lib;mfplat.lib;imm32.lib;Setupapi.lib;Iphlpapi.lib;Version.lib;winmm.lib;wldap32.lib;crypt32.lib;Secur32.lib;dsound.lib;opengl32.lib;glu32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>SDL2main.lib;shlwapi.lib;dwmapi.lib;ws2_32.lib;Strmiids.lib;mfuuid.lib;mfplat.lib;imm32.lib;Setupapi.lib;Iphlpapi.lib;Version.lib;winmm.lib;crypt32.lib;Secur32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <IgnoreSpecificDefaultLibraries>libcmtd.lib</IgnoreSpecificDefaultLibraries>
       <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
     </Link>
@@ -303,7 +303,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <AdditionalIncludeDirectories>$(ProjectDir)..\Source_Files\;$(ProjectDir)..\Source_Files\XML;$(ProjectDir)..\Source_Files\TCPMess;$(ProjectDir)..\Source_Files\Sound;$(ProjectDir)..\Source_Files\RenderOther;$(ProjectDir)..\Source_Files\RenderMain;$(ProjectDir)..\Source_Files\Network\Metaserver;$(ProjectDir)..\Source_Files\Network;$(ProjectDir)..\Source_Files\ModelView;$(ProjectDir)..\Source_Files\Misc;$(ProjectDir)..\Source_Files\Lua;$(ProjectDir)..\Source_Files\Input;$(ProjectDir)..\Source_Files\GameWorld;$(ProjectDir)..\Source_Files\Files;$(ProjectDir)..\Source_Files\FFmpeg;$(ProjectDir)..\Source_Files\CSeries;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>HAVE_SNDFILE;HAVE_NFD;HAVE_MINIUPNPC;MINIUPNP_STATICLIB;CURL_STATICLIB;SPEEX;HAVE_SDL_IMAGE;HAVE_CURL;HAVE_LUA;HAVE_PNG;HAVE_ZZIP;HAVE_FFMPEG;HAVE_OPENGL;SDL;WIN32;WIN64;__WIN32__;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>HAVE_NFD;HAVE_MINIUPNPC;MINIUPNP_STATICLIB;CURL_STATICLIB;HAVE_SDL_IMAGE;HAVE_CURL;HAVE_LUA;HAVE_PNG;HAVE_ZZIP;HAVE_FFMPEG;HAVE_OPENGL;SDL;WIN32;WIN64;__WIN32__;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
@@ -311,14 +311,14 @@
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>SDL2maind.lib;dwmapi.lib;ws2_32.lib;Strmiids.lib;mfuuid.lib;mfplat.lib;imm32.lib;Setupapi.lib;Iphlpapi.lib;Version.lib;winmm.lib;wldap32.lib;crypt32.lib;Secur32.lib;dsound.lib;opengl32.lib;glu32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>SDL2maind.lib;shlwapi.lib;dwmapi.lib;ws2_32.lib;Strmiids.lib;mfuuid.lib;mfplat.lib;imm32.lib;Setupapi.lib;Iphlpapi.lib;Version.lib;winmm.lib;crypt32.lib;Secur32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Windows</SubSystem>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
       <AdditionalIncludeDirectories>$(ProjectDir)..\Source_Files\;$(ProjectDir)..\Source_Files\XML;$(ProjectDir)..\Source_Files\TCPMess;$(ProjectDir)..\Source_Files\Sound;$(ProjectDir)..\Source_Files\RenderOther;$(ProjectDir)..\Source_Files\RenderMain;$(ProjectDir)..\Source_Files\Network\Metaserver;$(ProjectDir)..\Source_Files\Network;$(ProjectDir)..\Source_Files\ModelView;$(ProjectDir)..\Source_Files\Misc;$(ProjectDir)..\Source_Files\Lua;$(ProjectDir)..\Source_Files\Input;$(ProjectDir)..\Source_Files\GameWorld;$(ProjectDir)..\Source_Files\Files;$(ProjectDir)..\Source_Files\FFmpeg;$(ProjectDir)..\Source_Files\CSeries;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>HAVE_SNDFILE;HAVE_NFD;HAVE_MINIUPNPC;MINIUPNP_STATICLIB;CURL_STATICLIB;SPEEX;HAVE_SDL_IMAGE;HAVE_CURL;HAVE_LUA;HAVE_PNG;HAVE_ZZIP;HAVE_FFMPEG;HAVE_OPENGL;SDL;WIN32;WIN64;__WIN32__;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>HAVE_NFD;HAVE_MINIUPNPC;MINIUPNP_STATICLIB;CURL_STATICLIB;HAVE_SDL_IMAGE;HAVE_CURL;HAVE_LUA;HAVE_PNG;HAVE_ZZIP;HAVE_FFMPEG;HAVE_OPENGL;SDL;WIN32;WIN64;__WIN32__;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
@@ -327,7 +327,7 @@
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>SDL2main.lib;dwmapi.lib;ws2_32.lib;Strmiids.lib;mfuuid.lib;mfplat.lib;imm32.lib;Setupapi.lib;Iphlpapi.lib;Version.lib;winmm.lib;wldap32.lib;crypt32.lib;Secur32.lib;dsound.lib;opengl32.lib;glu32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>SDL2main.lib;shlwapi.lib;dwmapi.lib;ws2_32.lib;Strmiids.lib;mfuuid.lib;mfplat.lib;imm32.lib;Setupapi.lib;Iphlpapi.lib;Version.lib;winmm.lib;crypt32.lib;Secur32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Windows</SubSystem>
       <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
     </Link>
@@ -335,7 +335,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Marathon Infinity|x64'">
     <ClCompile>
       <AdditionalIncludeDirectories>$(ProjectDir)..\Source_Files\;$(ProjectDir)..\Source_Files\XML;$(ProjectDir)..\Source_Files\TCPMess;$(ProjectDir)..\Source_Files\Sound;$(ProjectDir)..\Source_Files\RenderOther;$(ProjectDir)..\Source_Files\RenderMain;$(ProjectDir)..\Source_Files\Network\Metaserver;$(ProjectDir)..\Source_Files\Network;$(ProjectDir)..\Source_Files\ModelView;$(ProjectDir)..\Source_Files\Misc;$(ProjectDir)..\Source_Files\Lua;$(ProjectDir)..\Source_Files\Input;$(ProjectDir)..\Source_Files\GameWorld;$(ProjectDir)..\Source_Files\Files;$(ProjectDir)..\Source_Files\FFmpeg;$(ProjectDir)..\Source_Files\CSeries;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>HAVE_SNDFILE;HAVE_NFD;HAVE_MINIUPNPC;MINIUPNP_STATICLIB;CURL_STATICLIB;SPEEX;HAVE_SDL_IMAGE;HAVE_CURL;HAVE_LUA;HAVE_PNG;HAVE_ZZIP;HAVE_FFMPEG;HAVE_OPENGL;SDL;WIN32;WIN64;__WIN32__;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>HAVE_NFD;HAVE_MINIUPNPC;MINIUPNP_STATICLIB;CURL_STATICLIB;HAVE_SDL_IMAGE;HAVE_CURL;HAVE_LUA;HAVE_PNG;HAVE_ZZIP;HAVE_FFMPEG;HAVE_OPENGL;SDL;WIN32;WIN64;__WIN32__;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
@@ -344,7 +344,7 @@
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>SDL2main.lib;dwmapi.lib;ws2_32.lib;Strmiids.lib;mfuuid.lib;mfplat.lib;imm32.lib;Setupapi.lib;Iphlpapi.lib;Version.lib;winmm.lib;wldap32.lib;crypt32.lib;Secur32.lib;dsound.lib;opengl32.lib;glu32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>SDL2main.lib;shlwapi.lib;dwmapi.lib;ws2_32.lib;Strmiids.lib;mfuuid.lib;mfplat.lib;imm32.lib;Setupapi.lib;Iphlpapi.lib;Version.lib;winmm.lib;crypt32.lib;Secur32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Windows</SubSystem>
       <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
     </Link>
@@ -352,7 +352,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Marathon 2|x64'">
     <ClCompile>
       <AdditionalIncludeDirectories>$(ProjectDir)..\Source_Files\;$(ProjectDir)..\Source_Files\XML;$(ProjectDir)..\Source_Files\TCPMess;$(ProjectDir)..\Source_Files\Sound;$(ProjectDir)..\Source_Files\RenderOther;$(ProjectDir)..\Source_Files\RenderMain;$(ProjectDir)..\Source_Files\Network\Metaserver;$(ProjectDir)..\Source_Files\Network;$(ProjectDir)..\Source_Files\ModelView;$(ProjectDir)..\Source_Files\Misc;$(ProjectDir)..\Source_Files\Lua;$(ProjectDir)..\Source_Files\Input;$(ProjectDir)..\Source_Files\GameWorld;$(ProjectDir)..\Source_Files\Files;$(ProjectDir)..\Source_Files\FFmpeg;$(ProjectDir)..\Source_Files\CSeries;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>HAVE_SNDFILE;HAVE_NFD;HAVE_MINIUPNPC;MINIUPNP_STATICLIB;CURL_STATICLIB;SPEEX;HAVE_SDL_IMAGE;HAVE_CURL;HAVE_LUA;HAVE_PNG;HAVE_ZZIP;HAVE_FFMPEG;HAVE_OPENGL;SDL;WIN32;WIN64;__WIN32__;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>HAVE_NFD;HAVE_MINIUPNPC;MINIUPNP_STATICLIB;CURL_STATICLIB;HAVE_SDL_IMAGE;HAVE_CURL;HAVE_LUA;HAVE_PNG;HAVE_ZZIP;HAVE_FFMPEG;HAVE_OPENGL;SDL;WIN32;WIN64;__WIN32__;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
@@ -361,7 +361,7 @@
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>SDL2main.lib;dwmapi.lib;ws2_32.lib;Strmiids.lib;mfuuid.lib;mfplat.lib;imm32.lib;Setupapi.lib;Iphlpapi.lib;Version.lib;winmm.lib;wldap32.lib;crypt32.lib;Secur32.lib;dsound.lib;opengl32.lib;glu32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>SDL2main.lib;shlwapi.lib;dwmapi.lib;ws2_32.lib;Strmiids.lib;mfuuid.lib;mfplat.lib;imm32.lib;Setupapi.lib;Iphlpapi.lib;Version.lib;winmm.lib;crypt32.lib;Secur32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Windows</SubSystem>
       <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
     </Link>
@@ -369,7 +369,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Marathon|x64'">
     <ClCompile>
       <AdditionalIncludeDirectories>$(ProjectDir)..\Source_Files\;$(ProjectDir)..\Source_Files\XML;$(ProjectDir)..\Source_Files\TCPMess;$(ProjectDir)..\Source_Files\Sound;$(ProjectDir)..\Source_Files\RenderOther;$(ProjectDir)..\Source_Files\RenderMain;$(ProjectDir)..\Source_Files\Network\Metaserver;$(ProjectDir)..\Source_Files\Network;$(ProjectDir)..\Source_Files\ModelView;$(ProjectDir)..\Source_Files\Misc;$(ProjectDir)..\Source_Files\Lua;$(ProjectDir)..\Source_Files\Input;$(ProjectDir)..\Source_Files\GameWorld;$(ProjectDir)..\Source_Files\Files;$(ProjectDir)..\Source_Files\FFmpeg;$(ProjectDir)..\Source_Files\CSeries;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>HAVE_SNDFILE;HAVE_NFD;HAVE_MINIUPNPC;MINIUPNP_STATICLIB;CURL_STATICLIB;SPEEX;HAVE_SDL_IMAGE;HAVE_CURL;HAVE_LUA;HAVE_PNG;HAVE_ZZIP;HAVE_FFMPEG;HAVE_OPENGL;SDL;WIN32;WIN64;__WIN32__;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>HAVE_NFD;HAVE_MINIUPNPC;MINIUPNP_STATICLIB;CURL_STATICLIB;HAVE_SDL_IMAGE;HAVE_CURL;HAVE_LUA;HAVE_PNG;HAVE_ZZIP;HAVE_FFMPEG;HAVE_OPENGL;SDL;WIN32;WIN64;__WIN32__;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
@@ -378,7 +378,7 @@
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>SDL2main.lib;dwmapi.lib;ws2_32.lib;Strmiids.lib;mfuuid.lib;mfplat.lib;imm32.lib;Setupapi.lib;Iphlpapi.lib;Version.lib;winmm.lib;wldap32.lib;crypt32.lib;Secur32.lib;dsound.lib;opengl32.lib;glu32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>SDL2main.lib;shlwapi.lib;dwmapi.lib;ws2_32.lib;Strmiids.lib;mfuuid.lib;mfplat.lib;imm32.lib;Setupapi.lib;Iphlpapi.lib;Version.lib;winmm.lib;crypt32.lib;Secur32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Windows</SubSystem>
       <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
     </Link>
@@ -441,6 +441,7 @@
     <ClCompile Include="..\Source_Files\Lua\lua_hud_script.cpp" />
     <ClCompile Include="..\Source_Files\Lua\lua_map.cpp" />
     <ClCompile Include="..\Source_Files\Lua\lua_monsters.cpp" />
+    <ClCompile Include="..\Source_Files\Lua\lua_music.cpp" />
     <ClCompile Include="..\Source_Files\Lua\lua_objects.cpp" />
     <ClCompile Include="..\Source_Files\Lua\lua_player.cpp" />
     <ClCompile Include="..\Source_Files\Lua\lua_projectiles.cpp" />
@@ -518,62 +519,9 @@
     <ClCompile Include="..\Source_Files\Network\network_data_formats.cpp" />
     <ClCompile Include="..\Source_Files\Network\network_dialogs.cpp" />
     <ClCompile Include="..\Source_Files\Network\network_dialog_widgets_sdl.cpp" />
-    <ClCompile Include="..\Source_Files\Network\network_dummy.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Marathon Infinity|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Marathon 2|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Marathon|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Marathon Infinity|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Marathon 2|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Marathon|x64'">true</ExcludedFromBuild>
-    </ClCompile>
     <ClCompile Include="..\Source_Files\Network\network_games.cpp" />
     <ClCompile Include="..\Source_Files\Network\network_lookup_sdl.cpp" />
     <ClCompile Include="..\Source_Files\Network\network_messages.cpp" />
-    <ClCompile Include="..\Source_Files\Network\network_microphone_coreaudio.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Marathon Infinity|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Marathon 2|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Marathon|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Marathon Infinity|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Marathon 2|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Marathon|x64'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\Source_Files\Network\network_microphone_sdl_alsa.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Marathon Infinity|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Marathon 2|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Marathon|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Marathon Infinity|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Marathon 2|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Marathon|x64'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\Source_Files\Network\network_microphone_sdl_dummy.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Marathon Infinity|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Marathon 2|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Marathon|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Marathon Infinity|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Marathon 2|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Marathon|x64'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\Source_Files\Network\network_microphone_sdl_win32.cpp" />
-    <ClCompile Include="..\Source_Files\Network\network_microphone_shared.cpp" />
-    <ClCompile Include="..\Source_Files\Network\network_speaker_sdl.cpp" />
-    <ClCompile Include="..\Source_Files\Network\network_speaker_shared.cpp" />
-    <ClCompile Include="..\Source_Files\Network\network_speex.cpp" />
     <ClCompile Include="..\Source_Files\Network\network_star_hub.cpp" />
     <ClCompile Include="..\Source_Files\Network\network_star_spoke.cpp" />
     <ClCompile Include="..\Source_Files\Network\network_udp.cpp" />
@@ -636,17 +584,18 @@
     <ClCompile Include="..\Source_Files\shell.cpp" />
     <ClCompile Include="..\Source_Files\shell_misc.cpp" />
     <ClCompile Include="..\Source_Files\shell_options.cpp" />
-    <ClCompile Include="..\Source_Files\Sound\BasicIFFDecoder.cpp" />
+    <ClCompile Include="..\Source_Files\Sound\AudioPlayer.cpp" />
     <ClCompile Include="..\Source_Files\Sound\Decoder.cpp" />
     <ClCompile Include="..\Source_Files\Sound\FFmpegDecoder.cpp" />
-    <ClCompile Include="..\Source_Files\Sound\MADDecoder.cpp" />
-    <ClCompile Include="..\Source_Files\Sound\Mixer.cpp" />
     <ClCompile Include="..\Source_Files\Sound\Music.cpp" />
+    <ClCompile Include="..\Source_Files\Sound\MusicPlayer.cpp" />
+    <ClCompile Include="..\Source_Files\Sound\OpenALManager.cpp" />
     <ClCompile Include="..\Source_Files\Sound\ReplacementSounds.cpp" />
     <ClCompile Include="..\Source_Files\Sound\SndfileDecoder.cpp" />
     <ClCompile Include="..\Source_Files\Sound\SoundFile.cpp" />
     <ClCompile Include="..\Source_Files\Sound\SoundManager.cpp" />
-    <ClCompile Include="..\Source_Files\Sound\VorbisDecoder.cpp" />
+    <ClCompile Include="..\Source_Files\Sound\SoundPlayer.cpp" />
+    <ClCompile Include="..\Source_Files\Sound\StreamPlayer.cpp" />
     <ClCompile Include="..\Source_Files\TCPMess\CommunicationsChannel.cpp" />
     <ClCompile Include="..\Source_Files\TCPMess\Message.cpp" />
     <ClCompile Include="..\Source_Files\TCPMess\MessageDispatcher.cpp" />
@@ -727,6 +676,7 @@
     <ClInclude Include="..\Source_Files\Lua\lua_map.h" />
     <ClInclude Include="..\Source_Files\Lua\lua_mnemonics.h" />
     <ClInclude Include="..\Source_Files\Lua\lua_monsters.h" />
+    <ClInclude Include="..\Source_Files\Lua\lua_music.h" />
     <ClInclude Include="..\Source_Files\Lua\lua_objects.h" />
     <ClInclude Include="..\Source_Files\Lua\lua_player.h" />
     <ClInclude Include="..\Source_Files\Lua\lua_projectiles.h" />
@@ -783,7 +733,6 @@
     <ClInclude Include="..\Source_Files\Network\Metaserver\network_metaserver.h" />
     <ClInclude Include="..\Source_Files\Network\network.h" />
     <ClInclude Include="..\Source_Files\Network\NetworkGameProtocol.h" />
-    <ClInclude Include="..\Source_Files\Network\network_audio_shared.h" />
     <ClInclude Include="..\Source_Files\Network\network_capabilities.h" />
     <ClInclude Include="..\Source_Files\Network\network_data_formats.h" />
     <ClInclude Include="..\Source_Files\Network\network_dialogs.h" />
@@ -792,11 +741,7 @@
     <ClInclude Include="..\Source_Files\Network\network_games.h" />
     <ClInclude Include="..\Source_Files\Network\network_lookup_sdl.h" />
     <ClInclude Include="..\Source_Files\Network\network_messages.h" />
-    <ClInclude Include="..\Source_Files\Network\network_microphone_shared.h" />
     <ClInclude Include="..\Source_Files\Network\network_private.h" />
-    <ClInclude Include="..\Source_Files\Network\network_sound.h" />
-    <ClInclude Include="..\Source_Files\Network\network_speaker_sdl.h" />
-    <ClInclude Include="..\Source_Files\Network\network_speex.h" />
     <ClInclude Include="..\Source_Files\Network\network_star.h" />
     <ClInclude Include="..\Source_Files\Network\PortForward.h" />
     <ClInclude Include="..\Source_Files\Network\RingGameProtocol.h" />
@@ -868,20 +813,21 @@
     <ClInclude Include="..\Source_Files\RenderOther\ViewControl.h" />
     <ClInclude Include="..\Source_Files\shell.h" />
     <ClInclude Include="..\Source_Files\shell_options.h" />
-    <ClInclude Include="..\Source_Files\Sound\BasicIFFDecoder.h" />
+    <ClInclude Include="..\Source_Files\Sound\AudioPlayer.h" />
     <ClInclude Include="..\Source_Files\Sound\Decoder.h" />
     <ClInclude Include="..\Source_Files\Sound\FFmpegDecoder.h" />
-    <ClInclude Include="..\Source_Files\Sound\MADDecoder.h" />
-    <ClInclude Include="..\Source_Files\Sound\Mixer.h" />
     <ClInclude Include="..\Source_Files\Sound\Music.h" />
+    <ClInclude Include="..\Source_Files\Sound\MusicPlayer.h" />
+    <ClInclude Include="..\Source_Files\Sound\OpenALManager.h" />
     <ClInclude Include="..\Source_Files\Sound\ReplacementSounds.h" />
     <ClInclude Include="..\Source_Files\Sound\SndfileDecoder.h" />
     <ClInclude Include="..\Source_Files\Sound\song_definitions.h" />
     <ClInclude Include="..\Source_Files\Sound\SoundFile.h" />
     <ClInclude Include="..\Source_Files\Sound\SoundManager.h" />
     <ClInclude Include="..\Source_Files\Sound\SoundManagerEnums.h" />
+    <ClInclude Include="..\Source_Files\Sound\SoundPlayer.h" />
     <ClInclude Include="..\Source_Files\Sound\sound_definitions.h" />
-    <ClInclude Include="..\Source_Files\Sound\VorbisDecoder.h" />
+    <ClInclude Include="..\Source_Files\Sound\StreamPlayer.h" />
     <ClInclude Include="..\Source_Files\TCPMess\CommunicationsChannel.h" />
     <ClInclude Include="..\Source_Files\TCPMess\Message.h" />
     <ClInclude Include="..\Source_Files\TCPMess\MessageDispatcher.h" />

@@ -140,7 +140,6 @@ static void update_screen(SDL_Rect &source, SDL_Rect &destination, bool hi_rez, 
 static void update_fps_display(SDL_Surface *s);
 static void DisplayPosition(SDL_Surface *s);
 static void DisplayMessages(SDL_Surface *s);
-static void DisplayNetMicStatus(SDL_Surface *s);
 static void DrawSurface(SDL_Surface *s, SDL_Rect &dest_rect, SDL_Rect &src_rect);
 static void clear_screen_margin();
 
@@ -305,6 +304,11 @@ int Screen::height()
 int Screen::width()
 {
 	return MainScreenLogicalWidth();
+}
+
+float Screen::pixel_scale()
+{
+	return MainScreenPixelScale();
 }
 
 int Screen::window_height()
@@ -1465,7 +1469,6 @@ void render_screen(short ticks_elapsed)
 		update_fps_display(disp_pixels);
 	  }
 	  DisplayPosition(disp_pixels);
-	  DisplayNetMicStatus(disp_pixels);
 	  DisplayScores(disp_pixels);
 	}
 	DisplayMessages(disp_pixels);
@@ -2198,7 +2201,7 @@ int MainScreenPixelWidth()
 		SDL_GL_GetDrawableSize(main_screen, &w, &dummy);
 	else
 #endif
-		SDL_GetRendererOutputSize(main_render, &w, NULL);
+		SDL_GetRendererOutputSize(main_render, &w, &dummy);
 	return w;
 }
 int MainScreenPixelHeight()
@@ -2210,7 +2213,7 @@ int MainScreenPixelHeight()
 		SDL_GL_GetDrawableSize(main_screen, &dummy, &h);
 	else
 #endif
-		SDL_GetRendererOutputSize(main_render, NULL, &h);
+		SDL_GetRendererOutputSize(main_render, &dummy, &h);
 	return h;
 }
 float MainScreenPixelScale()

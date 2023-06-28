@@ -39,7 +39,6 @@
 #include "vbl.h"
 #include "preferences.h"
 #include "tags.h" /* for scenario file type.. */
-#include "network_sound.h"
 #include "mouse.h"
 #include "joystick.h"
 #include "screen_drawing.h"
@@ -341,11 +340,8 @@ static int char_is_not_filesafe(int c)
 
 static void initialize_application(void)
 {
-#if defined(__WIN32__) && defined(__MINGW32__)
-	if (LoadLibraryW(L"exchndl.dll")) shell_options.debug = true;
-#endif
-
 #if defined(__WIN32__)
+	if (LoadLibraryW(L"exchndl.dll")) shell_options.debug = true;
 	SDL_setenv("SDL_AUDIODRIVER", "directsound", 0);
 #endif
 
@@ -1707,5 +1703,5 @@ char *contract_symbolic_paths(char *dest, const char *src, int maxlen)
 void PlayInterfaceButtonSound(short SoundID)
 {
 	if (TEST_FLAG(input_preferences->modifiers,_inputmod_use_button_sounds))
-		SoundManager::instance()->PlaySound(SoundID, (world_location3d *) NULL, NONE);
+		SoundManager::instance()->PlaySound(SoundID, (world_location3d *) NULL, NONE, true);
 }

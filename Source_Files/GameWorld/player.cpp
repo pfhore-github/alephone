@@ -155,6 +155,7 @@ May 22, 2003 (Woody Zenfell):
 #include "Console.h"
 #include "ViewControl.h"
 #include "InfoTree.h"
+#include "OpenALManager.h"
 
 /*
 //anybody on the receiving pad of a teleport should explode (what happens to invincible guys?)
@@ -748,30 +749,6 @@ void update_players(ActionQueues* inActionQueuesToUse, bool inPredictive)
 
 			// if ((static_world->environment_flags&_environment_vacuum) || (player->variables.flags&_HEAD_BELOW_MEDIA_BIT)) handle_player_in_vacuum(player_index, action_flags);
 
-#if !defined(DISABLE_NETWORKING)
-			/* handle arbitration of the communications channel (i.e., dynamic_world->speaking_player_index) */
-			if (action_flags&_microphone_button)
-			{
-				if (dynamic_world->speaking_player_index==NONE)
-				{
-					if (GET_GAME_OPTIONS() & _force_unique_teams || (get_player_data(player_index)->team == get_player_data(local_player_index)->team))
-					{
-						dynamic_world->speaking_player_index= player_index;
-					} 
-
-					if (player_index==local_player_index) set_interface_microphone_recording_state(true);
-				}
-			}
-			else
-			{
-				if (dynamic_world->speaking_player_index==player_index)
-				{
-					dynamic_world->speaking_player_index= NONE;
-					if (player_index==local_player_index) set_interface_microphone_recording_state(false);
-				}
-			}
-#endif // !defined(DISABLE_NETWORKING)
-
 			if (PLAYER_IS_DEAD(player))
 			{
 				/* do things dead players do (sit around and check for self-reincarnation) */
@@ -922,7 +899,7 @@ void damage_player(
 						{
 							short action= definition->death_action;
 							
-							play_object_sound(player->object_index, definition->death_sound);
+							play_object_sound(player->object_index, definition->death_sound, player_index == current_player_index);
 
 							if (action==NONE)
 							{
@@ -971,7 +948,7 @@ void damage_player(
 	}
 	
 	{
-		if (!PLAYER_IS_DEAD(player)) play_object_sound(player->object_index, definition->sound);
+		if (!PLAYER_IS_DEAD(player)) play_object_sound(player->object_index, definition->sound, player_index == current_player_index);
 		if (player_index==current_player_index)
 		{
 			if (definition->fade!=NONE) start_fade((definition->damage_threshhold!=NONE&&damage_amount>definition->damage_threshhold) ? (definition->fade+1) : definition->fade);
@@ -1270,10 +1247,19 @@ static void handle_player_in_vacuum(
 		{
 			player->suit_oxygen -= 1;
 			oxygenChange += 1;
-			if (!(player->suit_oxygen%breathing_frequency)) 
+			if (player->suit_oxygen % breathing_frequency == 0 &&
+				player_index == current_player_index)
+			{
 				SoundManager::instance()->PlayLocalSound(Sound_Breathing());
-			if ((player->suit_oxygen+OXYGEN_WARNING_OFFSET)<OXYGEN_WARNING_LEVEL && !((player->suit_oxygen+OXYGEN_WARNING_OFFSET)%OXYGEN_WARNING_FREQUENCY)) 
+			}
+
+			const auto offset_o2 = player->suit_oxygen + OXYGEN_WARNING_OFFSET;
+			if (offset_o2 < OXYGEN_WARNING_LEVEL &&
+				offset_o2 % OXYGEN_WARNING_FREQUENCY == 0 &&
+				player_index == current_player_index)
+			{
 				SoundManager::instance()->PlayLocalSound(Sound_OxygenWarning());
+			}
 		}
 				
 		if (player->suit_oxygen<=0)
@@ -1342,7 +1328,7 @@ static void update_player_teleport(
 				{
 					if (View_DoInterlevelTeleportInEffects()) {
 						start_teleporting_effect(false);
-						play_object_sound(player->object_index, Sound_TeleportIn()); 
+						play_object_sound(player->object_index, Sound_TeleportIn(), true); 
 						if (shapes_file_is_m1()) start_fade(_fade_bright);
 					}
 				}
@@ -1398,7 +1384,7 @@ static void update_player_teleport(
 				{
 					if (player->teleporting_destination >= 0 || View_DoInterlevelTeleportInEffects()) {
 						start_teleporting_effect(false);
-						play_object_sound(player->object_index, Sound_TeleportIn()); 
+						play_object_sound(player->object_index, Sound_TeleportIn(), true); 
 						if (shapes_file_is_m1()) start_fade(_fade_bright);
 					}
 					else {
@@ -1456,7 +1442,7 @@ static void update_player_teleport(
 					{
 						start_teleporting_effect(true);
 					}
-					play_object_sound(player->object_index, Sound_TeleportOut());
+					play_object_sound(player->object_index, Sound_TeleportOut(), player_index == current_player_index);
 				}
 				else /* Level change */
 				{
@@ -1465,7 +1451,7 @@ static void update_player_teleport(
 					/* Everyone plays the teleporting effect out. */
 					if (View_DoInterlevelTeleportOutEffects()) {
 						start_teleporting_effect(true);
-						play_object_sound(current_player->object_index, Sound_TeleportOut());
+						play_object_sound(current_player->object_index, Sound_TeleportOut(), player_index == current_player_index);
 					}
 					
 					/* Every players object plays the sound, and everyones monster responds. */
@@ -1554,7 +1540,7 @@ static void update_player_media(
 		
 		if (sound_type!=NONE)
 		{
-			play_object_sound(monster->object_index, get_media_sound(polygon->media_index, sound_type));
+			play_object_sound(monster->object_index, get_media_sound(polygon->media_index, sound_type), player_index == current_player_index);
 		}
 	}
 
@@ -1573,7 +1559,7 @@ static void update_player_media(
 		
 		if (sound_index!=NONE)
 		{
-			play_object_sound(monster->object_index, sound_index);
+			play_object_sound(monster->object_index, sound_index, player_index == current_player_index);
 		}
 	}
 }

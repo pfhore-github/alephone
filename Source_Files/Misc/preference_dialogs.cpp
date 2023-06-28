@@ -166,7 +166,6 @@ OpenGLDialog::~OpenGLDialog()
 	delete m_fsaaWidget;
 	delete m_anisotropicWidget;
 	delete m_sRGBWidget;
-	delete m_geForceFixWidget;
 	delete m_useNPOTWidget;
 	delete m_vsyncWidget;
 	delete m_wallsFilterWidget;
@@ -175,8 +174,6 @@ OpenGLDialog::~OpenGLDialog()
 	for (int i=0; i<OGL_NUMBER_OF_TEXTURE_TYPES; ++i) {
 		delete m_textureQualityWidget [i];
 		delete m_nearFiltersWidget[i];
-		delete m_textureResolutionWidget [i];
-		delete m_textureDepthWidget[i];
 	}
 
 }
@@ -217,9 +214,6 @@ void OpenGLDialog::OpenGLPrefsByRunning ()
 	BoolPref sRGBPref (graphics_preferences->OGL_Configure.Use_sRGB);
 	binders.insert<bool> (m_sRGBWidget, &sRGBPref);
 	
-	BoolPref geForceFixPref (graphics_preferences->OGL_Configure.GeForceFix);
-	binders.insert<bool> (m_geForceFixWidget, &geForceFixPref);
-	
 	BoolPref useNPOTPref (graphics_preferences->OGL_Configure.Use_NPOT);
 	binders.insert<bool> (m_useNPOTWidget, &useNPOTPref);
 	
@@ -253,25 +247,6 @@ void OpenGLDialog::OpenGLPrefsByRunning ()
 	binders.insert<int> (m_textureQualityWidget [3], &weaponQualityPref);
 	TexQualityPref modelQualityPref (graphics_preferences->OGL_Configure.ModelConfig.MaxSize, 256);
 	binders.insert<int> (m_modelQualityWidget, &modelQualityPref);
-	
-	Int16Pref wallResoPref (graphics_preferences->OGL_Configure.TxtrConfigList [0].Resolution);
-	binders.insert<int> (m_textureResolutionWidget [0], &wallResoPref);
-	Int16Pref landscapeResoPref (graphics_preferences->OGL_Configure.TxtrConfigList [1].Resolution);
-	binders.insert<int> (m_textureResolutionWidget [1], &landscapeResoPref);
-	Int16Pref spriteResoPref (graphics_preferences->OGL_Configure.TxtrConfigList [2].Resolution);
-	binders.insert<int> (m_textureResolutionWidget [2], &spriteResoPref);
-	Int16Pref weaponResoPref (graphics_preferences->OGL_Configure.TxtrConfigList [3].Resolution);
-	binders.insert<int> (m_textureResolutionWidget [3], &weaponResoPref);
-
-	Int16Pref wallDepthPref(graphics_preferences->OGL_Configure.TxtrConfigList[0].ColorFormat);
-	binders.insert<int> (m_textureDepthWidget[0], &wallDepthPref);
-	Int16Pref landscapeDepthPref(graphics_preferences->OGL_Configure.TxtrConfigList[1].ColorFormat);
-	binders.insert<int> (m_textureDepthWidget[1], &landscapeDepthPref);
-	Int16Pref spriteDepthPref(graphics_preferences->OGL_Configure.TxtrConfigList[2].ColorFormat);
-	binders.insert<int> (m_textureDepthWidget[2], &spriteDepthPref);
-	Int16Pref weaponDepthPref(graphics_preferences->OGL_Configure.TxtrConfigList[3].ColorFormat);
-	binders.insert<int> (m_textureDepthWidget[3], &weaponDepthPref);
-	
 	
 	// Set initial values from prefs
 	binders.migrate_all_second_to_first ();
@@ -477,12 +452,7 @@ public:
 
 		table_placer *advanced_table = new table_placer(2, get_theme_space(ITEM_WIDGET), true);
 		advanced_table->col_flags(0, placeable::kAlignRight);
-
-		w_toggle *geforce_fix_w = new w_toggle(false);
-		//		advanced_table->dual_add(geforce_fix_w->label("GeForce 1-4 Texture Fix"), m_dialog);
-		advanced_table->dual_add(geforce_fix_w->label("GeForce 1〜4のテスクチャの問題を解決"), m_dialog);
-		advanced_table->dual_add(geforce_fix_w, m_dialog);
-
+	
 		w_toggle *use_npot_w = new w_toggle(false);
 		//		advanced_table->dual_add(use_npot_w->label("Non-Power-of-Two Textures"), m_dialog);
 		advanced_table->dual_add(use_npot_w->label("非２乗テスクチャ"), m_dialog);
@@ -577,8 +547,8 @@ public:
 		vector<string> tex_reso_strings;
 		//		tex_reso_strings.push_back ("Full");
 		tex_reso_strings.push_back("フル");
-		tex_reso_strings.push_back("1/2");
-		tex_reso_strings.push_back("1/4");
+		tex_reso_strings.push_back ("1/2");
+		tex_reso_strings.push_back ("1/4");
 
 		vector<string> tex_depth_strings;
 		//		tex_depth_strings.push_back ("32-bit");
@@ -658,7 +628,6 @@ public:
 
 		m_sRGBWidget = new ToggleWidget(srgb_w);
 
-		m_geForceFixWidget = new ToggleWidget (geforce_fix_w);
 		m_useNPOTWidget = new ToggleWidget (use_npot_w);
 		m_vsyncWidget = new ToggleWidget (vsync_w);
 		
@@ -668,8 +637,6 @@ public:
 		for (int i = 0; i < OGL_NUMBER_OF_TEXTURE_TYPES; ++i) {
 			m_textureQualityWidget [i] = new PopupSelectorWidget (texture_quality_wa[i]);
 			m_nearFiltersWidget[i] = new SelectSelectorWidget(near_filter_wa[i]);
-			m_textureResolutionWidget [i] = new PopupSelectorWidget (texture_resolution_wa[i]);
-			m_textureDepthWidget [i] = new PopupSelectorWidget(texture_depth_wa[i]);
 		}
 		m_modelQualityWidget = new PopupSelectorWidget(model_quality_w);
 	}

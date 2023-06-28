@@ -1,6 +1,6 @@
 {
    "name":"alephone",
-   "version-date":"2022-01-15",
+   "version-date":"2023-01-19",
    "dependencies":[
       {
          "name":"boost-algorithm"
@@ -16,6 +16,9 @@
       },
       {
          "name":"boost-filesystem"
+      },
+      {
+         "name":"boost-lockfree"
       },
       {
          "name":"sdl2"
@@ -42,12 +45,6 @@
          "platform":"windows"
       },
       {
-         "name":"speex"
-      },
-      {
-         "name":"speexdsp"
-      },
-      {
          "name":"zziplib"
       },
       {
@@ -69,7 +66,10 @@
 	  {
 	      "name":"libsndfile",
 		  "default-features": false
-	  }
+	  },
+      {
+         "name":"openal-soft"
+      }
    ],
    "builtin-baseline":"6ca56aeb457f033d344a7106cb3f9f1abf8f4e98"
 }
