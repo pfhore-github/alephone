@@ -5,7 +5,7 @@
 LPALCLOOPBACKOPENDEVICESOFT OpenALManager::alcLoopbackOpenDeviceSOFT;
 LPALCISRENDERFORMATSUPPORTEDSOFT OpenALManager::alcIsRenderFormatSupportedSOFT;
 LPALCRENDERSAMPLESSOFT OpenALManager::alcRenderSamplesSOFT;
-
+LPALGETSTRINGISOFT OpenALManager::alGetStringiSOFT;
 LPALGENFILTERS OpenALManager::alGenFilters;
 LPALDELETEFILTERS OpenALManager::alDeleteFilters;
 LPALFILTERF OpenALManager::alFilterf;
@@ -13,11 +13,12 @@ LPALFILTERI OpenALManager::alFilteri;
 
 OpenALManager* OpenALManager::instance = nullptr;
 
-bool OpenALManager::Init(AudioParameters parameters) {
+bool OpenALManager::Init(const AudioParameters& parameters) {
 
 	if (instance) { //Don't bother recreating all the OpenAL context if nothing changed for it
 		if (parameters.hrtf != instance->audio_parameters.hrtf || parameters.rate != instance->audio_parameters.rate
-			|| parameters.stereo != instance->audio_parameters.stereo || parameters.sample_frame_size != instance->audio_parameters.sample_frame_size) {
+			|| parameters.stereo != instance->audio_parameters.stereo || parameters.sample_frame_size != instance->audio_parameters.sample_frame_size
+			|| parameters.resampler_index != instance->audio_parameters.resampler_index) {
 
 			Shutdown();
 
@@ -31,6 +32,7 @@ bool OpenALManager::Init(AudioParameters parameters) {
 			LOAD_PROC(LPALCLOOPBACKOPENDEVICESOFT, alcLoopbackOpenDeviceSOFT);
 			LOAD_PROC(LPALCISRENDERFORMATSUPPORTEDSOFT, alcIsRenderFormatSupportedSOFT);
 			LOAD_PROC(LPALCRENDERSAMPLESSOFT, alcRenderSamplesSOFT);
+			LOAD_PROC(LPALGETSTRINGISOFT, alGetStringiSOFT);
 			LOAD_PROC(LPALGENFILTERS, alGenFilters);
 			LOAD_PROC(LPALDELETEFILTERS, alDeleteFilters);
 			LOAD_PROC(LPALFILTERI, alFilteri);
@@ -157,7 +159,8 @@ std::shared_ptr<SoundPlayer> OpenALManager::GetSoundPlayer(short identifier, sho
 	return std::dynamic_pointer_cast<SoundPlayer>(matchingPlayer); //only sounds are supported, not musics
 }
 
-std::shared_ptr<SoundPlayer> OpenALManager::PlaySound(const Sound& sound, SoundParameters parameters) {
+std::shared_ptr<SoundPlayer> OpenALManager::PlaySound(const Sound& sound, const SoundParameters& parameters) {
+
 	auto soundPlayer = std::shared_ptr<SoundPlayer>();
 	const float simulatedVolume = SoundPlayer::Simulate(parameters);
 	if (!process_audio_active || simulatedVolume <= 0) return soundPlayer;
@@ -169,9 +172,7 @@ std::shared_ptr<SoundPlayer> OpenALManager::PlaySound(const Sound& sound, SoundP
 
 		if (existingPlayer) {
 
-			const auto existingParameters = existingPlayer->parameters.Get();
-
-			if (!(parameters.flags & _sound_cannot_be_restarted) && (parameters.source_identifier == existingParameters.source_identifier || simulatedVolume + abortAmplitudeThreshold > SoundPlayer::Simulate(existingParameters))) {
+			if (!(parameters.flags & _sound_cannot_be_restarted) && (existingPlayer->CanFastRewind(parameters) || simulatedVolume + abortAmplitudeThreshold > SoundPlayer::Simulate(existingPlayer->GetParameters()))) {
 				existingPlayer->AskRewind(parameters, sound); //we found one, we won't create another player but rewind this one instead
 			}
 
@@ -184,7 +185,7 @@ std::shared_ptr<SoundPlayer> OpenALManager::PlaySound(const Sound& sound, SoundP
 	return soundPlayer;
 }
 
-std::shared_ptr<SoundPlayer> OpenALManager::PlaySound(LoadedResource& rsrc, SoundParameters parameters) {
+std::shared_ptr<SoundPlayer> OpenALManager::PlaySound(LoadedResource& rsrc, const SoundParameters& parameters) {
 	SoundHeader header;
 	if (header.Load(rsrc)) {
 		auto data = header.LoadData(rsrc);
@@ -212,13 +213,13 @@ std::shared_ptr<StreamPlayer> OpenALManager::PlayStream(CallBackStreamPlayer cal
 //It's not a good idea generating dynamically a new source for each player
 //It's slow so it's better having a pool, also we already know the max amount
 //of supported simultaneous playing sources for the device
-std::unique_ptr<AudioPlayer::AudioSource> OpenALManager::PickAvailableSource(float priority) {
+std::unique_ptr<AudioPlayer::AudioSource> OpenALManager::PickAvailableSource(const AudioPlayer& audioPlayer) {
 	if (sources_pool.empty()) {
 		const auto& victimPlayer = *std::min_element(audio_players_queue.begin(), audio_players_queue.end(),
 			[](const std::shared_ptr<AudioPlayer>& a, const std::shared_ptr<AudioPlayer>& b)
 			{  return a->audio_source && a->GetPriority() < b->GetPriority(); });
 
-		return victimPlayer->GetPriority() < priority ? victimPlayer->RetrieveSource() : nullptr;
+		return victimPlayer->GetPriority() < audioPlayer.GetPriority() ? victimPlayer->RetrieveSource() : nullptr;
 	}
 
 	auto source = std::move(sources_pool.front());
@@ -279,6 +280,22 @@ bool OpenALManager::Is_HRTF_Enabled() const {
 	ALCint hrtfStatus;
 	alcGetIntegerv(p_ALCDevice, ALC_HRTF_SOFT, 1, &hrtfStatus);
 	return hrtfStatus;
+}
+
+std::string OpenALManager::GetResamplerName(int resamplerIndex) const {
+	return alGetStringiSOFT(AL_RESAMPLER_NAME_SOFT, resamplerIndex);
+}
+
+int OpenALManager::GetDefaultResampler() const {
+	ALint index;
+	alGetIntegerv(AL_DEFAULT_RESAMPLER_SOFT, &index);
+	return index;
+}
+
+int OpenALManager::GetResamplersNumber() const {
+	ALint number;
+	alGetIntegerv(AL_NUM_RESAMPLERS_SOFT, &number);
+	return number;
 }
 
 bool OpenALManager::OpenDevice() {
@@ -364,12 +381,15 @@ bool OpenALManager::GenerateSources() {
 	alcGetIntegerv(p_ALCDevice, ALC_MONO_SOURCES, 1, &monoSources);
 	alcGetIntegerv(p_ALCDevice, ALC_STEREO_SOURCES, 1, &stereoSources);
 	int nbSources = monoSources + stereoSources;
+	int resampler = audio_parameters.resampler_index != NONE && audio_parameters.resampler_index < GetResamplersNumber() ?
+					audio_parameters.resampler_index : GetDefaultResampler();
 
 	std::vector<ALuint> sources_id(nbSources);
 	alGenSources(nbSources, sources_id.data());
 	for (auto source_id : sources_id) {
 
 		alSourcei(source_id, AL_BUFFER, 0);
+		alSourcei(source_id, AL_SOURCE_RESAMPLER_SOFT, resampler);
 		alSourceRewind(source_id);
 
 		if (alGetError() != AL_NO_ERROR) {
@@ -396,7 +416,7 @@ bool OpenALManager::GenerateSources() {
 	return !sources_id.empty();
 }
 
-OpenALManager::OpenALManager(AudioParameters parameters) {
+OpenALManager::OpenALManager(const AudioParameters& parameters) {
 	UpdateParameters(parameters);
 	alListener3i(AL_POSITION, 0, 0, 0);
 
@@ -476,7 +496,7 @@ int OpenALManager::GetBestOpenALRenderingFormat(ALCint channelsType) {
 	return format;
 }
 
-void OpenALManager::UpdateParameters(AudioParameters parameters) {
+void OpenALManager::UpdateParameters(const AudioParameters& parameters) {
 	audio_parameters = parameters;
 	master_volume = parameters.volume;
 }

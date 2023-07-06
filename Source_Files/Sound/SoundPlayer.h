@@ -25,7 +25,7 @@ struct SoundParameters {
 	short identifier = NONE; //Identifier of the sound
 	short source_identifier = NONE; //Identifier of the source emitting the sound
 	float pitch = 1;
-	bool loop = false; //for now it will only be used by sound (musics work differently but should use this tbh)
+	bool loop = false;
 	bool local = true; //if false it will use source_location3d to position sound (3D sounds)
 	bool _is_for_rewind = false; //internal flag to know if those parameters must be loaded when rewinding sound or not
 	uint16_t permutation = 0;
@@ -61,12 +61,12 @@ struct Sound {
 
 class SoundPlayer : public AudioPlayer {
 public:
-	SoundPlayer(const Sound sound, SoundParameters parameters); //Must not be used outside OpenALManager (public for make_shared)
-	void UpdateParameters(SoundParameters parameters) { this->parameters.Store(parameters); }
+	SoundPlayer(const Sound& sound, const SoundParameters& parameters); //Must not be used outside OpenALManager (public for make_shared)
+	void UpdateParameters(const SoundParameters& parameters) { this->parameters.Store(parameters); }
 	short GetIdentifier() const override { return parameters.Get().identifier; }
 	short GetSourceIdentifier() const override { return parameters.Get().source_identifier; }
 	SoundParameters GetParameters() const { return parameters.Get(); }
-	static float Simulate(const SoundParameters soundParameters);
+	static float Simulate(const SoundParameters& soundParameters);
 	float GetPriority() const override { return Simulate(parameters.Get()); }
 	void AskSoftStop() { soft_stop_signal = true; } //not supported by 3d sounds because no need to
 private:
@@ -84,12 +84,13 @@ private:
 	SetupALResult SetUpALSourceIdle() override;
 	SetupALResult SetUpALSource3D();
 	bool SetUpALSourceInit() override;
-	bool CanRewindSound(int baseTick) const;
+	bool CanRewind(int baseTick) const;
+	bool CanFastRewind(const SoundParameters& soundParameters) const;
 	bool LoadParametersUpdates() override;
-	void AskRewind(SoundParameters soundParameters, const Sound& sound);
+	void AskRewind(const SoundParameters& soundParameters, const Sound& sound);
 	float ComputeParameterForTransition(float targetParameter, float currentParameter, int currentTick) const;
 	float ComputeVolumeForTransition(float targetVolume);
-	SoundBehavior ComputeVolumeForTransition(SoundBehavior targetSoundBehavior);
+	SoundBehavior ComputeVolumeForTransition(const SoundBehavior& targetSoundBehavior);
 	AtomicStructure<Sound> sound;
 	AtomicStructure<SoundParameters> parameters;
 	SoundParameters rewind_parameters;

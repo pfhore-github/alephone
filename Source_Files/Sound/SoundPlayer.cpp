@@ -4,22 +4,23 @@
 constexpr SoundBehavior SoundPlayer::sound_behavior_parameters[];
 constexpr SoundBehavior SoundPlayer::sound_obstructed_or_muffled_behavior_parameters[];
 constexpr SoundBehavior SoundPlayer::sound_obstructed_and_muffled_behavior_parameters[];
-SoundPlayer::SoundPlayer(const Sound sound, SoundParameters parameters)
+SoundPlayer::SoundPlayer(const Sound& sound, const SoundParameters& parameters)
 	: AudioPlayer(sound.header.rate >> 16, sound.header.stereo, sound.header.audio_format) {  //since header.rate is on 16.16 format
-	parameters.loop = parameters.loop || sound.header.loop_end - sound.header.loop_start >= 4;
+	auto soundParameters = parameters;
+	soundParameters.loop = parameters.loop || sound.header.loop_end - sound.header.loop_start >= 4; //where does this happen?
 	this->sound = sound;
-	this->parameters = parameters;
+	this->parameters = soundParameters;
 	data_length = sound.header.length;
 	start_tick = SoundManager::GetCurrentAudioTick();
 }
 
 //Simulate what the volume of our sound would be if we play it
 //If the volume is 0 then we just don't play the sound and drop it
-float SoundPlayer::Simulate(const SoundParameters soundParameters) {
+float SoundPlayer::Simulate(const SoundParameters& soundParameters) {
 	if (soundParameters.local && !soundParameters.stereo_parameters.is_panning) return 1; //ofc we play all local sounds without stereo panning
 	if (soundParameters.stereo_parameters.is_panning) return soundParameters.stereo_parameters.gain_global;
 
-	const auto listener = OpenALManager::Get()->GetListener(); //if we don't have a listener on a non local sound, there is a problem
+	const auto& listener = OpenALManager::Get()->GetListener(); //if we don't have a listener on a non local sound, there is a problem
 	float distance = std::sqrt(
 		std::pow((float)(soundParameters.source_location3d.point.x - listener.point.x) / WORLD_ONE, 2) +
 		std::pow((float)(soundParameters.source_location3d.point.y - listener.point.y) / WORLD_ONE, 2) +
@@ -44,16 +45,22 @@ float SoundPlayer::Simulate(const SoundParameters soundParameters) {
 	return volume;
 }
 
-bool SoundPlayer::CanRewindSound(int baseTick) const { 
-	auto rewindTime = OpenALManager::Get()->IsBalanceRewindSound() || rewind_parameters.source_identifier != parameters.Get().source_identifier ? rewind_time : fast_rewind_time;
+bool SoundPlayer::CanRewind(int baseTick) const { 
+	auto rewindTime = OpenALManager::Get()->IsBalanceRewindSound() || !CanFastRewind(rewind_parameters) ? rewind_time : fast_rewind_time;
 	return baseTick + rewindTime < SoundManager::GetCurrentAudioTick();
 }
 
-void SoundPlayer::AskRewind(SoundParameters soundParameters, const Sound& newSound) {
-	soundParameters._is_for_rewind = true;
-	UpdateParameters(soundParameters);
+bool SoundPlayer::CanFastRewind(const SoundParameters& soundParameters) const {
+	return (soundParameters.source_identifier != NONE || (soundParameters.local && !soundParameters.stereo_parameters.is_panning))
+		&& soundParameters.source_identifier == GetSourceIdentifier();
+}
 
-	if (parameters.Get().permutation != soundParameters.permutation) {
+void SoundPlayer::AskRewind(const SoundParameters& soundParameters, const Sound& newSound) {
+	auto soundParametersRewind = soundParameters;
+	soundParametersRewind._is_for_rewind = true;
+	UpdateParameters(soundParametersRewind);
+
+	if (parameters.Get().permutation != soundParametersRewind.permutation) {
 		sound.Store(newSound);
 	}
 
@@ -61,7 +68,7 @@ void SoundPlayer::AskRewind(SoundParameters soundParameters, const Sound& newSou
 }
 
 void SoundPlayer::Rewind() {
-	if (CanRewindSound(start_tick)) {
+	if (CanRewind(start_tick)) {
 		sound.Update();
 		parameters.Set(rewind_parameters);
 		AudioPlayer::Rewind();
@@ -81,7 +88,7 @@ int SoundPlayer::LoopManager(uint8* data, int length) {
 		auto header = sound.Get().header;
 		int loopLength = header.loop_end - header.loop_start;
 
-		if (loopLength >= 4) {
+		if (loopLength >= 4) { //where does this happen?
 			data_length = loopLength;
 			current_index_data = header.loop_start;
 		}
@@ -218,7 +225,7 @@ float SoundPlayer::ComputeParameterForTransition(float targetParameter, float cu
 	return targetParameter > currentParameter ? std::min(targetParameter, computedParameter) : std::max(targetParameter, computedParameter);
 }
 
-SoundBehavior SoundPlayer::ComputeVolumeForTransition(SoundBehavior targetSoundBehavior) {
+SoundBehavior SoundPlayer::ComputeVolumeForTransition(const SoundBehavior& targetSoundBehavior) {
 
 	auto computedSoundBehavior = targetSoundBehavior;
 

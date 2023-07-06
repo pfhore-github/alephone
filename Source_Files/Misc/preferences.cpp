@@ -103,6 +103,8 @@ May 22, 2003 (Woody Zenfell):
 #include "shell_options.h"
 #include "OpenALManager.h"
 
+#include "XML_LevelScript.h"
+
 #ifdef HAVE_UNISTD_H
 #include <unistd.h>
 #endif
@@ -999,11 +1001,6 @@ static const uint32 max_saves_values[] = {
 	20, 100, 500, 0
 };
 
-static const char* renderer_audio_labels[] = { 
-	"SDL", "OpenAL", NULL 
-};
-
-
 
 enum {
     iRENDERING_SYSTEM = 1000
@@ -1462,7 +1459,7 @@ static void graphics_dialog(void *arg)
 			ResetAllMMLValues();
 			LoadBaseMMLScripts();
 			Plugins::instance()->load_mml();
-			
+
 		    change_screen_mode(&graphics_preferences->screen_mode, true);
 		    clear_screen(true);
 		    parent->layout();
@@ -1556,6 +1553,24 @@ static void sound_dialog(void *arg)
 	table->dual_add(hrtf_w, d);
 	hrtf_w->set_enabled(OpenALManager::Get() && OpenALManager::Get()->Support_HRTF_Toggling());
 
+	int resamplers_number = OpenALManager::Get() ? OpenALManager::Get()->GetResamplersNumber() : 0;
+	static std::vector<std::string> resamplers(resamplers_number);
+
+	for (int i = 0; i < resamplers_number; i++) {
+		resamplers[i] = OpenALManager::Get()->GetResamplerName(i);
+	}
+
+	int resampler_index = sound_preferences->resampler_index != NONE && sound_preferences->resampler_index < resamplers_number ?
+		sound_preferences->resampler_index : OpenALManager::Get() ? OpenALManager::Get()->GetDefaultResampler() : NONE;
+
+	w_select_popup* resampler_w = new w_select_popup();
+	resampler_w->set_labels(resamplers);
+	resampler_w->set_selection(resampler_index);
+	table->dual_add(resampler_w->label("Resampler"), d);
+	table->dual_add(resampler_w, d);
+
+	table->add_row(new w_spacer(), true);
+
 	w_volume_slider *volume_w = new w_volume_slider(static_cast<int>(sound_preferences->volume_db / 2 + 20));
 	table->dual_add(volume_w->label("音量"), d);
 	table->dual_add(volume_w, d);
@@ -1646,6 +1661,12 @@ static void sound_dialog(void *arg)
 		float music_db = music_volume_w->get_selection() - 20;
 		if (music_db != sound_preferences->music_db) {
 			sound_preferences->music_db = music_db;
+			changed = true;
+		}
+
+		int resampler_index = resampler_w->get_selection();
+		if (resampler_index != sound_preferences->resampler_index) {
+			sound_preferences->resampler_index = resampler_index;
 			changed = true;
 		}
 
@@ -2963,6 +2984,9 @@ static void plugins_dialog(void *)
 			ResetAllMMLValues();
 			LoadBaseMMLScripts();
 			Plugins::instance()->load_mml();
+
+			Plugins::instance()->set_map_checksum(get_current_map_checksum());
+			LoadLevelScripts(get_map_file());
 		}
 	}
 }
@@ -3379,16 +3403,16 @@ void read_preferences ()
 			for (const InfoTree &child : root.children_named("environment"))
 				parse_environment_preferences(child, version);
 			
-		} catch (InfoTree::parse_error ex) {
+		} catch (const InfoTree::parse_error& ex) {
 			logError("Error parsing preferences file (%s): %s", FileSpec.GetPath(), ex.what());
 			parse_error = true;
-		} catch (InfoTree::path_error ep) {
+		} catch (const InfoTree::path_error& ep) {
 			logError("Could not find mara_prefs in preferences file (%s): %s", FileSpec.GetPath(), ep.what());
 			parse_error = true;
-		} catch (InfoTree::data_error ed) {
+		} catch (const InfoTree::data_error& ed) {
 			logError("Unexpected data error in preferences file (%s): %s", FileSpec.GetPath(), ed.what());
 			parse_error = true;
-		} catch (InfoTree::unexpected_error ee) {
+		} catch (const InfoTree::unexpected_error& ee) {
 			logError("Unexpected error in preferences file (%s): %s", FileSpec.GetPath(), ee.what());
 			parse_error = true;
 		}
@@ -3780,6 +3804,7 @@ InfoTree sound_preferences_tree()
 	root.put_attr("rate", sound_preferences->rate);
 	root.put_attr("samples", sound_preferences->samples);
 	root.put_attr("video_export_volume_db", sound_preferences->video_export_volume_db);
+	root.put_attr("resampler_index", sound_preferences->resampler_index);
 
 	return root;
 }
@@ -3897,9 +3922,9 @@ void write_preferences()
 	
 	try {
 		fileroot.save_xml(FileSpec);
-	} catch (InfoTree::parse_error ex) {
+	} catch (const InfoTree::parse_error& ex) {
 		logError("Error saving preferences file (%s): %s", FileSpec.GetPath(), ex.what());
-	} catch (InfoTree::unexpected_error ex) {
+	} catch (const InfoTree::unexpected_error& ex) {
 		logError("Error saving preferences file (%s): %s", FileSpec.GetPath(), ex.what());
 	}
 }
@@ -4432,7 +4457,7 @@ void parse_graphics_preferences(InfoTree root, std::string version)
 	
 	for (const InfoTree &landscape : root.children_named("landscapes"))
 	{
-		for (const InfoTree &color : root.children_named("color"))
+		for (const InfoTree &color : landscape.children_named("color"))
 		{
 			int16 index;
 			if (color.read_indexed("index", index, 8))
@@ -4679,7 +4704,6 @@ void parse_input_preferences(InfoTree root, std::string version)
 			key.read_attr("pressed", pressed_name))
 		{
 			BindingType binding_type;
-			bool shell = false;
 			int index = index_for_action_name(action_name, binding_type);
 			if (index < 0)
 				continue;
@@ -4754,6 +4778,7 @@ void parse_sound_preferences(InfoTree root, std::string version)
 	root.read_attr("rate", sound_preferences->rate);
 	root.read_attr("samples", sound_preferences->samples);
 	root.read_attr("video_export_volume_db", sound_preferences->video_export_volume_db);
+	root.read_attr("resampler_index", sound_preferences->resampler_index);
 }
 
 

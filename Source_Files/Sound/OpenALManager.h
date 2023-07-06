@@ -27,7 +27,7 @@ extern "C"
 }
 #endif
 
-const std::unordered_map<ALCint, AVSampleFormat> mapping_openal_ffmpeg = {
+const inline std::unordered_map<ALCint, AVSampleFormat> mapping_openal_ffmpeg = {
 	{ALC_FLOAT_SOFT, AV_SAMPLE_FMT_FLT},
 	{ALC_INT_SOFT, AV_SAMPLE_FMT_S32},
 	{ALC_SHORT_SOFT, AV_SAMPLE_FMT_S16},
@@ -39,6 +39,7 @@ const std::unordered_map<ALCint, AVSampleFormat> mapping_openal_ffmpeg = {
 struct AudioParameters {
 	int rate;
 	int sample_frame_size;
+	int resampler_index;
 	bool stereo;
 	bool balance_rewind;
 	bool hrtf;
@@ -49,26 +50,29 @@ struct AudioParameters {
 class OpenALManager {
 public:
 	static OpenALManager* Get() { return instance; }
-	static bool Init(AudioParameters parameters);
+	static bool Init(const AudioParameters& parameters);
 	static float From_db(float db, bool music = false) { return db <= (SoundManager::MINIMUM_VOLUME_DB / (music ? 2 : 1)) ? 0 : std::pow(10.f, db / 20.f); }
 	static void Shutdown();
 	void Start();
 	void Stop();
 	void StopAllPlayers();
-	std::shared_ptr<SoundPlayer> PlaySound(const Sound& sound, SoundParameters parameters);
-	std::shared_ptr<SoundPlayer> PlaySound(LoadedResource& rsrc, SoundParameters parameters);
+	std::shared_ptr<SoundPlayer> PlaySound(const Sound& sound, const SoundParameters& parameters);
+	std::shared_ptr<SoundPlayer> PlaySound(LoadedResource& rsrc, const SoundParameters& parameters);
 	std::shared_ptr<MusicPlayer> PlayMusic(std::shared_ptr<StreamDecoder> decoder, MusicParameters parameters);
 	std::shared_ptr<StreamPlayer> PlayStream(CallBackStreamPlayer callback, int length, int rate, bool stereo, AudioFormat audioFormat);
 	void StopSound(short sound_identifier, short source_identifier);
-	std::unique_ptr<AudioPlayer::AudioSource> PickAvailableSource(float priority);
+	std::unique_ptr<AudioPlayer::AudioSource> PickAvailableSource(const AudioPlayer& audioPlayer);
 	std::shared_ptr<SoundPlayer> GetSoundPlayer(short identifier, short source_identifier, bool sound_identifier_only = false) const;
 	void UpdateListener(world_location3d listener) { listener_location.Set(listener); }
-	const world_location3d GetListener() const { return listener_location.Get(); }
+	const world_location3d& GetListener() const { return listener_location.Get(); }
 	void SetMasterVolume(float volume);
 	float GetMasterVolume() const { return master_volume.load(); }
 	void ToggleDeviceMode(bool recording_device);
 	int GetFrequency() const { return audio_parameters.rate; }
 	void GetPlayBackAudio(uint8* data, int length);
+	int GetDefaultResampler() const;
+	int GetResamplersNumber() const;
+	std::string GetResamplerName(int resamplerIndex) const;
 	bool Support_HRTF_Toggling() const;
 	bool Is_HRTF_Enabled() const;
 	bool IsBalanceRewindSound() const { return audio_parameters.balance_rewind; }
@@ -80,12 +84,12 @@ private:
 	static OpenALManager* instance;
 	ALCdevice* p_ALCDevice = nullptr;
 	ALCcontext* p_ALCContext = nullptr;
-	OpenALManager(AudioParameters parameters);
+	OpenALManager(const AudioParameters& parameters);
 	~OpenALManager();
 	std::atomic<float> master_volume;
 	bool process_audio_active = false;
 	AtomicStructure<world_location3d> listener_location = {};
-	void UpdateParameters(AudioParameters parameters);
+	void UpdateParameters(const AudioParameters& parameters);
 	void UpdateListener();
 	void CleanEverything();
 	bool GenerateSources();
@@ -106,6 +110,8 @@ private:
 	static LPALCLOOPBACKOPENDEVICESOFT alcLoopbackOpenDeviceSOFT;
 	static LPALCISRENDERFORMATSUPPORTEDSOFT alcIsRenderFormatSupportedSOFT;
 	static LPALCRENDERSAMPLESSOFT alcRenderSamplesSOFT;
+
+	static LPALGETSTRINGISOFT alGetStringiSOFT;
 
 	/* Filter object functions */
 	static LPALGENFILTERS alGenFilters;
