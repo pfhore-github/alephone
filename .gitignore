@@ -8,6 +8,7 @@ Makefile.in
 GNUmakefile
 lib*.a
 *.o
+
 /aclocal.m4
 /AlephOne.spec
 /autom4te.cache
@@ -25,8 +26,10 @@ lib*.a
 /missing
 /stamp-h1
 /Source_Files/CSeries/confpaths.h
+
 /Source_Files/alephone
 /Source_Files/*.exe
 /*.zip
 /*.tar.bz2
+
 .vscode/

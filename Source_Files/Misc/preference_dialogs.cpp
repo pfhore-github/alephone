@@ -539,106 +539,58 @@ public:
 		texture_labels[OGL_Txtr_Inhabitant] = new w_label("スプライト");
 		texture_labels[OGL_Txtr_WeaponsInHand] = new w_label("手中の武器／HUD");
 
-		//		advanced_placer->dual_add(new w_static_text("Built-in Texture Size and Depth"), m_dialog);
-		//		advanced_placer->dual_add(new w_static_text("(reduce for machines with low VRAM)"), m_dialog);
-		advanced_placer->dual_add(new w_static_text("ビルドインのテスクチャのサイズと色深度"), m_dialog);
-		advanced_placer->dual_add(new w_static_text("（VRAMの量が少ないマシンでは、減らすことを推奨します）"), m_dialog);
-
-		vector<string> tex_reso_strings;
-		//		tex_reso_strings.push_back ("Full");
-		tex_reso_strings.push_back("フル");
-		tex_reso_strings.push_back ("1/2");
-		tex_reso_strings.push_back ("1/4");
-
-		vector<string> tex_depth_strings;
-		//		tex_depth_strings.push_back ("32-bit");
-		//		tex_depth_strings.push_back ("16-bit");
-		//		tex_depth_strings.push_back ("8-bit");
-		tex_depth_strings.push_back("32ビット");
-		tex_depth_strings.push_back("16ビット");
-		tex_depth_strings.push_back("8ビット");
-
-		table_placer *table = new table_placer(3, get_theme_space(ITEM_WIDGET));
-
-		table->col_flags(0, placeable::kAlignRight);
-		table->col_flags(1, placeable::kAlignLeft);
-		table->col_flags(2, placeable::kAlignLeft);
-
-		table->add(new w_spacer(), true);
-		//		table->dual_add(new w_label("Size"), m_dialog);
-		//		table->dual_add(new w_label("Depth"), m_dialog);
-		table->dual_add(new w_label("サイズ"), m_dialog);
-		table->dual_add(new w_label("色深度"), m_dialog);
-
-		for (int i = 0; i < OGL_NUMBER_OF_TEXTURE_TYPES; i++)
-		{
-			table->dual_add(texture_labels[i], m_dialog);
-			table->dual_add(texture_resolution_wa[i], m_dialog);
-			table->dual_add(texture_depth_wa[i], m_dialog);
-
-			texture_resolution_wa[i]->associate_label(texture_labels[i]);
-			texture_resolution_wa[i]->set_labels(tex_reso_strings);
-
-			texture_depth_wa[i]->associate_label(texture_labels[i]);
-			texture_depth_wa[i]->set_labels(tex_depth_strings);
-		}
-
-		table->col_min_width(1, (table->col_width(0) - get_theme_space(ITEM_WIDGET)) / 2);
-		table->col_min_width(2, (table->col_width(0) - get_theme_space(ITEM_WIDGET)) / 2);
-
-		advanced_placer->add(table, true);
-
 		m_tabs->add(general_table, true);
 		m_tabs->add(advanced_placer, true);
 		placer->add(m_tabs, false);
-	
+
 		placer->add(new w_spacer(), true);
 
-		horizontal_placer *button_placer = new horizontal_placer;
-		//		w_button* ok_w = new w_button("ACCEPT");
+		horizontal_placer* button_placer = new horizontal_placer;
 		w_button* ok_w = new w_button("了承");
 		button_placer->dual_add(ok_w, m_dialog);
 
-		//		w_button* cancel_w = new w_button("CANCEL");
 		w_button* cancel_w = new w_button("キャンセル");
 		button_placer->dual_add(cancel_w, m_dialog);
 		placer->add(button_placer, true);
 
 		m_dialog.set_widget_placer(placer);
 
-		m_cancelWidget = new ButtonWidget (cancel_w);
-		m_okWidget = new ButtonWidget (ok_w);
-		
-		m_fogWidget = new ToggleWidget (fog_w);
-		m_colourEffectsWidget = new ToggleWidget (fader_w);
-		m_transparentLiquidsWidget = new ToggleWidget (liq_w);
-		m_3DmodelsWidget = new ToggleWidget (models_w);
-		m_blurWidget = new ToggleWidget (blur_w);
-		m_bumpWidget = new ToggleWidget (bump_w);
-		m_perspectiveWidget = new ToggleWidget (perspective_w);
+		m_cancelWidget = new ButtonWidget(cancel_w);
+		m_okWidget = new ButtonWidget(ok_w);
+
+		m_fogWidget = new ToggleWidget(fog_w);
+		m_colourEffectsWidget = new ToggleWidget(fader_w);
+		m_transparentLiquidsWidget = new ToggleWidget(liq_w);
+		m_3DmodelsWidget = new ToggleWidget(models_w);
+		m_blurWidget = new ToggleWidget(blur_w);
+		m_bumpWidget = new ToggleWidget(bump_w);
+		m_perspectiveWidget = new ToggleWidget(perspective_w);
 
 		m_colourTheVoidWidget = 0;
 		m_voidColourWidget = 0;
 
 		m_ephemeraQualityWidget = new PopupSelectorWidget(ephemera_w);
 
-		m_fsaaWidget = new PopupSelectorWidget (fsaa_w);
+		m_fsaaWidget = new PopupSelectorWidget(fsaa_w);
 
-		m_anisotropicWidget = new SliderSelectorWidget (aniso_w);
+		m_anisotropicWidget = new SliderSelectorWidget(aniso_w);
 
 		m_sRGBWidget = new ToggleWidget(srgb_w);
 
-		m_useNPOTWidget = new ToggleWidget (use_npot_w);
-		m_vsyncWidget = new ToggleWidget (vsync_w);
-		
-		m_wallsFilterWidget = new SelectSelectorWidget (far_filter_wa[OGL_Txtr_Wall]);
-		m_spritesFilterWidget = new SelectSelectorWidget (far_filter_wa[OGL_Txtr_Inhabitant]);
+		m_useNPOTWidget = new ToggleWidget(use_npot_w);
+		m_vsyncWidget = new ToggleWidget(vsync_w);
+
+		m_wallsFilterWidget = new SelectSelectorWidget(far_filter_wa[OGL_Txtr_Wall]);
+		m_spritesFilterWidget = new SelectSelectorWidget(far_filter_wa[OGL_Txtr_Inhabitant]);
 
 		for (int i = 0; i < OGL_NUMBER_OF_TEXTURE_TYPES; ++i) {
-			m_textureQualityWidget [i] = new PopupSelectorWidget (texture_quality_wa[i]);
+			m_textureQualityWidget[i] = new PopupSelectorWidget(texture_quality_wa[i]);
 			m_nearFiltersWidget[i] = new SelectSelectorWidget(near_filter_wa[i]);
 		}
 		m_modelQualityWidget = new PopupSelectorWidget(model_quality_w);
+
+
+		
 	}
 
 	~SdlOpenGLDialog() {
