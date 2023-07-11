@@ -63,10 +63,9 @@
       {
         "name": "libiconv"
       },
-	  {
-	      "name":"libsndfile",
-		  "default-features": false
-	  },
+       {
+         "name":"libsndfile"
+      },
       {
          "name":"openal-soft"
       }
