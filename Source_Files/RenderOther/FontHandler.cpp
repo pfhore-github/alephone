@@ -310,6 +310,7 @@ void FontSpecifier::OGL_DrawText(const char *text, const screen_rectangle &r, sh
 	int rect_width = RECTANGLE_WIDTH(&r);
 	// Check for wrapping, and if it occurs, be recursive
 	int t_width = TextWidth(text_to_draw);
+	auto len = strlen(text_to_draw);
 	if (t_width > rect_width && (flags & _wrap_text)) {
 		int last_breaking_pos = 0, text_width = 0;
 		unsigned count = 0;
