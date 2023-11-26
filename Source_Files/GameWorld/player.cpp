@@ -684,6 +684,8 @@ void update_players(ActionQueues* inActionQueuesToUse, bool inPredictive)
 			action_flags= 0;
 		}
 		
+		player->run_key = action_flags & _run_dont_walk;
+		
 		bool IsSwimming = TEST_FLAG(player->variables.flags,_HEAD_BELOW_MEDIA_BIT) && player_settings.CanSwim;
 
 		// if we’ve got the ball we can’t run (that sucks)
@@ -701,7 +703,7 @@ void update_players(ActionQueues* inActionQueuesToUse, bool inPredictive)
 		
 		// if our head is under media, we can’t run (that sucks, too)
 		if (IsSwimming && (action_flags&_run_dont_walk)) action_flags&= ~_run_dont_walk, action_flags|= _swim;
-		
+
 		update_player_physics_variables(player_index, action_flags, inPredictive);
 
 		if(!inPredictive)
@@ -1078,6 +1080,12 @@ bool legal_player_powerup(
 	struct player_data *player= get_player_data(player_index);
 	bool legal= true;
 
+	if ((static_world->environment_flags & _environment_m1_weapons)
+		&& film_profile.m1_bce_pickup)
+	{
+		return true;
+	}
+
 	if (item_index == player_powerups.Powerup_Invincibility)
 	{
 		if (player->invincibility_duration) legal= false;
@@ -1323,13 +1331,15 @@ static void update_player_teleport(
 			/*  after the level transition */
 			case PLAYER_TELEPORTING_MIDPOINT+1:
 				/* Either the player is teleporting, or everyone is. (level change) */
-				if(player_index==current_player_index)
+				if (View_DoInterlevelTeleportInEffects()) 
 				{
-					if (View_DoInterlevelTeleportInEffects()) {
+					if (player_index == current_player_index) 
+					{
 						start_teleporting_effect(false);
-						play_object_sound(player->object_index, Sound_TeleportIn(), true); 
 						if (shapes_file_is_m1()) start_fade(_fade_bright);
 					}
+
+					play_object_sound(player->object_index, Sound_TeleportIn(), player_index == current_player_index);
 				}
 				player->teleporting_destination= NO_TELEPORTATION_DESTINATION;
 				break;
@@ -1379,21 +1389,25 @@ static void update_player_teleport(
 
 			case PLAYER_TELEPORTING_MIDPOINT+1:
 				 /* Interlevel or my intralevel.. */
-				if(player_index==current_player_index)
+				if (player->teleporting_destination >= 0 || View_DoInterlevelTeleportInEffects())
 				{
-					if (player->teleporting_destination >= 0 || View_DoInterlevelTeleportInEffects()) {
+					if (player_index == current_player_index)
+					{
 						start_teleporting_effect(false);
-						play_object_sound(player->object_index, Sound_TeleportIn(), true); 
 						if (shapes_file_is_m1()) start_fade(_fade_bright);
 					}
-					else {
-						player->teleporting_phase = PLAYER_TELEPORTING_DURATION;
-					}
-				} 
-				player->teleporting_destination= NO_TELEPORTATION_DESTINATION;
+
+					play_object_sound(player->object_index, Sound_TeleportIn(), player_index == current_player_index);
+				}
+				else {
+					player->teleporting_phase = PLAYER_TELEPORTING_DURATION;
+				}
+
+				player->teleporting_destination = NO_TELEPORTATION_DESTINATION;
 
 				if (player->teleporting_phase != PLAYER_TELEPORTING_DURATION) break;
 			
+				[[fallthrough]];
 			case PLAYER_TELEPORTING_DURATION:
 				monster->action= _monster_is_moving;
 				SET_PLAYER_TELEPORTING_STATUS(player, false);

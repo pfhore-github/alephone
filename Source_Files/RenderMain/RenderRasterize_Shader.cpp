@@ -26,8 +26,6 @@
 
 #define MAXIMUM_VERTICES_PER_WORLD_POLYGON (MAXIMUM_VERTICES_PER_POLYGON+4)
 
-inline bool FogActive();
-
 class Blur {
 
 private:
@@ -160,35 +158,53 @@ void RenderRasterize_Shader::render_tree() {
 		}
 	}
 	
-	bool usefog = false;
-	int fogtype;
-	OGL_FogData *fogdata;
-	if (TEST_FLAG(Get_OGL_ConfigureData().Flags,OGL_Flag_Fog))
-	{
-		fogtype = (current_player->variables.flags&_HEAD_BELOW_MEDIA_BIT) ?
-		OGL_Fog_BelowLiquid : OGL_Fog_AboveLiquid;
-		fogdata = OGL_GetFogData(fogtype);
-		if (fogdata && fogdata->IsPresent && fogdata->AffectsLandscapes) {
-			usefog = true;
-		}
+	float fogMix = 0.0;
+	auto fogdata = OGL_GetCurrFogData();
+	if (fogdata && fogdata->IsPresent && fogdata->AffectsLandscapes) {
+		fogMix = fogdata->LandscapeMix;
 	}
+
+	float fogmode = -1.0;
+	if (fogdata) {
+		fogmode = fogdata->Mode;
+	}
+
 	const float virtual_yaw = view->virtual_yaw * FixedAngleToRadians;
 	const float virtual_pitch = view->virtual_pitch * FixedAngleToRadians;
-	s = Shader::get(Shader::S_Landscape);
-	s->enable();
-	s->setFloat(Shader::U_UseFog, usefog ? 1.0 : 0.0);
-	s->setFloat(Shader::U_Yaw, virtual_yaw);
-	s->setFloat(Shader::U_Pitch, view->mimic_sw_perspective ? 0.0 : virtual_pitch);
-	s = Shader::get(Shader::S_LandscapeBloom);
-	s->enable();
-	s->setFloat(Shader::U_UseFog, usefog ? 1.0 : 0.0);
-	s->setFloat(Shader::U_Yaw, virtual_yaw);
-	s->setFloat(Shader::U_Pitch, view->mimic_sw_perspective ? 0.0 : virtual_pitch);
-	s = Shader::get(Shader::S_LandscapeInfravision);
-	s->enable();
-	s->setFloat(Shader::U_UseFog, usefog ? 1.0 : 0.0);
-	s->setFloat(Shader::U_Yaw, virtual_yaw);
-	s->setFloat(Shader::U_Pitch, view->mimic_sw_perspective ? 0.0 :virtual_pitch);
+
+	Shader* landscape_shaders[] = {
+		Shader::get(Shader::S_Landscape),
+		Shader::get(Shader::S_LandscapeBloom),
+		Shader::get(Shader::S_LandscapeInfravision)
+	};
+
+	for (auto s : landscape_shaders) {
+		s->enable();
+		s->setFloat(Shader::U_FogMix, fogMix);
+		s->setFloat(Shader::U_Yaw, virtual_yaw);
+		s->setFloat(Shader::U_Pitch, view->mimic_sw_perspective ? 0.0 : virtual_pitch);
+	}
+
+	Shader* fog_mode_shaders[] = {
+		Shader::get(Shader::S_Bump),
+		Shader::get(Shader::S_BumpBloom),
+		Shader::get(Shader::S_Invincible),
+		Shader::get(Shader::S_InvincibleBloom),
+		Shader::get(Shader::S_Invisible),
+		Shader::get(Shader::S_InvisibleBloom),
+		Shader::get(Shader::S_Wall),
+		Shader::get(Shader::S_WallBloom),
+		Shader::get(Shader::S_WallInfravision),
+		Shader::get(Shader::S_Sprite),
+		Shader::get(Shader::S_SpriteBloom),
+		Shader::get(Shader::S_SpriteInfravision)
+	};
+	
+	for (auto s : fog_mode_shaders) {
+		s->enable();
+		s->setFloat(Shader::U_FogMode, fogmode);
+	}
+	
 	Shader::disable();
 
 	RenderRasterizerClass::render_tree(kDiffuse);
@@ -506,6 +522,10 @@ void instantiate_transfer_mode(struct view_data *view, short transfer_mode, worl
 		case _xfer_fast_vertical_slide:
 		case _xfer_wander:
 		case _xfer_fast_wander:
+		case _xfer_reverse_horizontal_slide:
+		case _xfer_reverse_fast_horizontal_slide:
+		case _xfer_reverse_vertical_slide:
+		case _xfer_reverse_fast_vertical_slide:
 			x0 = y0= 0;
 			switch (transfer_mode) {
 				case _xfer_fast_horizontal_slide: transfer_phase<<= 1;
@@ -513,6 +533,11 @@ void instantiate_transfer_mode(struct view_data *view, short transfer_mode, worl
 
 				case _xfer_fast_vertical_slide: transfer_phase<<= 1;
 				case _xfer_vertical_slide: y0= (transfer_phase<<2)&(WORLD_ONE-1); break;
+				case _xfer_reverse_fast_horizontal_slide: transfer_phase<<= 1;
+				case _xfer_reverse_horizontal_slide: x0 = WORLD_ONE - (transfer_phase<<2)&(WORLD_ONE-1); break;
+			
+		        case _xfer_reverse_fast_vertical_slide: transfer_phase<<= 1;
+				case _xfer_reverse_vertical_slide: y0 = WORLD_ONE - (transfer_phase<<2)&(WORLD_ONE-1); break;
 
 				case _xfer_fast_wander: transfer_phase<<= 1;
 				case _xfer_wander:
@@ -658,6 +683,21 @@ void RenderRasterize_Shader::render_node_floor_or_ceiling(clipping_window_data *
 
 		GLfloat* vp = vertex_array;
 		GLfloat* tp = texcoord_array;
+		float scale;
+
+		switch (surface->transfer_mode)
+		{
+			case _xfer_2x:
+				scale = 2 * WORLD_ONE * TMgr->TileRatio();
+				break;
+		    case _xfer_4x:
+				scale = 4 * WORLD_ONE * TMgr->TileRatio();
+				break;
+			default:
+				scale = WORLD_ONE * TMgr->TileRatio();
+				break;
+		}
+
 		if (ceil)
 		{
 			for(short i = 0; i < vertex_count; ++i) {
@@ -665,8 +705,8 @@ void RenderRasterize_Shader::render_node_floor_or_ceiling(clipping_window_data *
 				*vp++ = vertex.x;
 				*vp++ = vertex.y;
 				*vp++ = surface->height;
-				*tp++ = (vertex.x + surface->origin.x + x) / float(WORLD_ONE);
-				*tp++ = (vertex.y + surface->origin.y + y) / float(WORLD_ONE);
+				*tp++ = (vertex.x + surface->origin.x + x) / scale;
+				*tp++ = (vertex.y + surface->origin.y + y) / scale;
 			}
 		}
 		else
@@ -676,8 +716,8 @@ void RenderRasterize_Shader::render_node_floor_or_ceiling(clipping_window_data *
 				*vp++ = vertex.x;
 				*vp++ = vertex.y;
 				*vp++ = surface->height;
-				*tp++ = (vertex.x + surface->origin.x + x) / float(WORLD_ONE);
-				*tp++ = (vertex.y + surface->origin.y + y) / float(WORLD_ONE);
+				*tp++ = (vertex.x + surface->origin.x + x) / scale;
+				*tp++ = (vertex.y + surface->origin.y + y) / scale;
 			}
 		}
 		glVertexPointer(3, GL_FLOAT, 0, vertex_array);
@@ -756,12 +796,25 @@ void RenderRasterize_Shader::render_node_side(clipping_window_data *window, vert
 			vertices[0].flags = vertices[3].flags = 0;
 			vertices[1].flags = vertices[2].flags = 0;
 
-			double div = WORLD_ONE;
+			uint16 div;
+			switch (surface->transfer_mode)
+			{
+				case _xfer_2x:
+					div = 2 * WORLD_ONE * TMgr->TileRatio();
+					break;
+				case _xfer_4x:
+					div = 4 * WORLD_ONE * TMgr->TileRatio();
+					break;
+				default:
+					div = WORLD_ONE * TMgr->TileRatio();;
+					break;
+			}
+			
 			double dx = (surface->p1.i - surface->p0.i) / double(surface->length);
 			double dy = (surface->p1.j - surface->p0.j) / double(surface->length);
 
-			world_distance x0 = WORLD_FRACTIONAL_PART(surface->texture_definition->x0);
-			world_distance y0 = WORLD_FRACTIONAL_PART(surface->texture_definition->y0);
+			world_distance x0 = surface->texture_definition->x0 % div;
+			world_distance y0 = surface->texture_definition->y0 % div;
 
 			double tOffset = surface->h1 + view->origin.z + y0;
 
@@ -790,8 +843,8 @@ void RenderRasterize_Shader::render_node_side(clipping_window_data *window, vert
 				*vp++ = vertices[i].x;
 				*vp++ = vertices[i].y;
 				*vp++ = vertices[i].z;
-				*tp++ = (tOffset - vertices[i].z) / div;
-				*tp++ = (x0+p2) / div;
+				*tp++ = (tOffset - vertices[i].z) / static_cast<float>(div);
+				*tp++ = (x0+p2) / static_cast<float>(div);
 			}
 			glVertexPointer(3, GL_FLOAT, 0, vertex_array);
 			glTexCoordPointer(2, GL_FLOAT, 0, texcoord_array);

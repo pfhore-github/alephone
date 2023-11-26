@@ -163,7 +163,6 @@ OpenGLDialog::~OpenGLDialog()
 	delete m_bumpWidget;
 	delete m_colourTheVoidWidget;
 	delete m_voidColourWidget;
-	delete m_fsaaWidget;
 	delete m_anisotropicWidget;
 	delete m_sRGBWidget;
 	delete m_useNPOTWidget;
@@ -204,9 +203,6 @@ void OpenGLDialog::OpenGLPrefsByRunning ()
 	binders.insert<bool> (m_colourTheVoidWidget, &colourTheVoidPref);
 	ColourPref voidColourPref (graphics_preferences->OGL_Configure.VoidColor);
 	binders.insert<RGBColor> (m_voidColourWidget, &voidColourPref);
-	
-	TimesTwoPref fsaaPref (graphics_preferences->OGL_Configure.Multisamples);
-	binders.insert<int> (m_fsaaWidget, &fsaaPref);
 	
 	AnisotropyPref anisotropyPref (graphics_preferences->OGL_Configure.AnisotropyLevel);
 	binders.insert<int> (m_anisotropicWidget, &anisotropyPref);
@@ -372,19 +368,6 @@ public:
 		//		general_table->dual_add(vsync_w->label("VSync"), m_dialog);
 		general_table->dual_add(vsync_w->label("垂直同期"), m_dialog);
 		general_table->dual_add(vsync_w, m_dialog);
-
-		w_select_popup *fsaa_w = new w_select_popup();
-		//		general_table->dual_add(fsaa_w->label("Full Scene Antialiasing"), m_dialog);
-		general_table->dual_add(fsaa_w->label("フルスクリーンアンチエイリアス"), m_dialog);
-		general_table->dual_add(fsaa_w, m_dialog);
-		vector<string> fsaa_strings;
-		//		fsaa_strings.push_back ("Off");
-		//		fsaa_strings.push_back ("2x");
-		//		fsaa_strings.push_back ("4x");
-		fsaa_strings.push_back("切り");
-		fsaa_strings.push_back("２倍");
-		fsaa_strings.push_back("４倍");
-		fsaa_w->set_labels(fsaa_strings);
 
 		w_aniso_slider *aniso_w = new w_aniso_slider(6, 1);
 		//		general_table->dual_add(aniso_w->label("Anisotropic Filtering"),m_dialog);
@@ -570,8 +553,6 @@ public:
 		m_voidColourWidget = 0;
 
 		m_ephemeraQualityWidget = new PopupSelectorWidget(ephemera_w);
-
-		m_fsaaWidget = new PopupSelectorWidget(fsaa_w);
 
 		m_anisotropicWidget = new SliderSelectorWidget(aniso_w);
 

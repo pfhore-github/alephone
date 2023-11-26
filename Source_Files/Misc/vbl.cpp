@@ -1233,23 +1233,64 @@ uint32 parse_keymap(void)
 		  hotkey_sequence[2] = 0;
 	  }
 
-      bool do_interchange =
-	      (local_player->variables.flags & _HEAD_BELOW_MEDIA_BIT) ?
-	      (input_preferences->modifiers & _inputmod_interchange_swim_sink) != 0:
-	      (input_preferences->modifiers & _inputmod_interchange_run_walk) != 0;
-      
       // Handle the selected input controller
       if (input_preferences->input_device == _mouse_yaw_pitch) {
           flags = process_aim_input(flags, pull_mouselook_delta());
       }
-        int joyflags = process_joystick_axes(flags, heartbeat_count);
-        if (joyflags != flags) {
-            flags = joyflags;
-        }
+      
+      int joyflags = process_joystick_axes(flags, heartbeat_count);
+      if (joyflags != flags) {
+          flags = joyflags;
+      }
 
-          // Modify flags with run/walk and swim/sink
-        if (do_interchange)
-	    flags ^= _run_dont_walk;
+      // if the user prefers to toggle run/swim, the flag becomes latched
+      if (input_preferences->modifiers & _inputmod_run_key_toggle)
+      {
+          static bool persistence = false;
+          if (flags & _run_dont_walk)
+          {
+              if (persistence)
+              {
+                  flags &= ~_run_dont_walk;
+              }
+
+              persistence = true;
+          }
+          else
+          {
+              persistence = false;
+          }
+      }
+
+      if (input_preferences->modifiers & _inputmod_run_key_toggle)
+      {
+          static bool run_swim = false;
+          if (flags & _run_dont_walk)
+          {
+              run_swim = !run_swim;
+          }
+
+          if (run_swim)
+          {
+              flags |= _run_dont_walk;
+          }
+          else
+          {
+              flags &= ~_run_dont_walk;
+          }
+      }
+      else
+      {
+          bool do_interchange =
+              (local_player->variables.flags & _HEAD_BELOW_MEDIA_BIT) ?
+              (input_preferences->modifiers & _inputmod_interchange_swim_sink) != 0:
+              (input_preferences->modifiers & _inputmod_interchange_run_walk) != 0;
+
+           if (do_interchange)
+           {
+               flags ^= _run_dont_walk;
+           }
+      }
 		
       
       if (player_in_terminal_mode(local_player_index))

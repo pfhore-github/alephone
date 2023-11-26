@@ -1553,22 +1553,6 @@ static void sound_dialog(void *arg)
 	table->dual_add(hrtf_w, d);
 	hrtf_w->set_enabled(OpenALManager::Get() && OpenALManager::Get()->Support_HRTF_Toggling());
 
-	int resamplers_number = OpenALManager::Get() ? OpenALManager::Get()->GetResamplersNumber() : 0;
-	static std::vector<std::string> resamplers(resamplers_number);
-
-	for (int i = 0; i < resamplers_number; i++) {
-		resamplers[i] = OpenALManager::Get()->GetResamplerName(i);
-	}
-
-	int resampler_index = sound_preferences->resampler_index != NONE && sound_preferences->resampler_index < resamplers_number ?
-		sound_preferences->resampler_index : OpenALManager::Get() ? OpenALManager::Get()->GetDefaultResampler() : NONE;
-
-	w_select_popup* resampler_w = new w_select_popup();
-	resampler_w->set_labels(resamplers);
-	resampler_w->set_selection(resampler_index);
-	table->dual_add(resampler_w->label("Resampler"), d);
-	table->dual_add(resampler_w, d);
-
 	table->add_row(new w_spacer(), true);
 
 	w_volume_slider *volume_w = new w_volume_slider(static_cast<int>(sound_preferences->volume_db / 2 + 20));
@@ -1664,12 +1648,6 @@ static void sound_dialog(void *arg)
 			changed = true;
 		}
 
-		int resampler_index = resampler_w->get_selection();
-		if (resampler_index != sound_preferences->resampler_index) {
-			sound_preferences->resampler_index = resampler_index;
-			changed = true;
-		}
-
 		if (changed) {
 //			set_sound_manager_parameters(sound_preferences);
 			SoundManager::instance()->SetParameters(*sound_preferences);
@@ -1730,7 +1708,8 @@ static const char *action_name[NUM_KEYS] = {
 	"左を見る", "右を見る", "上を見る", "下を見る", "前を見る",
 	"前の武器", "次の武器", "主砲", "副砲",
 	"サイドステップ", "走る／泳ぐ", "見る",
-	"アクション", "地図", "マイク"};
+	"アクション", "地図", "補助トリガ"
+};
 
 static key_binding_map default_key_bindings = {
 	{ 0, { SDL_SCANCODE_W,
@@ -2535,19 +2514,66 @@ static void controls_dialog(void *arg)
 	}
 	move->add(move_table, true);
 	move->add(new w_spacer(), true);
-	
-	table_placer *move_options = new table_placer(2, get_theme_space(ITEM_WIDGET), true);
+
+	table_placer* move_options = new table_placer(3, get_theme_space(ITEM_WIDGET));
 	move_options->col_flags(0, placeable::kAlignRight);
 
-	w_toggle *always_run_w = new w_toggle(input_preferences->modifiers & _inputmod_interchange_run_walk);
-	move_options->dual_add(always_run_w->label("常時走行"), d);
-	move_options->dual_add(always_run_w, d);
-	
-	w_toggle *always_swim_w = new w_toggle(TEST_FLAG(input_preferences->modifiers, _inputmod_interchange_swim_sink));
-	move_options->dual_add(always_swim_w->label("常時泳ぐ"), d);
-	move_options->dual_add(always_swim_w, d);
-	
+	static const char* run_option_labels[] = {
+//		"Hold to Run",
+		"押下中は走る",
+//		"Hold to Walk",
+		"押下中は歩く",
+//		"Tap to Toggle",
+		"押すと切り替え",
+		nullptr
+	};
+
+	static const char* swim_option_labels[] = {
+//		"Hold to Swim",
+		"押下中は泳ぐ",
+//		"Hold to Sink",
+		"押下中は沈む",
+		nullptr
+	};
+
+	static const char* swim_toggle_labels[] = {
+		"",
+		"",
+//		"Hold to Swim", // hack, otherwise width changes
+		"押下中は泳ぐ", // hack, otherwise width changes
+		nullptr
+	};
+
+	w_select *run_w = new w_select(input_preferences->modifiers & _inputmod_run_key_toggle ? 2 : input_preferences->modifiers & _inputmod_interchange_swim_sink ? 1 : 0, run_option_labels);
+//	move_options->dual_add(run_w->label("Run/Swim Behavior"), d);
+	move_options->dual_add(run_w->label("走る・泳ぎの挙動"), d);
+	move_options->dual_add(run_w, d);
+
+	w_select *swim_w = new w_select(input_preferences->modifiers & _inputmod_interchange_swim_sink ? 1 : 0, swim_option_labels);
+	move_options->dual_add(swim_w, d);
+
+	const auto update_swim_w = [&](w_select*) {
+		if (run_w->get_selection() == 2)
+		{
+			swim_w->set_labels(swim_toggle_labels);
+			swim_w->set_enabled(false);
+		}
+		else
+		{
+			swim_w->set_labels(swim_option_labels);
+			swim_w->set_enabled(true);
+		}
+	};
+
+	update_swim_w(swim_w);
+	run_w->set_selection_changed_callback(update_swim_w);
+
 	move->add(move_options, true);
+	move->add(new w_spacer(), true);
+//	move->dual_add(new w_static_text("Double-tap Run/Walk to activate control panels and doors"), d);
+	move->dual_add(new w_static_text("「走る/歩く」をダブルタップして、コントロールパネルとドアをアクティブにします"), d);
+//	move->dual_add(new w_static_text("Double-tap Move -> Look to center vertical view"), d);
+	move->dual_add(new w_static_text("「見る」をダブルタップして、方向のビューを中央に移動"), d);
 
 	vertical_placer *look = new vertical_placer();
 	table_placer *look_table = new table_placer(4, get_theme_space(ITEM_WIDGET), true);
@@ -2641,7 +2667,7 @@ static void controls_dialog(void *arg)
 	controller_options->col_flags(1, placeable::kAlignLeft);
 	
 	controller_options->dual_add_row(new w_label(""), d);
-	std::vector<std::string> joystick_aiming_labels = {"アナログスティックとして扱う", "十字キーとして扱う"};
+	std::vector<std::string> joystick_aiming_labels = {"アナログスティック", "十字キー"};
 	w_select_popup *joystick_aiming_w = new w_select_popup();
 	joystick_aiming_w->set_labels(joystick_aiming_labels);
 	joystick_aiming_w->set_selection(input_preferences->controller_analog ? 0 : 1);
@@ -2867,8 +2893,17 @@ static void controls_dialog(void *arg)
 		bool changed = false;
 		
 		uint16 flags = input_preferences->modifiers & (_inputmod_use_button_sounds|_inputmod_invert_mouse);
-		if (always_run_w->get_selection()) flags |= _inputmod_interchange_run_walk;
-		if (always_swim_w->get_selection()) flags |= _inputmod_interchange_swim_sink;
+
+		if (run_w->get_selection() == 2)
+		{
+			flags |= _inputmod_run_key_toggle;
+		}
+		else
+		{
+			if (run_w->get_selection()) flags |= _inputmod_interchange_run_walk;
+			if (swim_w->get_selection()) flags |= _inputmod_interchange_swim_sink;
+		}
+
 		if (!(weapon_w->get_selection())) flags |= _inputmod_dont_switch_to_new_weapon;
 		if (!(auto_recenter_w->get_selection())) flags |= _inputmod_dont_auto_recenter;
 		
@@ -3484,7 +3519,6 @@ InfoTree graphics_preferences_tree()
 	root.put_attr("wait_for_vsync", graphics_preferences->OGL_Configure.WaitForVSync);
 	root.put_attr("gamma_corrected_blending", graphics_preferences->OGL_Configure.Use_sRGB);
 	root.put_attr("use_npot", graphics_preferences->OGL_Configure.Use_NPOT);
-	root.put_attr("double_corpse_limit", graphics_preferences->double_corpse_limit);
 	root.put_attr("movie_export_video_quality", graphics_preferences->movie_export_video_quality);
 	root.put_attr("movie_export_video_bitrate", graphics_preferences->movie_export_video_bitrate);
 	root.put_attr("movie_export_audio_quality", graphics_preferences->movie_export_audio_quality);
@@ -3804,7 +3838,6 @@ InfoTree sound_preferences_tree()
 	root.put_attr("rate", sound_preferences->rate);
 	root.put_attr("samples", sound_preferences->samples);
 	root.put_attr("video_export_volume_db", sound_preferences->video_export_volume_db);
-	root.put_attr("resampler_index", sound_preferences->resampler_index);
 
 	return root;
 }
@@ -3959,8 +3992,6 @@ static void default_graphics_preferences(graphics_preferences_data *preferences)
 	preferences->screen_mode.fov = 0; // use default
 	
 	OGL_SetDefaults(preferences->OGL_Configure);
-
-	preferences->double_corpse_limit= false;
 
 	preferences->software_alpha_blending = _sw_alpha_off;
 	preferences->software_sdl_driver = _sw_driver_default;
@@ -4440,7 +4471,6 @@ void parse_graphics_preferences(InfoTree root, std::string version)
 	root.read_attr("wait_for_vsync", graphics_preferences->OGL_Configure.WaitForVSync);
 	root.read_attr("gamma_corrected_blending", graphics_preferences->OGL_Configure.Use_sRGB);
 	root.read_attr("use_npot", graphics_preferences->OGL_Configure.Use_NPOT);
-	root.read_attr("double_corpse_limit", graphics_preferences->double_corpse_limit);
 	root.read_attr_bounded<int16>("movie_export_video_quality", graphics_preferences->movie_export_video_quality, 0, 100);
 	root.read_attr_bounded<int16>("movie_export_audio_quality", graphics_preferences->movie_export_audio_quality, 0, 100);
 	root.read_attr("movie_export_video_bitrate", graphics_preferences->movie_export_video_bitrate);
@@ -4778,7 +4808,6 @@ void parse_sound_preferences(InfoTree root, std::string version)
 	root.read_attr("rate", sound_preferences->rate);
 	root.read_attr("samples", sound_preferences->samples);
 	root.read_attr("video_export_volume_db", sound_preferences->video_export_volume_db);
-	root.read_attr("resampler_index", sound_preferences->resampler_index);
 }
 
 

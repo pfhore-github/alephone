@@ -6,12 +6,21 @@ constexpr SoundBehavior SoundPlayer::sound_obstructed_or_muffled_behavior_parame
 constexpr SoundBehavior SoundPlayer::sound_obstructed_and_muffled_behavior_parameters[];
 SoundPlayer::SoundPlayer(const Sound& sound, const SoundParameters& parameters)
 	: AudioPlayer(sound.header.rate >> 16, sound.header.stereo, sound.header.audio_format) {  //since header.rate is on 16.16 format
-	auto soundParameters = parameters;
-	soundParameters.loop = parameters.loop || sound.header.loop_end - sound.header.loop_start >= 4; //where does this happen?
 	this->sound = sound;
-	this->parameters = soundParameters;
+	Init(parameters);
+}
+
+void SoundPlayer::Init(const SoundParameters& parameters) {
+	auto& sound = this->sound.Get();
+	AudioPlayer::Init(sound.header.rate >> 16, sound.header.stereo, sound.header.audio_format);
+	auto soundParameters = parameters;
+	soundParameters.loop = parameters.loop || sound.header.loop_end - sound.header.loop_start >= 4;
+	this->parameters.Set(soundParameters);
 	data_length = sound.header.length;
 	start_tick = SoundManager::GetCurrentAudioTick();
+	sound_transition.allow_transition = false;
+	sound_transition.start_transition_tick = 0;
+	current_index_data = 0;
 }
 
 //Simulate what the volume of our sound would be if we play it
@@ -45,8 +54,10 @@ float SoundPlayer::Simulate(const SoundParameters& soundParameters) {
 	return volume;
 }
 
-bool SoundPlayer::CanRewind(int baseTick) const { 
-	auto rewindTime = OpenALManager::Get()->IsBalanceRewindSound() || !CanFastRewind(rewind_parameters) ? rewind_time : fast_rewind_time;
+bool SoundPlayer::CanRewind(int baseTick) const {
+	const auto& rewindParameters = rewind_parameters.Get();
+	if (rewindParameters.soft_rewind) return true;
+	auto rewindTime = OpenALManager::Get()->IsBalanceRewindSound() || !CanFastRewind(rewindParameters) ? rewind_time : fast_rewind_time;
 	return baseTick + rewindTime < SoundManager::GetCurrentAudioTick();
 }
 
@@ -56,11 +67,9 @@ bool SoundPlayer::CanFastRewind(const SoundParameters& soundParameters) const {
 }
 
 void SoundPlayer::AskRewind(const SoundParameters& soundParameters, const Sound& newSound) {
-	auto soundParametersRewind = soundParameters;
-	soundParametersRewind._is_for_rewind = true;
-	UpdateParameters(soundParametersRewind);
+	UpdateRewindParameters(soundParameters);
 
-	if (parameters.Get().permutation != soundParametersRewind.permutation) {
+	if (parameters.Get().permutation != soundParameters.permutation) {
 		sound.Store(newSound);
 	}
 
@@ -68,27 +77,37 @@ void SoundPlayer::AskRewind(const SoundParameters& soundParameters, const Sound&
 }
 
 void SoundPlayer::Rewind() {
-	if (CanRewind(start_tick)) {
-		sound.Update();
-		parameters.Set(rewind_parameters);
-		AudioPlayer::Rewind();
-		current_index_data = 0;
-		data_length = sound.Get().header.length;
-		start_tick = SoundManager::GetCurrentAudioTick();
-		sound_transition.allow_transition = false;
-		sound_transition.start_transition_tick = 0;
-	}
-	else 
+
+	if (!CanRewind(start_tick)) {
 		rewind_signal = false;
+		return;
+	}
+
+	const auto& rewindParameters = rewind_parameters.Get();
+
+	if (!rewindParameters.soft_rewind) {
+		AudioPlayer::Rewind();
+	}
+	else {
+
+		if (current_index_data < sound.Get().header.length)
+			return;
+		else
+			rewind_signal = false;
+	}
+
+	sound.Update();
+	Init(rewindParameters);
 }
 
 int SoundPlayer::LoopManager(uint8* data, int length) {
+
 	if (parameters.Get().loop) {
 
 		auto header = sound.Get().header;
 		int loopLength = header.loop_end - header.loop_start;
 
-		if (loopLength >= 4) { //where does this happen?
+		if (loopLength >= 4) {
 			data_length = loopLength;
 			current_index_data = header.loop_start;
 		}
@@ -114,24 +133,26 @@ bool SoundPlayer::LoadParametersUpdates() {
 
 		float priority = Simulate(soundParameters);
 
-		if (soundParameters._is_for_rewind) {
+		if (priority <= lastPriority) continue;
 
-			if (priority <= rewindLastPriority) continue;
-
-			bestRewindParameters = soundParameters;
-			rewindLastPriority = priority;
-
-		} else {
-
-			if (priority <= lastPriority) continue;
-
-			bestParameters = soundParameters;
-			lastPriority = priority;
-		}
+		bestParameters = soundParameters;
+		lastPriority = priority;
 	}
 
 	if (lastPriority > 0) parameters.Set(bestParameters);
-	if (rewindLastPriority > 0) rewind_parameters = bestRewindParameters;
+
+	while (rewind_parameters.Consume(soundParameters)) {
+
+		float priority = Simulate(soundParameters);
+
+		if (priority <= rewindLastPriority) continue;
+
+		bestRewindParameters = soundParameters;
+		rewindLastPriority = priority;
+
+	}
+
+	if (rewindLastPriority > 0) rewind_parameters.Set(bestRewindParameters);
 
 	return lastPriority > 0 || rewindLastPriority > 0 || softStop;
 }

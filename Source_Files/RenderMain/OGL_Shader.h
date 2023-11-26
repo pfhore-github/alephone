@@ -47,7 +47,7 @@ public:
 		U_OffsetX,
 		U_OffsetY,
 		U_Pass,
-		U_UseFog,
+		U_FogMix,
 		U_Visibility,
         U_TransferFadeOut,
 		U_Depth,
@@ -64,6 +64,7 @@ public:
 		U_LogicalHeight,
 		U_PixelWidth,
 		U_PixelHeight,
+		U_FogMode,
 		NUMBER_OF_UNIFORM_LOCATIONS
 	};
 

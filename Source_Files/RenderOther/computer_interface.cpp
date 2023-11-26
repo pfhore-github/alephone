@@ -1297,7 +1297,7 @@ static void display_picture(
 
 		int pict_header_width = get_pict_header_width(PictRsrc);
 		bool cinemascopeHack = false;
-		if (bounds.right == 614 && pict_header_width == 307)
+		if (bounds.right != pict_header_width && bounds.right == 614)
 		{
 			cinemascopeHack = true;
 			bounds.right = pict_header_width;
@@ -1806,6 +1806,12 @@ static void goto_terminal_group(
 				terminal_data->maximum_line= count_total_lines(terminal_text, get_text_base(terminal_text),
 					RECTANGLE_WIDTH(&text_bounds), current_group->start_index, 
 					current_group->start_index+current_group->length);
+
+				if (film_profile.page_up_past_full_width_term_pict &&
+					terminal_data->maximum_line == 0)
+				{
+					terminal_data->maximum_line = 1;
+				}
 			}
 			break;
 			
