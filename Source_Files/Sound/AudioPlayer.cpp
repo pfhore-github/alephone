@@ -28,8 +28,6 @@ void AudioPlayer::ResetSource() {
 	for (auto& buffer : audio_source->buffers) {
 		buffer.second = false;
 	}
-
-	SetUpALSourceInit();
 }
 
 //Get back the source of the player
@@ -106,9 +104,8 @@ bool AudioPlayer::Update() {
 	bool needsUpdate = LoadParametersUpdates() || !is_sync_with_al_parameters;
 	if (rewind_signal) Rewind();
 	if (!needsUpdate) return true;
-	is_sync_with_al_parameters = true;
 	auto updateStatus = SetUpALSourceIdle();
-	is_sync_with_al_parameters.store(is_sync_with_al_parameters && updateStatus.second);
+	is_sync_with_al_parameters = updateStatus.second;
 	return updateStatus.first;
 }
 

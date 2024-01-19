@@ -1167,6 +1167,7 @@ bool idle_game_state(uint32 time)
 						game_state.state= _game_in_progress;
 						game_state.phase = 15 * MACHINE_TICKS_PER_SECOND;
 						game_state.last_ticks_on_idle= machine_tick_count();
+						SoundManager::instance()->UpdateListener();
 						update_interface(NONE);
 					} else {
 						/* Give them the error... */
@@ -1450,7 +1451,7 @@ void do_menu_item_command(
 					break;
 					
 				case iCenterButton:
-					SoundManager::instance()->PlaySound(Sound_Center_Button(), 0, NONE, true);
+					SoundManager::instance()->PlaySound(Sound_Center_Button(), 0, NONE);
 					break;
 					
 				case iSaveLastFilm:
@@ -1645,7 +1646,7 @@ static void display_introduction(
 		if (get_sound_resource_from_images(screen_data->screen_base, SoundRsrc))
 		{
 			SoundParameters parameters;
-			if (OpenALManager::Get()) introduction_sound = OpenALManager::Get()->PlaySound(SoundRsrc, parameters);
+			introduction_sound = SoundManager::instance()->PlaySound(SoundRsrc, parameters);
 		}
 	}
 	else
@@ -2282,7 +2283,9 @@ static void start_game(
 	if(!changing_level)
 	{
 		set_keyboard_controller_status(true);
-	} 
+	}
+
+	SoundManager::instance()->UpdateListener();
 }
 
 // LP: "static" removed
@@ -2562,7 +2565,7 @@ static void next_game_screen(
 					_fixed pitch = (shapes_file_is_m1() && game_state.state==_display_intro_screens) ? _m1_high_frequency : _normal_frequency;
 					SoundParameters parameters;
 					parameters.pitch = pitch * 1.f / _normal_frequency;
-					if (OpenALManager::Get()) introduction_sound = OpenALManager::Get()->PlaySound(SoundRsrc, parameters);
+					introduction_sound = SoundManager::instance()->PlaySound(SoundRsrc, parameters);
 				}
 			}
 		}
@@ -2824,7 +2827,7 @@ static void try_and_display_chapter_screen(
 				_fixed pitch = (shapes_file_is_m1() && level == 101) ? _m1_high_frequency : _normal_frequency;
 				SoundParameters parameters;
 				parameters.pitch = pitch * 1.f / _normal_frequency;
-				if (OpenALManager::Get()) soundPlayer = OpenALManager::Get()->PlaySound(SoundRsrc, parameters);
+				soundPlayer = SoundManager::instance()->PlaySound(SoundRsrc, parameters);
 			}
 			
 			/* Fade in.... */

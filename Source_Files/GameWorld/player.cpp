@@ -155,7 +155,6 @@ May 22, 2003 (Woody Zenfell):
 #include "Console.h"
 #include "ViewControl.h"
 #include "InfoTree.h"
-#include "OpenALManager.h"
 
 /*
 //anybody on the receiving pad of a teleport should explode (what happens to invincible guys?)
@@ -1257,7 +1256,7 @@ static void handle_player_in_vacuum(
 			if (player->suit_oxygen % breathing_frequency == 0 &&
 				player_index == current_player_index)
 			{
-				SoundManager::instance()->PlayLocalSound(Sound_Breathing());
+				SoundManager::instance()->PlaySound(Sound_Breathing(), nullptr, NONE);
 			}
 
 			const auto offset_o2 = player->suit_oxygen + OXYGEN_WARNING_OFFSET;
@@ -1265,7 +1264,7 @@ static void handle_player_in_vacuum(
 				offset_o2 % OXYGEN_WARNING_FREQUENCY == 0 &&
 				player_index == current_player_index)
 			{
-				SoundManager::instance()->PlayLocalSound(Sound_OxygenWarning());
+				SoundManager::instance()->PlaySound(Sound_OxygenWarning(), nullptr, NONE);
 			}
 		}
 				
@@ -1528,7 +1527,7 @@ static void update_player_media(
 			struct media_data *media= get_media_data(polygon->media_index); // should be valid
 			{
 			world_distance current_magnitude= (player->variables.old_flags&_HEAD_BELOW_MEDIA_BIT) ? media->current_magnitude : (media->current_magnitude>>1);
-			world_distance external_magnitude= FIXED_TO_WORLD(GUESS_HYPOTENUSE(ABS(player->variables.external_velocity.i), ABS(player->variables.external_velocity.j)));
+			world_distance external_magnitude= FIXED_TO_WORLD(GUESS_HYPOTENUSE(std::abs(player->variables.external_velocity.i), std::abs(player->variables.external_velocity.j)));
 			struct damage_definition *damage= get_media_damage(polygon->media_index, (player->variables.flags&_HEAD_BELOW_MEDIA_BIT) ? FIXED_ONE : FIXED_ONE/4);
 			
 			// apply current if possible

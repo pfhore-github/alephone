@@ -4,7 +4,6 @@
 #include "MusicPlayer.h"
 #include "SoundPlayer.h"
 #include "StreamPlayer.h"
-#include "SoundManager.h"
 #include <queue>
 
 #if defined (_MSC_VER) && !defined (M_PI)
@@ -39,7 +38,7 @@ const inline std::unordered_map<ALCint, AVSampleFormat> mapping_openal_ffmpeg = 
 struct AudioParameters {
 	int rate;
 	int sample_frame_size;
-	bool stereo;
+	ChannelType channel_type;
 	bool balance_rewind;
 	bool hrtf;
 	bool sounds_3d;
@@ -50,18 +49,14 @@ class OpenALManager {
 public:
 	static OpenALManager* Get() { return instance; }
 	static bool Init(const AudioParameters& parameters);
-	static float From_db(float db, bool music = false) { return db <= (SoundManager::MINIMUM_VOLUME_DB / (music ? 2 : 1)) ? 0 : std::pow(10.f, db / 20.f); }
 	static void Shutdown();
 	void Start();
 	void Stop();
 	void StopAllPlayers();
 	std::shared_ptr<SoundPlayer> PlaySound(const Sound& sound, const SoundParameters& parameters);
-	std::shared_ptr<SoundPlayer> PlaySound(LoadedResource& rsrc, const SoundParameters& parameters);
 	std::shared_ptr<MusicPlayer> PlayMusic(std::shared_ptr<StreamDecoder> decoder, MusicParameters parameters);
 	std::shared_ptr<StreamPlayer> PlayStream(CallBackStreamPlayer callback, int length, int rate, bool stereo, AudioFormat audioFormat);
-	void StopSound(short sound_identifier, short source_identifier);
 	std::unique_ptr<AudioPlayer::AudioSource> PickAvailableSource(const AudioPlayer& audioPlayer);
-	std::shared_ptr<SoundPlayer> GetSoundPlayer(short identifier, short source_identifier, bool sound_identifier_only = false) const;
 	void UpdateListener(world_location3d listener) { listener_location.Set(listener); }
 	const world_location3d& GetListener() const { return listener_location.Get(); }
 	void SetMasterVolume(float volume);
@@ -72,10 +67,8 @@ public:
 	bool Support_HRTF_Toggling() const;
 	bool Is_HRTF_Enabled() const;
 	bool IsBalanceRewindSound() const { return audio_parameters.balance_rewind; }
-	void CleanInactivePlayers();
-	ALCint GetRenderingFormat() const { return rendering_format; }
+	ALCint GetRenderingFormat() const { return openal_rendering_format; }
 	ALuint GetLowPassFilter(float highFrequencyGain) const;
-	const std::vector<std::shared_ptr<AudioPlayer>>& GetAudioPlayers() const { return audio_players_local; }
 private:
 	static OpenALManager* instance;
 	ALCdevice* p_ALCDevice = nullptr;
@@ -93,13 +86,12 @@ private:
 	bool OpenDevice();
 	bool CloseDevice();
 	void ProcessAudioQueue();
-	void QueueAudio(std::shared_ptr<AudioPlayer> audioPlayer);
+	void ResyncPlayers();
 	bool is_using_recording_device = false;
 	std::queue<std::unique_ptr<AudioPlayer::AudioSource>> sources_pool;
 	std::deque<std::shared_ptr<AudioPlayer>> audio_players_queue; //for audio thread only
-	std::vector<std::shared_ptr<AudioPlayer>> audio_players_local; //for OpenALManager only (main thread)
 	boost::lockfree::spsc_queue<std::shared_ptr<AudioPlayer>, boost::lockfree::capacity<256>> audio_players_shared; //pipeline main => audio thread
-	int GetBestOpenALRenderingFormat(ALCint channelsType);
+	int GetBestOpenALSupportedFormat();
 	void RetrieveSource(const std::shared_ptr<AudioPlayer>& player);
 
 	/* Loopback device functions */
@@ -118,10 +110,8 @@ private:
 	static void MixerCallback(void* usr, uint8* stream, int len);
 	SDL_AudioSpec sdl_audio_specs_obtained;
 	AudioParameters audio_parameters;
-	ALCint rendering_format = 0;
+	ALCint openal_rendering_format = 0;
 	ALuint low_pass_filter;
-
-	static constexpr int max_sounds_for_source = 3;
 
 	/* format type we supports for mixing / rendering
 	* those are used from the first to the last of the list
@@ -134,18 +124,36 @@ private:
 		ALC_UNSIGNED_BYTE_SOFT
 	};
 
-	const std::unordered_map<ALCint, int> mapping_openal_sdl = {
+	const std::unordered_map<ALCint, SDL_AudioFormat> mapping_openal_sdl_format = {
 		{ALC_FLOAT_SOFT, AUDIO_F32SYS},
 		{ALC_INT_SOFT, AUDIO_S32SYS},
 		{ALC_SHORT_SOFT, AUDIO_S16SYS},
 		{ALC_UNSIGNED_BYTE_SOFT, AUDIO_U8}
 	};
 
-	const std::unordered_map<int, ALCint> mapping_sdl_openal = {
+	const std::unordered_map<SDL_AudioFormat, ALCint> mapping_sdl_openal_format = {
 		{AUDIO_F32SYS, ALC_FLOAT_SOFT},
 		{AUDIO_S32SYS, ALC_INT_SOFT},
 		{AUDIO_S16SYS, ALC_SHORT_SOFT},
 		{AUDIO_U8, ALC_UNSIGNED_BYTE_SOFT}
+	};
+
+	const std::unordered_map<ChannelType, ALCint> mapping_sdl_openal_channel = {
+		{ChannelType::_mono, ALC_MONO_SOFT},
+		{ChannelType::_stereo, ALC_STEREO_SOFT},
+		{ChannelType::_quad, ALC_QUAD_SOFT},
+		{ChannelType::_5_1, ALC_5POINT1_SOFT},
+		{ChannelType::_6_1, ALC_6POINT1_SOFT},
+		{ChannelType::_7_1, ALC_7POINT1_SOFT}
+	};
+
+	const std::unordered_map<ALCint, ChannelType> mapping_openal_sdl_channel = {
+		{ALC_MONO_SOFT, ChannelType::_mono},
+		{ALC_STEREO_SOFT, ChannelType::_stereo},
+		{ALC_QUAD_SOFT, ChannelType::_quad},
+		{ALC_5POINT1_SOFT, ChannelType::_5_1},
+		{ALC_6POINT1_SOFT, ChannelType::_6_1},
+		{ALC_7POINT1_SOFT, ChannelType::_7_1}
 	};
 };
 

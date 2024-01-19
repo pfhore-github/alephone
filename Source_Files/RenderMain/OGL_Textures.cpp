@@ -1150,7 +1150,7 @@ uint32 *TextureManager::GetOGLTexture(uint32 *ColorTable)
 }
 
 
-uint32 *TextureManager::GetFakeLandscape()
+uint32 *TextureManager::GetFakeLandscape() const
 {
 	// Allocate and set to black and transparent
 	int NumPixels = int(TxtrWidth)*int(TxtrHeight);
@@ -1161,7 +1161,7 @@ uint32 *TextureManager::GetFakeLandscape()
 	// be sure to idiot-proof out-of-range ones
 	OGL_ConfigureData& ConfigureData = Get_OGL_ConfigureData();
 	int LscpIndx = static_world->song_index;
-	if (!LandscapesLoaded || (LscpIndx < 0 && LscpIndx >= 4))
+	if (!LandscapesLoaded || LscpIndx < 0 || LscpIndx >= 4)
 	{
 		memset(Buffer,0,NumPixels*sizeof(uint32));
 		return Buffer;
@@ -1899,11 +1899,11 @@ static inline uint16 SetPixelOpacitiesDXTC5Pair(int scale, int shift, uint16 alp
 		if (a1 > a2)
 			if (new_a2) new_a2--;
 			else new_a1++;
-		else 
+		else
 			if (new_a1) new_a1--;
 			else new_a2++;
 	else if ((new_a1 > new_a2) != (a1 > a2))
-		SWAP(new_a1, new_a2);
+		std::swap(new_a1, new_a2);
 	
 	return (new_a1 << 8 | new_a2);
 }
