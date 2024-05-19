@@ -465,7 +465,7 @@ uint16 ttf_font_info::_text_width(const char *text, uint16 style, bool utf8) con
 uint16 ttf_font_info::_text_width(const char *text, size_t length, uint16 style, bool utf8) const
 {
 	int width = 0;
-	for (const char *c = text; *c;)
+	for (const char *c = text; (c - text) < length && *c ;)
 	{
 		auto ret = next_utf8(c);
 		width += char_width(ret.second, style);
