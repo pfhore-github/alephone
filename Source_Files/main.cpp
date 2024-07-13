@@ -31,11 +31,8 @@ int main(int argc, char **argv)
 #if !defined(DISABLE_NETWORKING)
 	  "\nこのビルドは、ネットワークプレイが有効です。\n"
 #endif
-#ifdef HAVE_LUA
-	  "\nこのビルドは、Luaスクリプトが有効です。\n"
-#endif
-	  , app_name_version, A1_HOMEPAGE_URL
-    );
+		, app_name_version, A1_HOMEPAGE_URL
+	);
 
 	shell_options.parse(argc, argv);
 

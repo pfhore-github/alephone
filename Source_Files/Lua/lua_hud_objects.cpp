@@ -49,12 +49,12 @@ LUA_HUD_OBJECTS.CPP
 #include "collection_definition.h"
 #include "FileHandler.h"
 #include "Crosshairs.h"
+#include "OGL_Textures.h"
+#include "OGL_Setup.h"
 
 #include <algorithm>
 #include <cmath>
 #include <unordered_map>
-
-#ifdef HAVE_LUA
 
 extern struct view_data *world_view;
 
@@ -410,12 +410,15 @@ int Lua_Images_New(lua_State *L)
     {
         int resource_id = lua_tointeger(L, -1);
 
-        // blitter from image
-#ifdef HAVE_OPENGL	
-        Image_Blitter *blitter = (get_screen_mode()->acceleration != _no_acceleration) ? new OGL_Blitter() : new Image_Blitter();
+		// blitter from image
+#ifdef HAVE_OPENGL
+		Image_Blitter *blitter = (get_screen_mode()->acceleration != _no_acceleration)
+			? new OGL_Blitter()
+			: new Image_Blitter();
 #else
-        Image_Blitter *blitter = new Image_Blitter();
+		Image_Blitter *blitter = new Image_Blitter();
 #endif
+
         if (!blitter->Load(resource_id))
         {
             lua_pushnil(L);
@@ -503,11 +506,13 @@ int Lua_Images_New(lua_State *L)
 	}
 	
 	// blitter from image
-#ifdef HAVE_OPENGL	
-        Image_Blitter *blitter = (get_screen_mode()->acceleration != _no_acceleration) ? new OGL_Blitter() : new Image_Blitter();
+#ifdef HAVE_OPENGL
+	Image_Blitter *blitter = (get_screen_mode()->acceleration != _no_acceleration)
+		? new OGL_Blitter()
+		: new Image_Blitter();
 #else
-        Image_Blitter *blitter = new Image_Blitter();
-#endif	
+	Image_Blitter *blitter = new Image_Blitter();
+#endif
 	if (!blitter->Load(image))
 	{
 		lua_pushnil(L);
@@ -965,8 +970,10 @@ int Lua_Fonts_New(lua_State *L)
 	FontSpecifier *ff = new FontSpecifier(f);
 	ff->Init();
 #ifdef HAVE_OPENGL	
-	if (alephone::Screen::instance()->openGL())
+	if (alephone::Screen::instance()->openGL()) {
+		ff->NearFilter = TxtrTypeInfoList[OGL_Txtr_HUD].NearFilter;
 		ff->OGL_Reset(true);
+	}
 #endif	
 	if (ff->LineSpacing <= 0)
 	{
@@ -2520,7 +2527,7 @@ static int Lua_Screen_FOV_Get_Horizontal(lua_State *L)
 	float factor = 1.0f;
 	if (get_screen_mode()->acceleration == _opengl_acceleration)
 		factor = 1.3f;
-    lua_pushnumber(L, world_view->half_cone * 2.0f / factor);
+    lua_pushnumber(L, world_view->half_cone * 360.f / NUMBER_OF_ANGLES * 2.0f / factor);
     return 1;
 }
 
@@ -2529,7 +2536,7 @@ static int Lua_Screen_FOV_Get_Vertical(lua_State *L)
 	float factor = 1.0f;
 	if (get_screen_mode()->acceleration == _opengl_acceleration)
 		factor = 1.3f;
-    lua_pushnumber(L, world_view->half_vertical_cone * 2.0f / factor);
+    lua_pushnumber(L, world_view->half_vertical_cone * 360.f / NUMBER_OF_ANGLES * 2.0f / factor);
     return 1;
 }
 
@@ -3403,5 +3410,3 @@ int Lua_HUDObjects_register(lua_State *L)
 	
 	return 0;
 }
-
-#endif

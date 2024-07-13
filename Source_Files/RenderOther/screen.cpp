@@ -37,6 +37,7 @@
 #include "OGL_Headers.h"
 #include "OGL_Blitter.h"
 #include "OGL_Faders.h"
+#include "OGL_Textures.h"
 #endif
 
 #include "world.h"
@@ -935,8 +936,8 @@ static void change_screen_mode(int width, int height, int depth, bool nogl, bool
 								   sdl_width, sdl_height,
 								   flags);
 
-#ifdef HAVE_OPENGL
 	bool context_created = false;
+#ifdef HAVE_OPENGL
 	if (main_screen == NULL && !nogl && screen_mode.acceleration != _no_acceleration && Get_OGL_ConfigureData().Multisamples > 0) {
 		// retry with multisampling off
 		SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 0);
@@ -970,7 +971,7 @@ static void change_screen_mode(int width, int height, int depth, bool nogl, bool
 			SDL_GL_CreateContext(main_screen);
 			context_created = true;
 		}
-#ifdef __WIN32__
+#if defined (__WIN32__) && (HAVE_OPENGL)
 		glewInit();
 #endif
 		if (!OGL_CheckExtension("GL_ARB_vertex_shader") || !OGL_CheckExtension("GL_ARB_fragment_shader") || !OGL_CheckExtension("GL_ARB_shader_objects") || !OGL_CheckExtension("GL_ARB_shading_language_100"))
@@ -1234,6 +1235,7 @@ void toggle_fullscreen()
  */
 
 static bool clear_next_screen = false;
+static void darken_world_window(void);
 
 void update_world_view_camera()
 {
@@ -1242,7 +1244,7 @@ void update_world_view_camera()
 	world_view->maximum_depth_intensity = current_player->weapon_intensity;
 
 	world_view->origin = current_player->camera_location;
-	if (!graphics_preferences->screen_mode.camera_bob)
+	if (graphics_preferences->screen_mode.bobbing_type != BobbingType::camera_and_weapon)
 		world_view->origin.z -= current_player->step_height;
 	world_view->origin_polygon_index = current_player->camera_polygon_index;
 
@@ -1266,6 +1268,8 @@ void update_world_view_camera()
 		}
 	}
 }
+
+extern bool is_network_pregame;
 
 void render_screen(short ticks_elapsed)
 {
@@ -1351,7 +1355,7 @@ void render_screen(short ticks_elapsed)
 	}
 	
 	static bool PrevHighRes = true;
-	bool HighResolution = mode->high_resolution;
+	bool HighResolution = mode->high_resolution || is_network_pregame;
 	if (PrevHighRes != HighResolution)
 	{
 		ViewChangedSize = true;
@@ -1391,7 +1395,7 @@ void render_screen(short ticks_elapsed)
 		if (!OGL_IsActive() && DrawEveryOtherLine)
 			clear_screen();
 		update_full_screen = true;
-		if (Screen::instance()->hud() && !Screen::instance()->lua_hud())
+		if (Screen::instance()->hud() && !Screen::instance()->lua_hud() && !is_network_pregame)
 			draw_interface();
 
 		// Reallocate the drawing buffer
@@ -1406,7 +1410,7 @@ void render_screen(short ticks_elapsed)
 	{
 		clear_screen(false);
 		update_full_screen = true;
-		if (Screen::instance()->hud() && !Screen::instance()->lua_hud())
+		if (Screen::instance()->hud() && !Screen::instance()->lua_hud() && !is_network_pregame)
 			draw_interface();
 
 		clear_next_screen = false;
@@ -1448,6 +1452,28 @@ void render_screen(short ticks_elapsed)
     if (screen_mode.acceleration == _no_acceleration &&
 		(MapIsTranslucent || Screen::instance()->lua_hud()))
         clear_screen_margin();
+
+	if (game_is_networked && is_network_pregame)
+	{
+		clear_screen(false);
+
+#ifdef HAVE_OPENGL
+		if (OGL_IsActive())
+		{
+			Screen::instance()->bound_screen();
+			OGL_SetWindow(sr, sr, true);
+			DisplayNetLoadingScreen(MainScreenSurface());
+			OGL_SwapBuffers();
+			return;
+		}
+#endif
+		SDL_Rect rect = { (Screen::instance()->window_rect().w - ViewRect.w) / 2, (Screen::instance()->window_rect().h - ViewRect.h) / 2, 0, 0 };
+		SDL_FillRect(world_pixels, NULL, SDL_MapRGB(world_pixels->format, 0, 0, 0));
+		DisplayNetLoadingScreen(world_pixels);
+		update_screen(rect, rect, true, false);
+		MainScreenUpdateRect(0, 0, 0, 0);
+		return;
+	}
     
 	// Render crosshairs
 	if (!world_view->overhead_map_active && !world_view->terminal_mode_active)
@@ -1502,6 +1528,7 @@ void render_screen(short ticks_elapsed)
 				Term_Blitter.Load(*Term_Buffer);
 				Term_RenderRequest = false;
 			}
+			Term_Blitter.nearFilter = TxtrTypeInfoList[OGL_Txtr_HUD].NearFilter;
 			Term_Blitter.Draw(TermRect);
 		}
 
@@ -1538,6 +1565,11 @@ void render_screen(short ticks_elapsed)
 			}
 		}
 
+		if (!get_keyboard_controller_status())
+		{
+			darken_world_window();
+		}
+
 		if (update_full_screen || Screen::instance()->lua_hud())
 		{
 			MainScreenUpdateRect(0, 0, 0, 0);
@@ -1552,7 +1584,14 @@ void render_screen(short ticks_elapsed)
 #ifdef HAVE_OPENGL
 	// Swap OpenGL double-buffers
 	if (screen_mode.acceleration != _no_acceleration)
+	{
+		if (!get_keyboard_controller_status())
+		{
+			darken_world_window();
+		}
+
 		OGL_SwapBuffers();
+	}
 #endif
 	
 	Movie::instance()->AddFrame(Movie::FRAME_NORMAL);
@@ -1939,7 +1978,7 @@ static inline void draw_pattern_rect(T *p, int pitch, uint32 pixel, const SDL_Re
 	}
 }
 
-void darken_world_window(void)
+static void darken_world_window(void)
 {
 	// Get world window bounds
 	SDL_Rect r = Screen::instance()->window_rect();
@@ -1979,7 +2018,7 @@ void darken_world_window(void)
 		glPopMatrix();
 		glPopAttrib();
 
-		MainScreenSwap();
+//		MainScreenSwap();
 		return;
 	}
 #endif

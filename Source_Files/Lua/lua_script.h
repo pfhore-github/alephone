@@ -57,6 +57,8 @@ void L_Call_Player_Damaged(short player_index, short aggressor_player_index, sho
 void L_Call_Projectile_Detonated(short type, short owner_index, short polygon, world_point3d location, uint16_t flags, int16_t obstruction_index, int16_t line_index);
 void L_Call_Projectile_Created(short projectile_index);
 void L_Call_Item_Created(short item_index);
+bool L_Calculate_Completion_State(short& completion_state);
+void L_Call_Monster_Kamikazed(short monster_index);
 
 void L_Invalidate_Effect(short effect_index);
 void L_Invalidate_Monster(short monster_index);
@@ -68,7 +70,8 @@ enum ScriptType {
 	_embedded_lua_script,
 	_lua_netscript,
 	_solo_lua_script,
-	_stats_lua_script
+	_stats_lua_script,
+	_achievements_lua_script
 };
 
 void *L_Persistent_Table_Key();
@@ -81,6 +84,9 @@ void ResetPassedLua();
 void ExecuteLuaString(const std::string&);
 void LoadSoloLua();
 void LoadReplayNetLua();
+
+void LoadAchievementsLua();
+void InvalidateAchievements();
 
 void LoadStatsLua();
 bool CollectLuaStats(std::map<std::string, std::string>& table, std::map<std::string, std::string>& parameters);

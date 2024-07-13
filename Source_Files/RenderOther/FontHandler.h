@@ -37,12 +37,8 @@ Jan 14, 2001 (Loren Petrich):
 
 
 #include "cseries.h"
-
 #include "sdl_fonts.h"
-
-#ifdef HAVE_OPENGL
 #include "OGL_Headers.h"
-#endif
 
 #include <set>
 #include <string>
@@ -139,6 +135,7 @@ public:
 	// if OGL_Texture is NULL, then there is no OpenGL font texture to render.
 	std::unordered_map<std::string, OGL_CACHE> caches;
 	void render_text_(const char* str, bool draw);
+	GLuint NearFilter = GL_LINEAR;
 
 	static std::set<FontSpecifier*> *m_font_registry;
 #endif

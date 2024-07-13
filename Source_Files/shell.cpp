@@ -85,9 +85,7 @@
 #include <unistd.h>
 #endif
 
-#ifdef HAVE_OPENGL
 #include "OGL_Headers.h"
-#endif
 
 #if !defined(DISABLE_NETWORKING)
 #include <SDL2/SDL_net.h>
@@ -124,9 +122,9 @@
 
 #include "shell_options.h"
 
-// LP addition: whether or not the cheats are active
-// Defined in shell_misc.cpp
-extern bool CheatsActive;
+#ifdef HAVE_STEAM
+#include "steamshim_child.h"
+#endif
 
 // Data directories
 vector<DirectorySpecifier> data_search_path; // List of directories in which data files are searched for
@@ -153,10 +151,6 @@ static bool force_fullscreen = false; // Force fullscreen mode
 static bool force_windowed = false;   // Force windowed mode
 */
 
-// Prototypes
-extern int process_keyword_key(char key);
-extern void handle_keyword(int type_of_cheat);
-
 void PlayInterfaceButtonSound(short SoundID);
 
 // From preprocess_map_sdl.cpp
@@ -172,6 +166,7 @@ static void process_event(const SDL_Event &event);
 
 // cross-platform static variables
 short vidmasterStringSetID = -1; // can be set with MML
+short vidmasterLevelOffset = 1; // can be set with MML
 
 static bool IsCompositingWindowManagerEnabled() // double buffering
 {
@@ -377,7 +372,7 @@ void initialize_application(void)
 	load_film_profile(FILM_PROFILE_DEFAULT, false);
 
 	// Parse MML files
-	LoadBaseMMLScripts();
+	LoadBaseMMLScripts(true);
 
 	// Check for presence of strings
 	if (!TS_IsPresent(strERRORS) || !TS_IsPresent(strFILENAMES)) {
@@ -398,7 +393,7 @@ void initialize_application(void)
 			
 			// Parse MML files again, now that we have a new dir to search
 			initialize_fonts(false);
-			LoadBaseMMLScripts();
+			LoadBaseMMLScripts(true);
 		}
 	}
 
@@ -433,13 +428,15 @@ void initialize_application(void)
 #ifndef HAVE_OPENGL
 	graphics_preferences->screen_mode.acceleration = _no_acceleration;
 #endif
+	if (shell_options.nogl)
+		graphics_preferences->screen_mode.acceleration = _no_acceleration;
 	if (shell_options.force_fullscreen)
 		graphics_preferences->screen_mode.fullscreen = true;
 	if (shell_options.force_windowed)		// takes precedence over fullscreen because windowed is safer
 		graphics_preferences->screen_mode.fullscreen = false;
 	write_preferences();
 
-	Plugins::instance()->load_mml();
+	Plugins::instance()->load_mml(true);
 
 //	SDL_WM_SetCaption(application_name, application_name);
 
@@ -467,6 +464,14 @@ void initialize_application(void)
 	
 	HTTPClient::Init();
 
+#ifdef HAVE_STEAM
+	if (!STEAMSHIM_init())
+	{
+		alert_user("You must launch the Steam version of Classic Marathon using the Classic Marathon Launcher.", fatalError);
+		exit(1);
+	}
+#endif
+
 	// Initialize everything
 	mytm_initialize();
 //	initialize_fonts();
@@ -490,7 +495,6 @@ void initialize_application(void)
 void shutdown_application(void)
 {
 	WadImageCache::instance()->save_cache();
-	close_external_resources();
 
 	shutdown_dialogs();
         
@@ -502,6 +506,10 @@ void shutdown_application(void)
 #endif
 	TTF_Quit();
 	SDL_Quit();
+
+#ifdef HAVE_STEAM
+	STEAMSHIM_deinit();
+#endif
 }
 
 bool networking_available(void)
@@ -592,6 +600,7 @@ short get_level_number_from_user(void)
 	placer->dual_add(new w_static_text("開始レベル："), d);
 
 	w_levels *level_w = new w_levels(levels, &d);
+	level_w->set_offset(vidmasterLevelOffset);
 	placer->dual_add(level_w, d);
 	placer->add(new w_spacer(), true);
 	placer->dual_add(new w_button("キャンセル", dialog_cancel, &d), d);
@@ -626,7 +635,7 @@ void main_event_loop(void)
 		switch (game_state) {
 			case _game_in_progress:
 			case _change_level:
-				if (get_fps_target() == 0 || Console::instance()->input_active() || cur_time - last_event_poll >= TICKS_BETWEEN_EVENT_POLL) {
+				if ((get_fps_target() == 0 && get_keyboard_controller_status()) || Console::instance()->input_active() || cur_time - last_event_poll >= TICKS_BETWEEN_EVENT_POLL) {
 					poll_event = true;
 					last_event_poll = cur_time;
 			  } else {				  
@@ -673,20 +682,50 @@ void main_event_loop(void)
 			{
 				process_event(event);
 			}
+
+#ifdef HAVE_STEAM
+			while (auto steam_event = STEAMSHIM_pump()) {
+				switch (steam_event->type) {
+					case SHIMEVENT_ISOVERLAYACTIVATED:
+						if (steam_event->okay && get_game_state() == _game_in_progress && !game_is_networked)
+						{
+							pause_game();
+						}
+						break;
+
+					default:
+						break;
+				}
+			}
+#endif
 		}
 
 		execute_timer_tasks(machine_tick_count());
 		idle_game_state(machine_tick_count());
 
-		if (game_state == _game_in_progress &&
-			get_fps_target() != 0)
+		auto fps_target = get_fps_target();
+		if (!get_keyboard_controller_status())
+		{
+			fps_target = 30;
+		}
+	
+		if (game_state == _game_in_progress && fps_target != 0)
 		{
 			int elapsed_machine_ticks = machine_tick_count() - cur_time;
-			int desired_elapsed_machine_ticks = MACHINE_TICKS_PER_SECOND / get_fps_target();
+			int desired_elapsed_machine_ticks = MACHINE_TICKS_PER_SECOND / fps_target;
 
 			if (desired_elapsed_machine_ticks - elapsed_machine_ticks > desired_elapsed_machine_ticks / 3)
 			{
 				sleep_for_machine_ticks(1);
+			}
+		}
+		else if (game_state != _game_in_progress)
+		{
+			static auto last_redraw = 0;
+			if (machine_tick_count() > last_redraw + TICKS_PER_SECOND / 30)
+			{
+				update_game_window();
+				last_redraw = machine_tick_count();
 			}
 		}
 	}
@@ -727,11 +766,6 @@ static void handle_game_key(const SDL_Event &event)
 	bool changed_prefs = false;
 	bool changed_resolution = false;
 
-	if (!game_is_networked && (event.key.keysym.mod & KMOD_CTRL) && CheatsActive) {
-		int type_of_cheat = process_keyword_key(key);
-		if (type_of_cheat != NONE)
-			handle_keyword(type_of_cheat);
-	}
 	if (Console::instance()->input_active()) {
 		switch(key) {
 			case SDLK_RETURN:
@@ -1264,13 +1298,22 @@ static void process_event(const SDL_Event &event)
 		break;
 	
 	case SDL_CONTROLLERBUTTONDOWN:
-		joystick_button_pressed(event.cbutton.which, event.cbutton.button, true);
-		SDL_Event e2;
-		memset(&e2, 0, sizeof(SDL_Event));
-		e2.type = SDL_KEYDOWN;
-		e2.key.keysym.sym = SDLK_UNKNOWN;
-		e2.key.keysym.scancode = (SDL_Scancode)(AO_SCANCODE_BASE_JOYSTICK_BUTTON + event.cbutton.button);
-		process_game_key(e2);
+		if (get_game_state() == _game_in_progress && !get_keyboard_controller_status())
+		{
+			hide_cursor();
+			validate_world_window();
+			set_keyboard_controller_status(true);
+		}
+		else
+		{
+			joystick_button_pressed(event.cbutton.which, event.cbutton.button, true);
+			SDL_Event e2;
+			memset(&e2, 0, sizeof(SDL_Event));
+			e2.type = SDL_KEYDOWN;
+			e2.key.keysym.sym = SDLK_UNKNOWN;
+			e2.key.keysym.scancode = (SDL_Scancode)(AO_SCANCODE_BASE_JOYSTICK_BUTTON + event.cbutton.button);
+			process_game_key(e2);
+		}
 		break;
 		
 	case SDL_CONTROLLERBUTTONUP:
@@ -1286,7 +1329,8 @@ static void process_event(const SDL_Event &event)
 		break;
 			
 	case SDL_JOYDEVICEREMOVED:
-		joystick_removed(event.jdevice.which);
+		if (joystick_removed(event.jdevice.which) && get_game_state() == _game_in_progress);
+			pause_game();
 		break;
 			
 	case SDL_KEYDOWN:
@@ -1310,14 +1354,16 @@ static void process_event(const SDL_Event &event)
 		switch (event.window.event) {
 			case SDL_WINDOWEVENT_FOCUS_LOST:
 				if (get_game_state() == _game_in_progress && get_keyboard_controller_status() && !Movie::instance()->IsRecording() && shell_options.replay_directory.empty()) {
-					darken_world_window();
+//					darken_world_window();
 					set_keyboard_controller_status(false);
 					show_cursor();
 				}
+
+				set_game_focus_lost();
 				break;
-#if (defined(__APPLE__) && defined(__MACH__))
-			// work around Mojave issue
 			case SDL_WINDOWEVENT_FOCUS_GAINED:
+#if (defined(__APPLE__) && defined(__MACH__))
+    			// work around Mojave issue
 				static bool gFirstWindow = true;
 				if (gFirstWindow) {
 					gFirstWindow = false;
@@ -1332,8 +1378,9 @@ static void process_event(const SDL_Event &event)
 						SDL_DestroyWindow(w2);
 					}
 				}
-				break;
 #endif
+				set_game_focus_gained();
+				break;
 			case SDL_WINDOWEVENT_EXPOSED:
 				if (Movie::instance()->IsRecording())
 				{
@@ -1341,7 +1388,7 @@ static void process_event(const SDL_Event &event)
 					// leave it alone
 					break;
 				}
-	
+/*	
 			if (!IsCompositingWindowManagerEnabled()) {
 #ifdef HAVE_OPENGL
 				if (MainScreenIsOpenGL())
@@ -1349,7 +1396,8 @@ static void process_event(const SDL_Event &event)
 				else
 #endif
 					update_game_window();
-				}
+		}
+		*/
 				break;
 		}
 		break;
@@ -1510,7 +1558,7 @@ void dump_screen(void)
 #endif
 }
 
-static bool _ParseMMLDirectory(DirectorySpecifier& dir)
+static bool _ParseMMLDirectory(DirectorySpecifier& dir, bool load_menu_mml_only)
 {
 	// Get sorted list of files in directory
 	vector<dir_entry> de;
@@ -1533,20 +1581,20 @@ static bool _ParseMMLDirectory(DirectorySpecifier& dir)
 		FileSpecifier file_name = dir + i->name;
 		
 		// Parse file
-		ParseMMLFromFile(file_name);
+		ParseMMLFromFile(file_name, load_menu_mml_only);
 	}
 	
 	return true;
 }
 
-void LoadBaseMMLScripts()
+void LoadBaseMMLScripts(bool load_menu_mml_only)
 {
 	vector <DirectorySpecifier>::const_iterator i = data_search_path.begin(), end = data_search_path.end();
 	while (i != end) {
 		DirectorySpecifier path = *i + "MML";
-		_ParseMMLDirectory(path);
+		_ParseMMLDirectory(path, load_menu_mml_only);
 		path = *i + "Scripts";
-		_ParseMMLDirectory(path);
+		_ParseMMLDirectory(path, load_menu_mml_only);
 		i++;
 	}
 }
@@ -1600,8 +1648,8 @@ char *contract_symbolic_paths(char *dest, const char *src, int maxlen)
 #if defined(HAVE_BUNDLE_NAME)
 		contract_symbolic_paths_helper(dest, src, maxlen, "$bundle$", bundle_data_dir) ||
 #endif
-		contract_symbolic_paths_helper(dest, src, maxlen, "$local$", local_data_dir) ||
-		contract_symbolic_paths_helper(dest, src, maxlen, "$default$", default_data_dir);
+		contract_symbolic_paths_helper(dest, src, maxlen, "$default$", default_data_dir) || //default first in case user installed his game in his local data dir
+		contract_symbolic_paths_helper(dest, src, maxlen, "$local$", local_data_dir);
 	if (!contracted)
 	{
 		strncpy(dest, src, maxlen);

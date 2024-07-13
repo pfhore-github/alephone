@@ -51,7 +51,7 @@ run_network_metaserver_ui()
 
 
 void
-setupAndConnectClient(MetaserverClient& client)
+setupAndConnectClient(MetaserverClient& client, bool use_remote_hub)
 {
 	{
 		client.setPlayerName(player_preferences->name);
@@ -61,6 +61,7 @@ setupAndConnectClient(MetaserverClient& client)
 	
 	static bool user_informed = false;
 
+#ifndef HAVE_STEAM
 	if (network_preferences->check_for_updates && !user_informed)
 	{
 		static bool first_check = true;
@@ -105,17 +106,16 @@ setupAndConnectClient(MetaserverClient& client)
 		
 		if (status != Update::CheckingForUpdate) user_informed = true;
 	}
+#endif
 
 	client.setPlayerTeamName("");
-	client.connect(A1_METASERVER_HOST, 6321, network_preferences->metaserver_login, network_preferences->metaserver_password);
+	client.connect(A1_METASERVER_HOST, 6321, network_preferences->metaserver_login, network_preferences->metaserver_password, use_remote_hub);
 }
 
 
 
-GameAvailableMetaserverAnnouncer::GameAvailableMetaserverAnnouncer(const game_info& info)
+GameAvailableMetaserverAnnouncer::GameAvailableMetaserverAnnouncer(const game_info& info, uint16 remote_hub_id)
 {
-	setupAndConnectClient(*gMetaserverClient);
-
 	GameDescription description;
 	description.m_type = info.net_game_type;
 	// If the time limit is longer than a week, we figure it's untimed (  ;)
@@ -169,7 +169,8 @@ GameAvailableMetaserverAnnouncer::GameAvailableMetaserverAnnouncer(const game_in
 		}
 	}
 	
-	gMetaserverClient->announceGame(GAME_PORT, description);
+	//port is ignored if we are using a remote server
+	gMetaserverClient->announceGame(GAME_PORT, description, remote_hub_id);
 }
 
 void GameAvailableMetaserverAnnouncer::Start(int32 time_limit)
@@ -299,7 +300,7 @@ const IPaddress MetaserverClientUi::GetJoinAddressByRunning()
 	
 	obj_clear(m_joinAddress);
 
-	setupAndConnectClient(*gMetaserverClient);
+	setupAndConnectClient(*gMetaserverClient, false);
 	gMetaserverClient->associateNotificationAdapter(this);
 
 	m_gamesInRoomWidget->SetItemSelectedCallback(std::bind(&MetaserverClientUi::GameSelected, this, std::placeholders::_1));
@@ -458,6 +459,7 @@ void MetaserverClientUi::gamesInRoomChanged(const std::vector<GameListMessage::G
 		if (gameChanges[i].verb() == MetaserverClient::GamesInRoom::kAdd && !gameChanges[i].running())
 		{
 			PlayInterfaceButtonSound(_snd_got_ball);
+			gMetaserverClient->gamesInRoomUpdate(false);
 			break;
 		}
 	}

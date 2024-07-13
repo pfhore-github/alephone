@@ -28,6 +28,8 @@
 #include "InfoTree.h"
 #include "Logging.h"
 
+#ifdef HAVE_OPENGL
+
 // gl_clipvertex puts Radeons into software mode on Mac
 #if (defined(__APPLE__) && defined(__MACH__))
 static bool DisableClipVertex()
@@ -105,7 +107,10 @@ const char* Shader::_shader_names[NUMBER_OF_SHADER_TYPES] =
 	"wall_infravision",
 	"bump",
 	"bump_bloom",
-	"gamma"
+	"gamma",
+	"landscape_sphere",
+	"landscape_sphere_bloom",
+	"landscape_sphere_infravision"
 };
 
 
@@ -555,5 +560,24 @@ void initDefaultPrograms() {
     defaultFragmentPrograms["bump_bloom"] =
         #include "Shaders/bump_bloom.frag"
 		;
+
+	defaultVertexPrograms["landscape_sphere"] =
+		#include "Shaders/landscape_sphere.vert"
+	;
+
+	defaultFragmentPrograms["landscape_sphere"] =
+		#include "Shaders/landscape_sphere.frag"
+	;
+
+	defaultVertexPrograms["landscape_sphere_bloom"] = defaultVertexPrograms["landscape_sphere"];
+	defaultFragmentPrograms["landscape_sphere_bloom"] =
+		#include "Shaders/landscape_sphere_bloom.frag"
+	;
+
+	defaultVertexPrograms["landscape_sphere_infravision"] = defaultVertexPrograms["landscape_sphere"];
+	defaultFragmentPrograms["landscape_sphere_infravision"] =
+		#include "Shaders/landscape_sphere_infravision.frag"
+	;
 }
 
+#endif

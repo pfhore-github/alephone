@@ -1,6 +1,6 @@
 {
    "name":"alephone",
-   "version-date":"2023-11-25",
+   "version-date":"2024-05-13",
    "dependencies":[
       {
          "name":"boost-algorithm"
@@ -12,13 +12,17 @@
          "name":"boost-property-tree"
       },
       {
-         "name":"boost-iostreams"
+         "name":"boost-iostreams",
+         "default-features":false
       },
       {
          "name":"boost-filesystem"
       },
       {
          "name":"boost-lockfree"
+      },
+      {
+         "name":"boost-dll"
       },
       {
          "name":"sdl2"
@@ -71,6 +75,9 @@
       },
       {
          "name":"catch2"
+      },
+      {
+         "name":"steamworks-sdk"
       }
    ],
    "overrides":[
@@ -79,6 +86,5 @@
          "version":"5.0.2",
          "port-version":3
       }
-   ],
-   "builtin-baseline":"0e47c1985273129e4d0ee52ff73bed9125555de8"
+   ]
 }

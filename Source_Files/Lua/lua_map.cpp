@@ -41,9 +41,6 @@ LUA_MAP.CPP
 
 #include "collection_definition.h"
 
-
-#ifdef HAVE_LUA
-
 char Lua_AmbientSound_Name[] = "ambient_sound";
 char Lua_AmbientSounds_Name[] = "AmbientSounds";
 
@@ -3537,14 +3534,13 @@ char Lua_Level_Name[] = "Level";
 typedef L_Class<Lua_Level_Name> Lua_Level;
 
 char Lua_CompletionState_Name[] = "completion_state";
-typedef L_Enum<Lua_CompletionState_Name> Lua_CompletionState;
 
 char Lua_CompletionStates_Name[] = "CompletionStates";
 typedef L_EnumContainer<Lua_CompletionStates_Name, Lua_CompletionState> Lua_CompletionStates;
 
 int Lua_Level_Calculate_Completion_State(lua_State *L)
 {
-	Lua_CompletionState::Push(L, calculate_level_completion_state());
+	Lua_CompletionState::Push(L, calculate_classic_level_completion_state());
 	return 1;
 }
 
@@ -3892,6 +3888,3 @@ static void compatibility(lua_State *L)
 	luaL_loadbuffer(L, compatibility_script, strlen(compatibility_script), "map_compatibility");
 	lua_pcall(L, 0, 0, 0);
 }
-
-#endif
-

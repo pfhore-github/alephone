@@ -1,6 +1,3 @@
-[submodule "data/Scenarios/Marathon"]
-	path = data/Scenarios/Marathon
-	url = ../data-marathon.git
 [submodule "data/Scenarios/Marathon 2"]
 	path = data/Scenarios/Marathon 2
 	url = ../data-marathon-2.git

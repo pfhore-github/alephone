@@ -644,11 +644,13 @@ void leaving_map(
 	// Hackish. Should probably be in stop_all_sounds(), but that just
 	// doesn't work out. 
 	Music::instance()->StopLevelMusic();
+	Music::instance()->Pause();
 	SoundManager::instance()->StopAllSounds();
 }
 
 extern bool first_frame_rendered;
 extern float last_heartbeat_fraction;
+extern bool is_network_pregame;
 
 /* call this function after the new level has been completely read into memory, after
 	player->location and player->facing have been updated, and as close to the end of
@@ -709,6 +711,7 @@ bool entering_map(bool restoring_saved)
 	
 	if (!success) leaving_map();
 
+	is_network_pregame = game_is_networked;
 	first_frame_rendered = false;
 	last_heartbeat_fraction = -1.f;
 
@@ -786,9 +789,23 @@ void changed_polygon(
 	}
 }
 
+// Lua scripts can now override completion state
+short calculate_level_completion_state()
+{
+	short completion_state;
+	if (L_Calculate_Completion_State(completion_state))
+	{
+		return completion_state;
+	}
+	else
+	{
+		return calculate_classic_level_completion_state();
+	}
+}
+
 /* _level_failed is the same as _level_finished but indicates a non-fatal failure condition (e.g.,
 	too many civilians died during _mission_rescue) */
-short calculate_level_completion_state(
+short calculate_classic_level_completion_state(
 	void)
 {
 	short completion_state= _level_finished;
