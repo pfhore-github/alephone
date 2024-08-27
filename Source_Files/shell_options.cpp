@@ -96,7 +96,8 @@ static const std::vector<ShellOptionsFlag> shell_options_flags {
 	{"j", "nojoystick", "ジョイスティックの初期化を行いません", shell_options.nojoystick},
 	{"i", "insecure_lua", "", shell_options.insecure_lua},
 	{"Q", "skip-intro", "イントロ画面を飛ばします", shell_options.skip_intro},
-	{"e", "editor", "エディタ設定を使い、マップに直接ジャンプします", shell_options.editor}
+	{"e", "editor", "エディタ設定を使い、マップに直接ジャンプします", shell_options.editor},
+	{"", "no-chooser", "シナリオチューザーを無効化します", shell_options.no_chooser}
 };
 
 static const std::vector<ShellOptionsString> shell_options_strings {

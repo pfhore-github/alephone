@@ -75,7 +75,6 @@ May 22, 2003 (Woody Zenfell):
 
 #include "InfoTree.h"
 #include "StarGameProtocol.h"
-#include "RingGameProtocol.h"
 
 #include "tags.h"
 #include "Logging.h"
@@ -123,8 +122,7 @@ using namespace alephone;
 static const char sPasswordMask[] = "reverof nohtaram";
 
 static const char* sNetworkGameProtocolNames[] =
-{	// These should match up with _network_game_protocol_ring, etc.
-	"ring",
+{	// These should match up with _network_game_protocol_star, etc.
 	"star"
 };
 
@@ -2576,18 +2574,18 @@ static void controls_dialog(void *arg)
 	static const char* run_option_labels[] = {
 //		"Hold to Run",
 		"押下中は走る",
-//		"Hold to Walk",
-		"押下中は歩く",
-//		"Tap to Toggle",
-		"押すと切り替え",
+//		"Always Run",
+		"何時も走る",
+//		"Toggle",
+		"切り替え",
 		nullptr
 	};
 
 	static const char* swim_option_labels[] = {
 //		"Hold to Swim",
 		"押下中は泳ぐ",
-//		"Hold to Sink",
-		"押下中は沈む",
+//		"Always Swim",
+		"いつも泳ぐ",
 		nullptr
 	};
 
@@ -2902,8 +2900,13 @@ static void controls_dialog(void *arg)
 		"F8", "クロスヘアー",
 		"F9", "スクリーンショット",
 		"F10", "デバッグ情報",
+#ifdef HAVE_STEAM
+		"Shift+F11", "明るさを下げる",
+		"Shift+F12", "明るさを上げる",
+#else
 		"F11", "明るさを下げる",
 		"F12", "明るさを上げる",
+#endif
 #if (defined(__APPLE__) && defined(__MACH__))
 		"Cmd-Return", "フルスクリーン切り替え",
 #else
@@ -3145,7 +3148,7 @@ static void environment_dialog(void *arg)
 	table->dual_add(sounds_w->label("サウンド"), d);
 	table->dual_add(sounds_w, d);
 
-	w_env_select* resources_w = new w_env_select(environment_preferences->resources_file, "利用可能なファイル", _typecode_unknown, &d);
+	w_env_select* resources_w = new w_env_select(environment_preferences->resources_file, "利用可能なファイル", _typecode_application, &d);
 	table->dual_add(resources_w->label("外部リソース"), d);
 	table->dual_add(resources_w, d);
 #endif
@@ -3157,8 +3160,7 @@ static void environment_dialog(void *arg)
 	table->dual_add(use_solo_lua_w->label("ソロスクリプトを使用"), d);
 	table->dual_add(use_solo_lua_w, d);
 
-	w_file_chooser *solo_lua_w = new w_file_chooser("スクリプトを選択", _typecode_netscript);
-	solo_lua_w->set_file(environment_preferences->solo_lua_file);
+	w_env_select *solo_lua_w = new w_env_select(environment_preferences->solo_lua_file, "利用可能なソロスクリプト", _typecode_netscript, &d);
 	table->dual_add(solo_lua_w->label("スクリプトファイル"), d);
 	table->dual_add(solo_lua_w, d);
 	use_solo_lua_w->add_dependent_widget(solo_lua_w);
@@ -3176,8 +3178,8 @@ static void environment_dialog(void *arg)
 	table->dual_add(use_replay_net_lua_w->label("フィルムでのネットスクリプト"), d);
 	table->dual_add(use_replay_net_lua_w, d);
 	
-	w_file_chooser *replay_net_lua_w = new w_file_chooser("スクリプトを選択", _typecode_netscript);
-	replay_net_lua_w->set_file(network_preferences->netscript_file);
+	w_env_select *replay_net_lua_w = new w_env_select(network_preferences->netscript_file, "利用可能なネットスクリプト", _typecode_netscript, &d);
+	replay_net_lua_w->set_prefer_net(true);
 	table->dual_add(replay_net_lua_w->label("ネットスクリプトファイル"), d);
 	table->dual_add(replay_net_lua_w, d);
 	use_replay_net_lua_w->add_dependent_widget(replay_net_lua_w);
@@ -3274,7 +3276,7 @@ static void environment_dialog(void *arg)
 			changed = true;
 		}
 		
-		path = solo_lua_w->get_file().GetPath();
+		path = solo_lua_w->get_path();
 		if (strcmp(path, environment_preferences->solo_lua_file)) {
 			strncpy(environment_preferences->solo_lua_file, path, 256);
 			changed = true;
@@ -3287,7 +3289,7 @@ static void environment_dialog(void *arg)
 			changed = true;
 		}
 		
-		path = replay_net_lua_w->get_file().GetPath();
+		path = replay_net_lua_w->get_path();
 		if (strcmp(path, network_preferences->netscript_file)) {
 			strncpy(network_preferences->netscript_file, path, 256);
 			changed = true;
@@ -3948,7 +3950,6 @@ InfoTree network_preferences_tree()
 		root.add_color("color", network_preferences->metaserver_colors[i], i);
 
 	root.put_child("star_protocol", StarPreferencesTree());
-	root.put_child("ring_protocol", RingPreferencesTree());
 	
 	return root;
 }
@@ -4112,7 +4113,6 @@ static void default_network_preferences(network_preferences_data *preferences)
 	preferences->game_protocol= _network_game_protocol_default;
 #if !defined(DISABLE_NETWORKING)
 	DefaultStarPreferences();
-	DefaultRingPreferences();
 #endif // !defined(DISABLE_NETWORKING)
 	preferences->use_netscript = false;
 	preferences->netscript_file[0] = '\0';
@@ -4983,8 +4983,6 @@ void parse_network_preferences(InfoTree root, std::string version)
 	
 	for (const InfoTree &child : root.children_named("star_protocol"))
 		StarGameProtocol::ParsePreferencesTree(child, version);
-	for (const InfoTree &child : root.children_named("ring_protocol"))
-		RingGameProtocol::ParsePreferencesTree(child, version);
 }
 
 void parse_environment_preferences(InfoTree root, std::string version)
