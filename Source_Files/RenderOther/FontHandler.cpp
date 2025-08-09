@@ -151,6 +151,7 @@ int FontSpecifier::TextWidth(const char *text)
 {
 	return Info->text_width(text, Style, false);
 }
+#ifdef HAVE_OPENGL
 void FontSpecifier::render_text_(const char* str, bool draw) {
 	// Put some padding around each glyph so as to avoid clipping i
 	const int Pad = 1;
@@ -236,7 +237,6 @@ void FontSpecifier::render_text_(const char* str, bool draw) {
 		glTranslated(found->second.Width - Pad, 0, 0);
 	}
 }
-
 // Reset the OpenGL fonts; its arg indicates whether this is for starting an OpenGL session
 // (this is to avoid texture and display-list memory leaks and other such things)
 void FontSpecifier::OGL_Reset(bool IsStarting)
@@ -445,7 +445,7 @@ void FontSpecifier::OGL_Deregister(FontSpecifier *F)
 }
 
 
-
+#endif
 // Draw text without worrying about OpenGL vs. SDL mode.
 int FontSpecifier::DrawText(SDL_Surface *s, const char *text, int x, int y, uint32 pixel, bool)
 {
