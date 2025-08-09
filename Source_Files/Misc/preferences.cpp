@@ -2272,32 +2272,32 @@ static bool apply_mouse_feel(int selection)
 static void mouse_custom_dialog(void *arg)
 {
 	dialog d;
-	vertical_placer *placer = new vertical_placer;
+	vertical_placer* placer = new vertical_placer;
 	placer->dual_add(new w_title("マウス拡張"), d);
 	placer->add(new w_spacer());
-	
-	table_placer *table = new table_placer(2, get_theme_space(ITEM_WIDGET), true);
+
+	table_placer* table = new table_placer(2, get_theme_space(ITEM_WIDGET), true);
 	table->col_flags(0, placeable::kAlignRight);
-	
-	float hSensitivity = ((float) input_preferences->sens_horizontal) / FIXED_ONE;
+
+	float hSensitivity = ((float)input_preferences->sens_horizontal) / FIXED_ONE;
 	if (hSensitivity <= 0.0f) hSensitivity = 1.0f;
 	float hSensitivityLog = std::log(hSensitivity);
 	int hSliderPosition =
-		(int) ((hSensitivityLog - kMinSensitivityLog) * (1000.0f / kSensitivityLogRange) + 0.5f);
-	w_sens_slider *mouse_h_sens_w = new w_sens_slider(1000, hSliderPosition);
+		(int)((hSensitivityLog - kMinSensitivityLog) * (1000.0f / kSensitivityLogRange) + 0.5f);
+	w_sens_slider* mouse_h_sens_w = new w_sens_slider(1000, hSliderPosition);
 	table->dual_add(mouse_h_sens_w->label("水平感度"), d);
 	table->dual_add(mouse_h_sens_w, d);
 
-	float vSensitivity = ((float) input_preferences->sens_vertical) / FIXED_ONE;
+	float vSensitivity = ((float)input_preferences->sens_vertical) / FIXED_ONE;
 	if (vSensitivity <= 0.0f) vSensitivity = 1.0f;
 	float vSensitivityLog = std::log(vSensitivity);
 	int vSliderPosition =
-		(int) ((vSensitivityLog - kMinSensitivityLog) * (1000.0f / kSensitivityLogRange) + 0.5f);
-	w_sens_slider *mouse_v_sens_w = new w_sens_slider(1000, vSliderPosition);
+		(int)((vSensitivityLog - kMinSensitivityLog) * (1000.0f / kSensitivityLogRange) + 0.5f);
+	w_sens_slider* mouse_v_sens_w = new w_sens_slider(1000, vSliderPosition);
 	table->dual_add(mouse_v_sens_w->label("垂直感度"), d);
 	table->dual_add(mouse_v_sens_w, d);
 
-	w_toggle *mouse_v_invert_w = new w_toggle(input_preferences->modifiers & _inputmod_invert_mouse);
+	w_toggle* mouse_v_invert_w = new w_toggle(input_preferences->modifiers & _inputmod_invert_mouse);
 	mouse_v_invert_w->set_selection_changed_callback(update_mouse_feel_details);
 	table->dual_add(mouse_v_invert_w->label("垂直軸を反転"), d);
 	table->dual_add(mouse_v_invert_w, d);
@@ -2310,22 +2310,22 @@ static void mouse_custom_dialog(void *arg)
 	mouse_feel_details_w->set_popup_callback(mouse_feel_details_changed, NULL);
 	table->dual_add(mouse_feel_details_w->label("マウスの感覚"), d);
 	table->dual_add(mouse_feel_details_w, d);
-	
+
 	mouse_raw_w = new w_toggle(input_preferences->raw_mouse_input);
 	mouse_raw_w->set_selection_changed_callback(update_mouse_feel_details);
 	table->dual_add(mouse_raw_w->label("生入力モード"), d);
 	table->dual_add(mouse_raw_w, d);
-	
+
 	mouse_accel_w = new w_toggle(input_preferences->mouse_accel_type == _mouse_accel_classic);
 	mouse_accel_w->set_selection_changed_callback(update_mouse_feel_details);
 	table->dual_add(mouse_accel_w->label("加速"), d);
 	table->dual_add(mouse_accel_w, d);
-	
+
 	mouse_vertical_w = new w_toggle(input_preferences->classic_vertical_aim);
 	mouse_vertical_w->set_selection_changed_callback(update_mouse_feel_details);
 	table->dual_add(mouse_vertical_w->label("垂直速度を調整"), d);
 	table->dual_add(mouse_vertical_w, d);
-	
+
 	mouse_precision_w = new w_toggle(!input_preferences->extra_mouse_precision);
 	mouse_precision_w->set_selection_changed_callback(update_mouse_feel_details);
 	table->dual_add(mouse_precision_w->label("武器照準に表示をスナップ"), d);
@@ -2335,32 +2335,32 @@ static void mouse_custom_dialog(void *arg)
 	mouse_speed_limit_w->set_selection_changed_callback(update_mouse_feel_details);
 	table->dual_add(mouse_speed_limit_w->label("Classic Aim Speed Limit"), d);
 	table->dual_add(mouse_speed_limit_w, d);
-	
+
 	placer->add(table);
 	placer->add(new w_spacer(), true);
 
-	horizontal_placer *button_placer = new horizontal_placer;
+	horizontal_placer* button_placer = new horizontal_placer;
 	button_placer->dual_add(new w_button("了承", dialog_ok, &d), d);
 	button_placer->dual_add(new w_button("キャンセル", dialog_cancel, &d), d);
 	placer->add(button_placer, true);
 
 	d.set_widget_placer(placer);
 	mouse_feel_details_changed(NULL);
-	
+
 	// Run dialog
 	if (d.run() == 0) {	// Accepted
 		bool changed = false;
-		
+
 		int hPos = mouse_h_sens_w->get_selection();
-		float hLog = kMinSensitivityLog + ((float) hPos) * (kSensitivityLogRange / 1000.0f);
+		float hLog = kMinSensitivityLog + ((float)hPos) * (kSensitivityLogRange / 1000.0f);
 		_fixed hNorm = _fixed(std::exp(hLog) * FIXED_ONE);
 		if (hNorm != input_preferences->sens_horizontal) {
 			input_preferences->sens_horizontal = hNorm;
 			changed = true;
 		}
-		
+
 		int vPos = mouse_v_sens_w->get_selection();
-		float vLog = kMinSensitivityLog + ((float) vPos) * (kSensitivityLogRange / 1000.0f);
+		float vLog = kMinSensitivityLog + ((float)vPos) * (kSensitivityLogRange / 1000.0f);
 		_fixed vNorm = _fixed(std::exp(vLog) * FIXED_ONE);
 		if (vNorm != input_preferences->sens_vertical) {
 			input_preferences->sens_vertical = vNorm;
@@ -2370,30 +2370,31 @@ static void mouse_custom_dialog(void *arg)
 		uint16 flags = input_preferences->modifiers;
 		if (mouse_v_invert_w->get_selection()) {
 			flags |= _inputmod_invert_mouse;
-		} else {
+		}
+		else {
 			flags &= ~_inputmod_invert_mouse;
 		}
 		if (flags != input_preferences->modifiers) {
 			input_preferences->modifiers = flags;
 			changed = true;
 		}
-		
+
 		if (mouse_raw_w->get_selection() != input_preferences->raw_mouse_input) {
 			input_preferences->raw_mouse_input = mouse_raw_w->get_selection();
 			changed = true;
 		}
-		
+
 		if (mouse_accel_w->get_selection() != input_preferences->mouse_accel_type) {
 			input_preferences->mouse_accel_type = mouse_accel_w->get_selection();
 			changed = true;
 		}
-		
+
 		bool vert = mouse_vertical_w->get_selection();
 		if (vert != input_preferences->classic_vertical_aim) {
 			input_preferences->classic_vertical_aim = vert;
 			changed = true;
 		}
-		
+
 		bool precision = (mouse_precision_w->get_selection() == 0);
 		if (precision != input_preferences->extra_mouse_precision) {
 			input_preferences->extra_mouse_precision = precision;
@@ -2411,47 +2412,62 @@ static void mouse_custom_dialog(void *arg)
 		}
 		update_mouse_feel(NULL);
 	}
+
 }
 
 
 static void controller_details_dialog(void *arg)
 {
 	dialog d;
-	vertical_placer *placer = new vertical_placer;
+	vertical_placer* placer = new vertical_placer;
 	placer->dual_add(new w_title("コントローラー拡張"), d);
 	placer->add(new w_spacer());
-	
-	table_placer *table = new table_placer(2, get_theme_space(ITEM_WIDGET), true);
+
+	table_placer* table = new table_placer(2, get_theme_space(ITEM_WIDGET), true);
 	table->col_flags(0, placeable::kAlignRight);
-	
-	float joySensitivityX = ((float) input_preferences->controller_sensitivity_horizontal) / FIXED_ONE;
+
+	float joySensitivityX = ((float)input_preferences->controller_sensitivity_horizontal) / FIXED_ONE;
 	if (joySensitivityX <= 0.0f) joySensitivityX = 1.0f;
 	float joySensitivityLogX = std::log(joySensitivityX);
-	int joySliderPositionX = (int) ((joySensitivityLogX - kMinSensitivityLog) * (1000.0f / kSensitivityLogRange) + 0.5f);
+	int joySliderPositionX = (int)((joySensitivityLogX - kMinSensitivityLog) * (1000.0f / kSensitivityLogRange) + 0.5f);
 
-	w_sens_slider* sens_joy_w = new w_sens_slider(1000, joySliderPosition);
-	table->dual_add(sens_joy_w->label("照準感度"), d);
-	table->dual_add(sens_joy_w, d);
-	
-	int joyDeadzone = (int)((input_preferences->controller_deadzone / 655.36f) + 0.5f);
-	w_deadzone_slider* dead_joy_w = new w_deadzone_slider(11, joyDeadzone);
-	table->dual_add(dead_joy_w->label("アナログ・デッドゾーン"), d);
-	table->dual_add(dead_joy_w, d);
+	w_sens_slider* sens_joy_w_x = new w_sens_slider(1000, joySliderPositionX);
+	table->dual_add(sens_joy_w_x->label("水平照準感度"), d);
+	table->dual_add(sens_joy_w_x, d);
+
+	int joyDeadzoneX = (int)((input_preferences->controller_deadzone_horizontal / 655.36f) + 0.5f);
+	w_deadzone_slider* dead_joy_w_x = new w_deadzone_slider(11, joyDeadzoneX);
+	table->dual_add(dead_joy_w_x->label("アナログ水平デッドゾーン"), d);
+	table->dual_add(dead_joy_w_x, d);
+
+	float joySensitivityY = ((float)input_preferences->controller_sensitivity_vertical) / FIXED_ONE;
+	if (joySensitivityY <= 0.0f) joySensitivityY = 1.0f;
+	float joySensitivityLogY = std::log(joySensitivityY);
+	int joySliderPositionY = (int)((joySensitivityLogY - kMinSensitivityLog) * (1000.0f / kSensitivityLogRange) + 0.5f);
+
+	w_sens_slider* sens_joy_w_y = new w_sens_slider(1000, joySliderPositionY);
+	table->dual_add(sens_joy_w_y->label("垂直照準感度"), d);
+	table->dual_add(sens_joy_w_y, d);
+
+	int joyDeadzoneY = (int)((input_preferences->controller_deadzone_vertical / 655.36f) + 0.5f);
+	w_deadzone_slider* dead_joy_w_y = new w_deadzone_slider(11, joyDeadzoneY);
+	table->dual_add(dead_joy_w_y->label("アナログ垂直デッドゾーン"), d);
+	table->dual_add(dead_joy_w_y, d);
 
 	w_toggle* controller_inverted = new w_toggle(input_preferences->controller_aim_inverted);
-	table->dual_add(controller_inverted->label("垂直方向の照準を反転"), d);
+	table->dual_add(controller_inverted->label("垂直照準を反転"), d);
 	table->dual_add(controller_inverted, d);
-	
+
 	table->add_row(new w_spacer(), true);
 	placer->add(table, true);
 
-	horizontal_placer *button_placer = new horizontal_placer;
+	horizontal_placer* button_placer = new horizontal_placer;
 	button_placer->dual_add(new w_button("了承", dialog_ok, &d), d);
 	button_placer->dual_add(new w_button("キャンセル", dialog_cancel, &d), d);
 	placer->add(button_placer, true);
-	
+
 	d.set_widget_placer(placer);
-	
+
 	// Run dialog
 	if (d.run() == 0) {	// Accepted
 		bool changed = false;
@@ -2463,7 +2479,7 @@ static void controller_details_dialog(void *arg)
 			input_preferences->controller_sensitivity_horizontal = sensNormX;
 			changed = true;
 		}
-		
+
 		int deadPosX = dead_joy_w_x->get_selection();
 		int deadNormX = deadPosX * 655.36f;
 		if (deadNormX != input_preferences->controller_deadzone_horizontal) {
