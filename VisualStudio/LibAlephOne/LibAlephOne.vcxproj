@@ -189,40 +189,40 @@
     <IntDir>$(Platform)\Steam Marathon\</IntDir>
   </PropertyGroup>
   <PropertyGroup Label="Vcpkg" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <VcpkgInstalledDir>..\..\vcpkg\installed-x86-windows</VcpkgInstalledDir>
+    <VcpkgInstalledDir>$(VcpkgManifestRoot)\vcpkg\installed-x86-windows</VcpkgInstalledDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Standalone Hub|Win32'" Label="Vcpkg">
-    <VcpkgInstalledDir>..\..\vcpkg\installed-x86-windows</VcpkgInstalledDir>
+    <VcpkgInstalledDir>$(VcpkgManifestRoot)\vcpkg\installed-x86-windows</VcpkgInstalledDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Steam Marathon|Win32'" Label="Vcpkg">
-    <VcpkgInstalledDir>..\..\vcpkg\installed-x86-windows</VcpkgInstalledDir>
+    <VcpkgInstalledDir>$(VcpkgManifestRoot)\vcpkg\installed-x86-windows</VcpkgInstalledDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Steam Marathon 2|Win32'" Label="Vcpkg">
-    <VcpkgInstalledDir>..\..\vcpkg\installed-x86-windows</VcpkgInstalledDir>
+    <VcpkgInstalledDir>$(VcpkgManifestRoot)\vcpkg\installed-x86-windows</VcpkgInstalledDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Steam Marathon Infinity|Win32'" Label="Vcpkg">
-    <VcpkgInstalledDir>..\..\vcpkg\installed-x86-windows</VcpkgInstalledDir>
+    <VcpkgInstalledDir>$(VcpkgManifestRoot)\vcpkg\installed-x86-windows</VcpkgInstalledDir>
   </PropertyGroup>
   <PropertyGroup Label="Vcpkg" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <VcpkgInstalledDir>..\..\vcpkg\installed-x86-windows</VcpkgInstalledDir>
+    <VcpkgInstalledDir>$(VcpkgManifestRoot)\vcpkg\installed-x86-windows</VcpkgInstalledDir>
   </PropertyGroup>
   <PropertyGroup Label="Vcpkg" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <VcpkgInstalledDir>..\..\vcpkg\installed-x64-windows</VcpkgInstalledDir>
+    <VcpkgInstalledDir>$(VcpkgManifestRoot)\vcpkg\installed-x64-windows</VcpkgInstalledDir>
   </PropertyGroup>
   <PropertyGroup Label="Vcpkg" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <VcpkgInstalledDir>..\..\vcpkg\installed-x64-windows</VcpkgInstalledDir>
+    <VcpkgInstalledDir>$(VcpkgManifestRoot)\vcpkg\installed-x64-windows</VcpkgInstalledDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Standalone Hub|x64'" Label="Vcpkg">
-    <VcpkgInstalledDir>..\..\vcpkg\installed-x64-windows</VcpkgInstalledDir>
+    <VcpkgInstalledDir>$(VcpkgManifestRoot)\vcpkg\installed-x64-windows</VcpkgInstalledDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Steam Marathon|x64'" Label="Vcpkg">
-    <VcpkgInstalledDir>..\..\vcpkg\installed-x64-windows</VcpkgInstalledDir>
+    <VcpkgInstalledDir>$(VcpkgManifestRoot)\vcpkg\installed-x64-windows</VcpkgInstalledDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Steam Marathon 2|x64'" Label="Vcpkg">
-    <VcpkgInstalledDir>..\..\vcpkg\installed-x64-windows</VcpkgInstalledDir>
+    <VcpkgInstalledDir>$(VcpkgManifestRoot)\vcpkg\installed-x64-windows</VcpkgInstalledDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Steam Marathon Infinity|x64'" Label="Vcpkg">
-    <VcpkgInstalledDir>..\..\vcpkg\installed-x64-windows</VcpkgInstalledDir>
+    <VcpkgInstalledDir>$(VcpkgManifestRoot)\vcpkg\installed-x64-windows</VcpkgInstalledDir>
   </PropertyGroup>
   <PropertyGroup Label="Vcpkg">
     <VcpkgUseStatic>true</VcpkgUseStatic>
@@ -667,6 +667,7 @@
     <ClCompile Include="..\..\Source_Files\Sound\SoundFile.cpp" />
     <ClCompile Include="..\..\Source_Files\Sound\SoundManager.cpp" />
     <ClCompile Include="..\..\Source_Files\Sound\SoundPlayer.cpp" />
+    <ClCompile Include="..\..\Source_Files\Sound\SoundsPatch.cpp" />
     <ClCompile Include="..\..\Source_Files\Sound\StreamPlayer.cpp" />
     <ClCompile Include="..\..\Source_Files\TCPMess\CommunicationsChannel.cpp" />
     <ClCompile Include="..\..\Source_Files\TCPMess\Message.cpp" />
@@ -894,6 +895,7 @@
     <ClInclude Include="..\..\Source_Files\Sound\SoundManager.h" />
     <ClInclude Include="..\..\Source_Files\Sound\SoundManagerEnums.h" />
     <ClInclude Include="..\..\Source_Files\Sound\SoundPlayer.h" />
+    <ClInclude Include="..\..\Source_Files\Sound\SoundsPatch.h" />
     <ClInclude Include="..\..\Source_Files\Sound\sound_definitions.h" />
     <ClInclude Include="..\..\Source_Files\Sound\StreamPlayer.h" />
     <ClInclude Include="..\..\Source_Files\TCPMess\CommunicationsChannel.h" />

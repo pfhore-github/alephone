@@ -127,6 +127,10 @@ Feb 8, 2003 (Woody Zenfell):
 #include "ephemera.h"
 #include "interpolated_world.h"
 
+#include "Plugins.h"
+#include "SoundsPatch.h"
+#include "shell_options.h"
+
 /* ---------- constants */
 
 /* ---------- globals */
@@ -677,6 +681,11 @@ bool entering_map(bool restoring_saved)
 
 	load_collections(true, get_screen_mode()->acceleration != _no_acceleration);
 
+	sounds_patches.clear();
+	Plugins::instance()->load_sounds_patches();
+
+	load_sounds_patch_data();
+	
 	load_all_monster_sounds();
 	load_all_game_sounds(static_world->environment_code);
 
@@ -778,7 +787,7 @@ void changed_polygon(
 		case _polygon_must_be_explored:
 			/* When a player enters a must be explored, it now becomes a normal polygon, to allow */
 			/*  for must be explored flags to work across cooperative net games */
-			if(player)
+			if (player && !shell_options.editor)
 			{
 				new_polygon->type= _polygon_is_normal;
 			}
@@ -928,7 +937,7 @@ void cause_polygon_damage(
 		damage.random= 0;
 		damage.scale= FIXED_ONE;
 		
-		damage_monster(monster_index, NONE, NONE, (world_point3d *) NULL, &damage, NONE);
+		damage_monster(monster_index, NONE, NONE, NULL, &damage, NONE);
 	}
 }
 

@@ -4,7 +4,7 @@ Aleph One is the open source continuation of Bungie™’s _Marathon® 2_ and _M
 
 Aleph One is available under the terms of the [GNU General Public License (GPL 3)](http://www.gnu.org/licenses/gpl-3.0.html)
 
-[![Discord](https://dcbadge.vercel.app/api/server/NvF3pdV)](https://discord.gg/NvF3pdV)     [![Steam](https://img.shields.io/badge/steam-%23000000.svg?style=for-the-badge&logo=steam&logoColor=white)](https://store.steampowered.com/developer/alephone)
+[![Discord](https://img.shields.io/badge/Discord-%235865F2.svg?&logo=discord&logoColor=white)](https://discord.gg/NvF3pdV)     [![Steam](https://img.shields.io/badge/steam-%23000000.svg?style=for-the-badge&logo=steam&logoColor=white)](https://store.steampowered.com/developer/alephone)
 
 # Download
 
@@ -42,7 +42,7 @@ Download, bootstrap, and install vcpkg:
 
 `cd` into Aleph One's vcpkg subdirectory and use the `install-arm-osx.sh` and `install-x64-osx.sh` scripts to install macOS dependencies for arm64 and x64.
 
-You should now be able to open `PBProjects/AlephOne.xcodeproj` in Xcode and build Aleph One.
+You should now be able to open `Xcode/AlephOne.xcodeproj` in Xcode and build Aleph One.
 
 ## Windows
 

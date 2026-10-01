@@ -4,23 +4,24 @@ on: [workflow_dispatch, workflow_call]
 
 jobs:
   release:
-    runs-on: macos-14
+    runs-on: macos-15
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
       with:
         submodules: true
         
     - name: Build
       uses: ./.github/actions/build-mac-osx
       with:
-        xcode_targets: "Aleph One, Marathon, Marathon 2, Marathon Infinity"
+        xcode_targets: "Aleph One, Marathon 1, Marathon 2, Marathon 3"
+
 
     - name: Create DMGs
-      run: cd tools && ./build_dmg.sh $GITHUB_WORKSPACE $GITHUB_WORKSPACE/PBProjects/build/Release
+      run: cd tools && ./build_dmg.sh $GITHUB_WORKSPACE $GITHUB_WORKSPACE/Xcode/build/Release
       
     - name: Upload
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v6
       with:
         name: alephone-macos-release
         if-no-files-found: error
-        path: 'PBProjects/build/Release/*.dmg'
+        path: 'Xcode/build/Release/*.dmg'

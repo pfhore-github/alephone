@@ -9,7 +9,7 @@ jobs:
       github.event.pull_request.base.repo.full_name
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Configure
         uses: ./.github/actions/configure-linux
         with:
@@ -24,7 +24,7 @@ jobs:
       - name: Run Tests
         uses: ./.github/actions/run-tests
         with:
-          test_application_path: /usr/local/bin/alephone_tests
+          test_application_path: "/usr/local/bin/alephone_tests"
           
   linux-standalone-hub:
     if: github.event_name != 'pull_request' ||
@@ -32,7 +32,7 @@ jobs:
       github.event.pull_request.base.repo.full_name
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Configure
         uses: ./.github/actions/configure-linux
         with:
@@ -50,7 +50,7 @@ jobs:
       github.event.pull_request.base.repo.full_name
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Configure
         uses: ./.github/actions/configure-linux
         with:
@@ -65,33 +65,47 @@ jobs:
       - name: Run Tests
         uses: ./.github/actions/run-tests
         with:
-          test_application_path: /usr/local/bin/alephone_tests
+          test_application_path: "/usr/local/bin/alephone_tests"
         
   mac-osx-x64:
     if: github.event_name != 'pull_request' ||
       github.event.pull_request.head.repo.full_name !=
       github.event.pull_request.base.repo.full_name
-    runs-on: macos-14
+    runs-on: macos-15-intel
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Build
         uses: ./.github/actions/build-mac-osx
         with:
           xcode_arch: x86_64
-          xcode_targets: "Aleph One"
+          xcode_targets: "Aleph One, Aleph One Tests"
+      - name: Run Tests
+        uses: ./.github/actions/run-tests
+        with:
+          test_application_path: "Xcode/build/Release/AlephOne Tests.app/Contents/MacOS/AlephOne Tests"
+          test_application_parameters: "--nogl"
+        env:
+          SDL_VIDEODRIVER: dummy
           
   mac-osx-arm:
     if: github.event_name != 'pull_request' ||
       github.event.pull_request.head.repo.full_name !=
       github.event.pull_request.base.repo.full_name
-    runs-on: macos-14
+    runs-on: macos-15
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Build
         uses: ./.github/actions/build-mac-osx
         with:
           xcode_arch: arm64
-          xcode_targets: "Aleph One"
+          xcode_targets: "Aleph One, Aleph One Tests"
+      - name: Run Tests
+        uses: ./.github/actions/run-tests
+        with:
+          test_application_path: "Xcode/build/Release/AlephOne Tests.app/Contents/MacOS/AlephOne Tests"
+          test_application_parameters: "--nogl"
+        env:
+          SDL_VIDEODRIVER: dummy
           
   windows-x64:
     if: github.event_name != 'pull_request' ||
@@ -99,7 +113,7 @@ jobs:
       github.event.pull_request.base.repo.full_name
     runs-on: windows-2022
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Build
         uses: ./.github/actions/build-windows
         with:
@@ -109,7 +123,8 @@ jobs:
       - name: Run Tests
         uses: ./.github/actions/run-tests
         with:
-          test_application_path: VisualStudio/x64/Release/Tests.exe
+          test_application_path: "VisualStudio/x64/Release/Tests.exe"
+          test_application_parameters: "--nogl"
           
   windows-x86:
     if: github.event_name != 'pull_request' ||
@@ -117,7 +132,7 @@ jobs:
       github.event.pull_request.base.repo.full_name
     runs-on: windows-2022
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Build
         uses: ./.github/actions/build-windows
         with:
@@ -127,4 +142,5 @@ jobs:
       - name: Run Tests
         uses: ./.github/actions/run-tests
         with:
-          test_application_path: VisualStudio/Release/Tests.exe
+          test_application_path: "VisualStudio/Release/Tests.exe"
+          test_application_parameters: "--nogl"

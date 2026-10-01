@@ -6,13 +6,18 @@ inputs:
     required: true
     type: string
     description: File path to the unit tests runner application
+    
+ test_application_parameters:
+    required: false
+    type: string
+    description: Args to pass to the test application
 
 runs:
     using: "composite"
     steps:
     - name: Checkout Submodules
       id: checkout
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
       with:
         submodules: true
         clean: false
@@ -20,23 +25,23 @@ runs:
         
     - name: Run Unit Tests
       run: |
-        &${{inputs.test_application_path}} --allow-running-no-tests ~[Replay]
+        &"${{inputs.test_application_path}}" ${{inputs.test_application_parameters}} --allow-running-no-tests ~[Replay]
       shell: pwsh
       
     - name: Run Marathon Replays
       if: ${{!cancelled() && steps.checkout.outcome == 'success'}}
       run: |
-        &${{inputs.test_application_path}} "${{github.workspace}}/data/Scenarios/Marathon" --replay-directory "${{github.workspace}}/tests/replays/Marathon" [Replay]
+        &"${{inputs.test_application_path}}" ${{inputs.test_application_parameters}} "${{github.workspace}}/data/Scenarios/Marathon" --replay-directory "${{github.workspace}}/tests/replays/Marathon" [Replay]
       shell: pwsh
       
     - name: Run Marathon 2 Replays
       if: ${{!cancelled() && steps.checkout.outcome == 'success'}}
       run: |
-        &${{inputs.test_application_path}} "${{github.workspace}}/data/Scenarios/Marathon 2" --replay-directory "${{github.workspace}}/tests/replays/Marathon 2" [Replay]
+        &"${{inputs.test_application_path}}" ${{inputs.test_application_parameters}} "${{github.workspace}}/data/Scenarios/Marathon 2" --replay-directory "${{github.workspace}}/tests/replays/Marathon 2" [Replay]
       shell: pwsh
       
     - name: Run Marathon Infinity Replays
       if: ${{!cancelled() && steps.checkout.outcome == 'success'}}
       run: |
-        &${{inputs.test_application_path}} "${{github.workspace}}/data/Scenarios/Marathon Infinity" --replay-directory "${{github.workspace}}/tests/replays/Marathon Infinity" [Replay]
+        &"${{inputs.test_application_path}}" ${{inputs.test_application_parameters}} "${{github.workspace}}/data/Scenarios/Marathon Infinity" --replay-directory "${{github.workspace}}/tests/replays/Marathon Infinity" [Replay]
       shell: pwsh
